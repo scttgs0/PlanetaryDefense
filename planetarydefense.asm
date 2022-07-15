@@ -9,8 +9,13 @@
 
 
                 .include "equates_system_atari8.asm"
+                .include "equates_system_c256.asm"
                 .include "equates_zeropage.asm"
                 .include "equates_game.asm"
+
+                .include "macros_65816.asm"
+                .include "macros_frs_graphic.asm"
+                .include "macros_frs_mouse.asm"
 
 
             .enc "atari-screen"
@@ -21,6 +26,23 @@
                 .cdef "AZ",$A1
                 .cdef "az",$E1
             .enc "none"
+
+
+;--------------------------------------
+;--------------------------------------
+                * = TLDL-40
+;--------------------------------------
+                .text "PGX"
+                .byte $01
+                .dword BOOT
+
+BOOT            clc
+                xce
+                .m8i8
+                .setdp $0000
+                .setbank $00
+
+                jmp PLANET
 
 
 ; -------------
@@ -127,7 +149,12 @@ GLIST           .byte AEMPTY8,AEMPTY8
 ;--------------------------------------
 ; Display the Intro Screen
 ;--------------------------------------
-PLANET          cld                     ;clear decimal
+PLANET          .frsGraphics mcGraphicsOn|mcSpriteOn,mcVideoMode320
+                .frsMouse_off
+                .frsBorder_off
+
+                cld                     ;clear decimal
+
                 lda #$00                ;get zero
                 sta NMIEN               ;display off
                 ldx #$7F                ;set index
@@ -897,11 +924,11 @@ NOEXP           lda BOMBS               ;# bombs to go
                 ora BOMACT+1            ;bomb 1 status
                 ora BOMACT+2            ;bomb 2 status
                 ora BOMACT+3            ;bomb 3 status
-                beq JSL                 ;any bombs? No.
+                beq _JSL                ;any bombs? No.
 
                 jmp LOOP                ;Yes. continue
 
-JSL             jmp SETLVL              ;setup new level
+_JSL            jmp SETLVL              ;setup new level
 
 
 ;======================================
@@ -2141,40 +2168,5 @@ SCOLIN          .fill 20                ;score line
 ; --------------
 ; End of program
 ; --------------
-
-
-;--------------------------------------
-;--------------------------------------
-                * = $0000
-;--------------------------------------
-                .byte $00
-;--------------------------------------
-;--------------------------------------
-                * = $0000
-;--------------------------------------
-                .byte $00
-;--------------------------------------
-;--------------------------------------
-                * = $0000
-;--------------------------------------
-                .byte $00
-;--------------------------------------
-;--------------------------------------
-                * = $0000
-;--------------------------------------
-                .byte $00
-;--------------------------------------
-;--------------------------------------
-                * = $0000
-;--------------------------------------
-                .byte $00
-
-
-;--------------------------------------
-;--------------------------------------
-                * = $02E0
-;--------------------------------------
-
-                .addr PLANET
 
                 .end
