@@ -4,7 +4,7 @@
 
 ;--------------------------------------
 ;--------------------------------------
-                * = $80                 ; top of page 0
+                * = $80
 ;--------------------------------------
 
 INDEX           .word ?                 ; temp index
@@ -31,7 +31,7 @@ SATY            .byte ?                 ; satellite y
 XHOLD           .byte ?                 ; x reg hold area
 LASTRG          .byte ?                 ; last trigger
 LEVEL           .byte ?                 ; level number
-BLEVEL          .byte ?                 ; binary level #
+vBombLevel      .byte ?                 ; bomb level #
 LIVES           .byte ?                 ; lives left
 SCORE           .fill 3                 ; score digits
 SCOADD          .fill 3                 ; score inc.
@@ -49,16 +49,13 @@ SAUCHN          .byte ?                 ; saucer chance
 BOMBWT          .byte ?                 ; bomb wait time
 BOMCOL          .byte ?                 ; bomb collis flg
 DEVICE          .byte ?                 ; koala pad sw
-PLNCOL          .byte ?                 ; planet color
+vPlanetColor    .byte ?
 PAUSED          .byte ?                 ; pause flag
-AVG             .word ?                 ; average
-PTR             .word ?                 ; queue pointer
 SSSCNT          .byte ?                 ; saucer snd cnt
 EXSCNT          .byte ?                 ; expl. snd count
 ESSCNT          .byte ?                 ; enemy shot snd
 PSSCNT          .byte ?                 ; player shot snd
 TITLE           .byte ?                 ; title scrn flag
-PENFLG          .byte ?                 ; pen up/dwn flg
 EXPCNT          .byte ?                 ; explosion counter
 NEWX            .byte ?                 ; explosion x
 NEWY            .byte ?                 ; explosion y
@@ -76,7 +73,3 @@ LR              .byte ?                 ; vector left/right hold
 UD              .byte ?                 ; vector up/down hold
 DELTAX          .byte ?                 ; vector work area
 DELTAY          .byte ?                 ; vector work area
-XQ              .fill 5                 ; x queue
-YQ              .fill 5                 ; y queue
-SL              .fill 5                 ; samples lo
-SH              .fill 5                 ; samples hi
