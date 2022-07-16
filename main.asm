@@ -27,18 +27,23 @@ _next2          lda SCOINI,X            ; get byte
                 lda #$01                ; get one
                 sta LEVEL               ; game level
                 sta SATLIV              ; live satellite
+
                 lda #4                  ; get 4
                 sta LIVES               ; number of lives
+
                 lda #$0C                ; set explosion
-                sta COLOR0+2            ; brightness
+                ;sta COLOR2             ; brightness
+
                 lda #$34                ; medium red
-                sta PCOLR0              ; bomb 0 color
-                sta PCOLR0+1            ; bomb 1 color
-                sta PCOLR0+2            ; bomb 2 color
+                ;sta PCOLR0             ; bomb 0 color
+                ;sta PCOLR1             ; bomb 1 color
+                ;sta PCOLR2             ; bomb 2 color
+
                 lda #127                ; center screen X
                 sta CURX                ; cursor X pos
                 lda #129                ; center screen Y
                 sta CURY                ; cursor Y pos
+
                 lda #1                  ; get one
                 sta GAMCTL              ; game control
                 jsr ShowScore
@@ -47,7 +52,7 @@ _next2          lda SCOINI,X            ; get byte
                 sta SCRN+1939           ; planet center
                 lda #$15                ; graphic-RT of
                 sta SCRN+1940           ; planet center
-                sta HITCLR              ; reset collision
+                ;sta HITCLR             ; reset collision
 
                 .endproc
 
@@ -71,7 +76,7 @@ SetLevel        .proc
                 cmp #$FF                ; level >14?
                 bne _savePC             ; No. skip next
 
-                lda RANDOM              ; random color
+                lda SID_RANDOM          ; random color
                 and #$F0                ; mask off lum.
 _savePC         sta vPlanetColor
 
@@ -165,7 +170,8 @@ _noRestart      jsr BombInit            ; try new bomb
                 lda SATLIV              ; satellite stat
                 beq _noTrig             ; alive? No.
 
-                lda STRIG0              ; get trigger
+                lda JOYSTICK0           ; get trigger
+                and #$10
                 cmp LASTRG              ; same as last VB
                 beq _noTrig             ; Yes. skip next
 

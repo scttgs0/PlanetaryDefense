@@ -14,3 +14,6 @@ PLR3            = PLR2+$0100            ; player 3
 
 ORBX            = $1E00                 ; orbit X
 ORBY            = $1F00                 ; orbit Y
+
+CharResX        = 40
+CharResY        = 30

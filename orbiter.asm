@@ -97,7 +97,7 @@ SHAPE_Satellite ;.byte $00,$00,$00,$0A,$04,$0A,$00,$00
 ;======================================
 CheckSatellite  .proc
                 lda DEADTM              ; satellite ok?
-                beq _live                ; No. skip next
+                beq _live               ; No. skip next
 
 _XIT            rts
 
@@ -106,9 +106,11 @@ _live           lda LIVES               ; lives left?
 
                 lda #1                  ; get one
                 sta SATLIV              ; set alive flag
-                lda M0PL                ; did satellite
-                ora M0PL+1              ; hit any bombs?
-                beq _XIT                ; No. exit
+
+                ;lda M0PL               ; did satellite
+                ;ora M0PL+1             ; hit any bombs?
+                ;beq _XIT               ; No. exit
+                bra _XIT    ; HACK:
 
                 lda #0                  ; get zero
                 sta SATLIV              ; kill satellite
@@ -139,7 +141,7 @@ _clearSat       lda MISL,X              ; satellite pic
                 and #$F0                ; mask off sat
                 sta MISL,X              ; restore data
                 dex                     ; dec index
-                bne _clearSat              ; done? No.
+                bne _clearSat           ; done? No.
 
                 lda #$FF                ; 4.25 seconds
                 sta DEADTM              ; till next life!

@@ -111,13 +111,13 @@ Interrupt_DLI   .proc
                 and #$07                ; only 3 bits
 
                 tax                     ; use as index
-                lda _Brightness,X       ; planet brightness
-                ora vPlanetColor
-                sta WSYNC               ; start of scan
-                sta COLPF0              ; color planet
+                ;lda _Brightness,X      ; planet brightness
+                ;ora vPlanetColor
+                ;sta WSYNC              ; start of scan
+                ;sta COLPF0             ; color planet
 
-                lda #$8C                ; bright blue
-                sta COLPF0+1            ; shot color
+                ;lda #$8C               ; bright blue
+                ;sta COLPF0+1           ; shot color
 
                 pla                     ; restore X
                 tax                     ; Acc --> X
@@ -139,28 +139,30 @@ Interrupt_VBI   .proc
 
                 ldx SAUCER              ; saucer flag as
                 lda P3COLR,X            ; index 0 or 1
-                sta PCOLR0+3            ; saucer color
+                ;sta PCOLR3             ; saucer color
                 lda #5                  ; get 5
                 sta DLICNT              ; reset DLI count
-                lda #$C0                ; enable
-                sta NMIEN               ; DLI's
-                lda CH                  ; keyboard char
+
+                ;lda #$C0               ; enable VBI+DLI
+                ;sta NMIEN
+
+                lda KEYCHAR             ; keyboard char
                 cmp #$21                ; space bar?
-                bne _1                 ; No. skip it
+                bne _1                  ; No. skip it
 
                 lda PAUSED              ; pause flag
                 eor #$FF                ; invert it
                 sta PAUSED              ; save pause flag
 
                 lda #$FF                ; get $FF
-                sta CH                  ; reset keyboard
+                sta KEYCHAR             ; reset keyboard
 
 _1              lda PAUSED              ; pause flag
                 beq _nopau              ; paused? No.
 
                 lda #0                  ; get zero
                 ldx #7                  ; do 8 bytes
-_next1          sta AUDF1,X             ; zero sound
+_next1          ;sta AUDF1,X            ; zero sound
                 dex                     ; dec index
                 bpl _next1              ; done? No.
 
@@ -169,18 +171,18 @@ _next1          sta AUDF1,X             ; zero sound
 _nopau          lda TITLE               ; title flag
                 bne _nocyc              ; title? Yes.
 
-                lda COLOR0+2            ; No. get color
+                ;lda COLOR2             ; No. get color
                 clc                     ; clear carry
                 adc #$10                ; next color
-                sta COLOR0+2            ; explosion col.
+                ;sta COLOR2             ; explosion col.
 _nocyc          lda EXSCNT              ; explosion cnt
                 beq _2                  ; any? No.
 
                 lsr A                   ; count/2
                 lsr A                   ; count/4
-                sta AUDC1+6             ; explo volume
+                ;sta AUDC4              ; explo volume
                 lda #40                 ; explosion
-                sta AUDF1+6             ; explo frequency
+                ;sta AUDC4              ; explo frequency
                 dec EXSCNT              ; dec count
 
 _2              lda GAMCTL              ; game control
@@ -202,7 +204,8 @@ _next2          lda #$0F                ; now clear out
                 dex                     ; dec count
                 bpl _next2              ; loop until done
 
-                lda STICK0              ; read joystick
+                lda JOYSTICK0           ; read joystick
+                and $0F
                 ldx CURX                ; get X value
                 ldy CURY                ; get Y value
                 lsr A                   ; shift right
@@ -271,9 +274,9 @@ _notGameOver    lda SATLIV              ; get satellite
                 lda ORBX,Y              ; get X coord
                 sta SATX                ; save Pfield x
                 adc #47                 ; X offset
-                sta HPOSM0+1            ; horizontal pos
+                sta SP05_X_POS          ; horizontal pos
                 adc #2                  ; +2 offset for
-                sta HPOSM0              ; right side
+                sta SP04_X_POS          ; right side
                 lda ORBY,Y              ; get Y coord
                 lsr A                   ; divide by 2
                 sta SATY                ; for playfield
@@ -316,7 +319,7 @@ _nxtsp          dey                     ; next scan line
                 bpl _next5              ; done? No.
 
                 lda BOMBX+3             ; saucer X pos
-                sta HPOSP0+3            ; move it
+                sta SP03_X_POS          ; move it
                 inc SAUTIM              ; saucer time
                 lda SAUTIM              ; get counter
                 lsr A                   ; /2
@@ -330,25 +333,25 @@ _sounds         ldx PSSCNT              ; shot sound
                 bpl _doSnd1             ; shot? Yes.
 
                 lda #0                  ; No. get zero
-                sta AUDC1               ; volume for shot
+                ;sta AUDC1              ; volume for shot
                 beq _trySnd2            ; skip next
 
 _doSnd1         lda #$A6                ; shot sound vol
-                sta AUDC1               ; set hardware
+                ;sta AUDC1              ; set hardware
                 lda PLSHOT,X            ; shot sound
-                sta AUDF1               ; frequency
+                ;sta AUDF1              ; frequency
                 dec PSSCNT              ; dec shot snd
 _trySnd2        ldx ESSCNT              ; enemy shots
                 bpl _doSnd2             ; shots? Yes.
 
                 lda #0                  ; No. get zero
-                sta AUDC1+2             ; into volume
+                ;sta AUDC2              ; into volume
                 beq _trySnd3            ; skip rest
 
 _doSnd2         lda #$A6                ; shot sound vol
-                sta AUDC1+2             ; set hardware
+                ;sta AUDC2              ; set hardware
                 lda ENSHOT,X            ; shot sound
-                sta AUDF1+2             ; frequency
+                ;sta AUDF2              ; frequency
                 dec ESSCNT              ; dec shot snd
 _trySnd3        lda SAUCER              ; saucer flag
                 beq _noSnd3             ; saucer? No.
@@ -361,7 +364,7 @@ _trySnd3        lda SAUCER              ; saucer flag
                 bcc _doSnd3             ; No. make sound
 
 _noSnd3         lda #0                  ; get zero
-                sta AUDC1+4             ; no saucer snd
+                ;sta AUDC3              ; no saucer snd
                 beq _XIT                ; skip next
 
 _doSnd3         inc SSSCNT              ; inc saucer cnt
@@ -372,8 +375,8 @@ _doSnd3         inc SSSCNT              ; inc saucer cnt
                 ldx #0                  ; get zero
                 stx SSSCNT              ; zero saucer cnt
 _setSnd3        lda #$A8                ; saucer volume
-                sta AUDC1+4             ; set hardware
+                ;sta AUDC3              ; set hardware
                 lda SAUSND,X            ; saucer sound
-                sta AUDF1+4             ; set hardware
+                ;sta AUDF3              ; set hardware
 _XIT            rti
                 .endproc

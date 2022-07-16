@@ -36,13 +36,13 @@ _gotBomb        lda #1                  ; this one is..
                 cpx #3                  ; Yes. bomb #3?
                 bne _noSauser           ; No. skip next
 
-                lda RANDOM              ; random number
+                lda SID_RANDOM          ; random number
                 cmp SAUCHN              ; compare chances
                 bcs _noSauser           ; put saucer? No.
 
                 lda #1                  ; Yes. get one
                 sta SAUCER              ; enable saucer
-                lda RANDOM              ; random number
+                lda SID_RANDOM          ; random number
                 and #$03                ; range: 0..3
                 tay                     ; use as index
                 lda STARTX,Y            ; saucer start X
@@ -84,27 +84,27 @@ _saveEndY       sta TOY                 ; to Y vector
 ; Bomb handler
 ; ------------
 
-_noSauser       lda RANDOM              ; random number
+_noSauser       lda SID_RANDOM          ; random number
                 bmi _bombMaxX           ; coin flip
 
-                lda RANDOM              ; random number
+                lda SID_RANDOM          ; random number
                 and #1                  ; make 0..1
                 tay                     ; use as index
                 lda BMAXS,Y             ; top/bottom tbl
                 sta BOMBY,X             ; bomb Y-coord
-_next2          lda RANDOM              ; random number
+_next2          lda SID_RANDOM          ; random number
                 cmp #250                ; compare w/250
                 bcs _next2              ; less than? No.
 
                 sta BOMBX,X             ; bomb X-coord
                 jmp _bombvec            ; skip next
 
-_bombMaxX       lda RANDOM              ; random number
+_bombMaxX       lda SID_RANDOM          ; random number
                 and #1                  ; make 0..1
                 tay                     ; use as index
                 lda BMAXS,Y             ; 0 or 250
                 sta BOMBX,X             ; bomb X-coord
-_next3          lda RANDOM              ; random number
+_next3          lda SID_RANDOM          ; random number
                 cmp #250                ; compare w/250
                 bcs _next3              ; less than? No.
 
@@ -206,7 +206,7 @@ _nobombdraw     dey                     ; PM index
 
                 ldx INDX2               ; restore X
                 lda BOMBX,X             ; bomb X-coord
-                sta HPOSP0,X            ; player pos
+                sta SP00_X_POS,X        ; player pos
 _nextbomb       dex                     ; more bombs?
                 bpl _next1              ; yes!
 
@@ -243,9 +243,11 @@ CheckHit        .proc
 
 _next1          lda #0                  ; get zero
                 sta BOMCOL              ; collision count
-                lda P0PF,X              ; playf collision
-                and #$05                ; w/shot+planet
-                beq _nobombhit          ; hit either? No.
+
+                ;lda P0PF,X             ; playf collision
+                ;and #$05               ; w/shot+planet
+                ;beq _nobombhit         ; hit either? No.
+                bra _nobombhit  ; HACK:
 
                 inc BOMCOL              ; Yes. inc count
                 and #$04                ; hit shot?
@@ -315,6 +317,6 @@ _explode        jsr ClearPlayer
 _nobombhit      dex                     ; dec index
                 bpl _next1              ; done? No.
 
-                sta HITCLR              ; reset collision
+                ;sta HITCLR             ; reset collision
                 rts
                 .endproc

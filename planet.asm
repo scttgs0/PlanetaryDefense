@@ -6,10 +6,29 @@ Planet          .proc
                 .frsMouse_off
                 .frsBorder_off
 
+                InitCharLUT
+
+                lda #<CharResX
+                sta COLS_PER_LINE
+                lda #>CharResX
+                sta COLS_PER_LINE+1
+                lda #CharResX
+                sta COLS_VISIBLE
+
+                lda #<CharResY
+                sta LINES_MAX
+                lda #>CharResY
+                sta LINES_MAX+1
+                lda #CharResY
+                sta LINES_VISIBLE
+
+                ClearScreen
+
                 cld                     ; clear decimal
 
                 lda #$00                ; get zero
-                sta NMIEN               ; display off
+                ;sta NMIEN              ; display off
+
                 ldx #$7F                ; set index
 _next1          sta $80,X               ; clr top page 0
                 dex                     ; dec pointer
@@ -23,34 +42,34 @@ _next1          sta $80,X               ; clr top page 0
                 sta PSSCNT              ; no player shots
                 jsr SoundOff            ; no sound on 123
 
-                sta AUDC1+6             ; turn off snd 4
-                lda #$C4                ; medium green
-                sta COLOR0              ; score color
-                lda #$84                ; medium blue
-                sta COLOR0+1            ; text color
-                lda #$0A                ; bright white
-                sta COLOR0+2            ; shot color
-                lda #$98                ; light blue
-                sta COLOR0+3            ; text color
+                ;sta AUDC4              ; turn off snd 4
+                ;lda #$C4               ; medium green
+                ;sta COLOR0             ; score color
+                ;lda #$84               ; medium blue
+                ;sta COLOR1             ; text color
+                ;lda #$0A               ; bright white
+                ;sta COLOR2             ; shot color
+                ;lda #$98               ; light blue
+                ;sta COLOR3             ; text color
 
                 ;lda #<Interrupt_DLI
                 ;sta VDSLST
                 ;lda #>Interrupt_DLI
                 ;sta VDSLST+1
 
-                lda #$C0                ; enable Display
-                sta NMIEN               ; List Interrupts
+                ;lda #$C0               ; enable Display
+                ;sta NMIEN              ; List Interrupts
 
-                lda #$32                ; PM DMA off
-                sta DMACTL              ; DMA control
-                sta SDMCTL              ; and shadow reg
+                ;lda #$32               ; PM DMA off
+                ;sta DMACTL             ; DMA control
+                ;sta SDMCTL             ; and shadow reg
 
                 lda #0                  ; get zero
-                sta GRACTL              ; graphics ctrl
-                sta AUDCTL              ; reset audio
+                ;sta GRACTL             ; graphics ctrl -- disable sprites
+                ;sta AUDCTL             ; reset audio
 
                 ldx #4                  ; 5 PM registers
-_next2          sta GRAFP0,X            ; clr register
+_next2          ;sta GRAFP0,X           ; clr register
                 dex                     ; dec index
                 bpl _next2
 
@@ -76,11 +95,12 @@ _next2          sta GRAFP0,X            ; clr register
 _wait1          lda DEADTM              ; look dead time
                 bne _wait1              ; alive? No.
 
-_next3          lda PTRIG0              ; paddle trig 0
-                eor PTRIG1              ; mask w/PTRIG1
-                bne _pdev               ; pushed? Yes.
+_next3          ;lda PTRIG0             ; paddle trig 0
+                ;eor PTRIG1             ; mask w/PTRIG1
+                ;bne _pdev              ; pushed? Yes.
 
-                lda STRIG0              ; stick trig
+                lda JOYSTICK0           ; stick trig
+                and #$10
                 beq _pdev               ; pushed? Yes.
 
                 lda CONSOL              ; get console
@@ -133,18 +153,18 @@ _next6          sta MISL,X              ; clear missiles
                 ;lda #>GameDL
                 ;sta SDLSTL+1
 
-                lda #>PM                ; PM address high
-                sta PMBASE              ; into hardware
+                ;lda #>PM               ; PM address high
+                ;sta PMBASE             ; into hardware
 
-                lda #$3E                ; enable single
-                sta SDMCTL              ; line resolution
-                sta DMACTL              ; DMA control
+                ;lda #$3E               ; enable single
+                ;sta SDMCTL             ; line resolution
+                ;sta DMACTL             ; DMA control
 
-                lda #3                  ; enable player
-                sta GRACTL              ; and missile DMA
+                ;lda #3                 ; enable player
+                ;sta GRACTL             ; and missile DMA
 
-                lda #$11                ; set up
-                sta GPRIOR              ; P/M priority
+                ;lda #$11               ; set up
+                ;sta GPRIOR             ; P/M priority
 
                 lda #0                  ; get zero
                 sta TITLE               ; title off

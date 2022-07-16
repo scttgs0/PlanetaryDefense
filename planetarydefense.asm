@@ -8,7 +8,6 @@
 ; ------------------
 
 
-                .include "equates_system_atari8.asm"
                 .include "equates_system_c256.asm"
                 .include "equates_zeropage.asm"
                 .include "equates_game.asm"

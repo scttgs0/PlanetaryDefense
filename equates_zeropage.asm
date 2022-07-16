@@ -73,3 +73,11 @@ LR              .byte ?                 ; vector left/right hold
 UD              .byte ?                 ; vector up/down hold
 DELTAX          .byte ?                 ; vector work area
 DELTAY          .byte ?                 ; vector work area
+
+JIFFYCLOCK      .byte ?
+InputFlags      .byte ?
+InputType       .byte ?
+itJoystick  = 0
+itKeyboard  = 1
+KEYCHAR         .byte ?                 ; last key pressed
+CONSOL          .byte ?                 ; state of OPTION,SELECT,START
