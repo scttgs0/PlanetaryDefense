@@ -2,7 +2,7 @@
         --long-address \
         --flat \
         --nostart \
-        -o planetarydefense.pgx \
-        --list=planetarydefense.lst \
-        --labels=planetarydefense.lbl \
+        -o pdefense.pgx \
+        --list=pdefense.lst \
+        --labels=pdefense.lbl \
         planetarydefense.asm
