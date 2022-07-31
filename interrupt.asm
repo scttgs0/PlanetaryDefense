@@ -333,25 +333,25 @@ _sounds         ldx PSSCNT              ; shot sound
                 bpl _doSnd1             ; shot? Yes.
 
                 lda #0                  ; No. get zero
-                ;sta AUDC1              ; volume for shot
+                sta SID_CTRL1           ; volume for shot
                 beq _trySnd2            ; skip next
 
 _doSnd1         lda #$A6                ; shot sound vol
-                ;sta AUDC1              ; set hardware
+                sta SID_CTRL1           ; set hardware
                 lda PLSHOT,X            ; shot sound
-                ;sta AUDF1              ; frequency
+                sta SID_FREQ1           ; frequency
                 dec PSSCNT              ; dec shot snd
 _trySnd2        ldx ESSCNT              ; enemy shots
                 bpl _doSnd2             ; shots? Yes.
 
                 lda #0                  ; No. get zero
-                ;sta AUDC2              ; into volume
+                sta SID_CTRL2           ; into volume
                 beq _trySnd3            ; skip rest
 
 _doSnd2         lda #$A6                ; shot sound vol
-                ;sta AUDC2              ; set hardware
+                sta SID_CTRL2           ; set hardware
                 lda ENSHOT,X            ; shot sound
-                ;sta AUDF2              ; frequency
+                sta SID_FREQ2           ; frequency
                 dec ESSCNT              ; dec shot snd
 _trySnd3        lda SAUCER              ; saucer flag
                 beq _noSnd3             ; saucer? No.
@@ -364,7 +364,7 @@ _trySnd3        lda SAUCER              ; saucer flag
                 bcc _doSnd3             ; No. make sound
 
 _noSnd3         lda #0                  ; get zero
-                ;sta AUDC3              ; no saucer snd
+                sta SID_CTRL3           ; no saucer snd
                 beq _XIT                ; skip next
 
 _doSnd3         inc SSSCNT              ; inc saucer cnt
@@ -375,8 +375,8 @@ _doSnd3         inc SSSCNT              ; inc saucer cnt
                 ldx #0                  ; get zero
                 stx SSSCNT              ; zero saucer cnt
 _setSnd3        lda #$A8                ; saucer volume
-                ;sta AUDC3              ; set hardware
+                sta SID_CTRL3           ; set hardware
                 lda SAUSND,X            ; saucer sound
-                ;sta AUDF3              ; set hardware
+                sta SID_FREQ3           ; set hardware
 _XIT            rti
                 .endproc
