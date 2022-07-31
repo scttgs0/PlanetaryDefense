@@ -7,6 +7,7 @@
 ;   and Tom Hudson
 ; ------------------
 
+                .cpu "65816"
 
                 .include "equates_system_c256.asm"
                 .include "equates_zeropage.asm"
@@ -48,11 +49,23 @@ BOOT            clc
 ;-------------------------------------
                 * = $2000
 ;-------------------------------------
+                .include "main.asm"
+
+
+;--------------------------------------
+                .align $100
+;--------------------------------------
 
                 .include "interrupt.asm"
+                .include "platform_c256.asm"
+
+
+;--------------------------------------
+                .align $100
+;--------------------------------------
+
                 .include "planet.asm"
                 .include "orbiter.asm"
-                .include "main.asm"
                 .include "explosion.asm"
                 .include "plot.asm"
                 .include "bomb.asm"
@@ -66,6 +79,15 @@ BOOT            clc
                 .include "score.asm"
                 .include "data.asm"
 
+
 ;--------------------------------------
+                .align $100
+;--------------------------------------
+
+GameFont        .include "FONT.asm"
+GameFont_end
+
+Palette         .include "PALETTE.asm"
+Palette_end
 
                 .end

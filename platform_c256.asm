@@ -10,6 +10,45 @@ BITMAPTXT1      = $B71A00
 BITMAPTXT2      = $B74C00
 BITMAPTXT3      = $B31400
 
+
+;======================================
+; Initialize SID
+;======================================
+InitSID         .proc
+                pha
+                phx
+
+;   reset the SID
+                lda #$00
+                ldx #$18
+_next1          sta $AF_E400,X
+                dex
+                bpl _next1
+
+                lda #$09                ; Attack/Decay = 9
+                sta SID_ATDCY1
+                sta SID_ATDCY2
+                sta SID_ATDCY3
+
+                lda #$00                ; Susatain/Release = 0
+                sta SID_SUREL1
+                sta SID_SUREL2
+                sta SID_SUREL3
+
+                ;lda #$21
+                ;sta SID_CTRL1
+                ;sta SID_CTRL2
+                ;sta SID_CTRL3
+
+                lda #$0F                ; Volume = 15 (max)
+                sta SID_SIGVOL
+
+                plx
+                pla
+                rts
+                .endproc
+
+
 ;======================================
 ; Create the lookup table (LUT)
 ;======================================
@@ -18,10 +57,10 @@ InitLUT         .proc
                 phb
 
                 .m16i16
-                lda #palette_end-palette ; Copy the palette to LUT0
-                ldx #<>palette
+                lda #Palette_end-Palette ; Copy the palette to LUT0
+                ldx #<>Palette
                 ldy #<>GRPH_LUT0_PTR
-                mvn `palette,`GRPH_LUT0_PTR
+                mvn `Palette,`GRPH_LUT0_PTR
 
                 plb
                 plp
@@ -178,7 +217,7 @@ _nextGlyph      lda TitleScreenData,Y   ; Get the tile code
                 cpy #MAPWIDTH*MAPHEIGHT-18  ; bottom lines are text
                 bne _nextGlyph
 
-                .setbank $03
+                .setbank $00
                 plp
                 rts
                 .endproc
@@ -220,6 +259,8 @@ InitUnitOverlay .proc
 
 ;======================================
 ; Initialize the Sprite layer
+;--------------------------------------
+; sprites dimensions are 32x32 (1024)
 ;======================================
 InitSprites     .proc
                 php
@@ -326,12 +367,16 @@ v_Empty         .var $00
 v_TextColor     .var $40
 ;---
 
+                php
+                .m16i8
+
 ;   reset the addresses to make this reentrant
                 lda #<>CS_TEXT_MEM_PTR
-                sta _setAddr1
+                sta _setAddr1+1
                 lda #<>CS_COLOR_MEM_PTR
-                sta _setAddr2
+                sta _setAddr2+1
 
+                .m8
                 ldx #$00
                 ldy #v_QtyPages
 
@@ -349,6 +394,7 @@ _setAddr2       sta CS_COLOR_MEM_PTR,x  ; SMC
                 dey
                 bne _clearNext
 
+                plp
                 rts
                 .endproc
 
@@ -450,11 +496,103 @@ wait_vdma       lda VDMA_STATUS         ; Get the VDMA status
                 sta SDMA0_CTRL
                 sta VDMA_CTRL
 
-                .setdp $0800
-                .setbank $03
+                .setdp $0000
+                .setbank $00
                 .m8i8
                 plp
                 rts
 
 vdma_err        brk
+                .endproc
+
+
+;======================================
+;
+;======================================
+InitIRQs        .proc
+                pha
+
+;   enable vertical blank interrupt
+
+                .m8i8
+                ldx #HandleIrq_END-HandleIrq
+_relocate       ;lda @l $024000,X        ; HandleIrq address
+                ;sta @l $002000,X        ; new address within Bank 00
+                ;dex
+                ;bpl _relocate
+
+                sei                     ; disable IRQ
+
+                .m16
+                ;lda @l vecIRQ
+                ;sta IRQ_PRIOR
+
+                lda #<>$002900
+                sta @l vecIRQ
+
+                .m8
+                lda #$07                ; reset consol
+                sta CONSOL
+
+                lda #$1F
+                sta InputFlags
+                stz InputType           ; joystick
+
+                lda @l INT_MASK_REG0
+                and #~FNX0_INT00_SOF    ; enable Start-of-Frame IRQ
+                sta @l INT_MASK_REG0
+
+                lda @l INT_MASK_REG1
+                and #~FNX1_INT00_KBD    ; enable Keyboard IRQ
+                sta @l INT_MASK_REG1
+
+                cli                     ; enable IRQ
+
+                pla
+                rts
+                .endproc
+
+
+;======================================
+;
+;======================================
+SetFont         .proc
+                php
+                pha
+                phx
+                phy
+
+                lda #<GameFont
+                sta SOURCE
+                lda #>GameFont
+                sta SOURCE+1
+                lda #`GameFont
+                sta SOURCE+2
+
+                lda #<FONT_MEMORY_BANK0
+                sta DEST
+                lda #>FONT_MEMORY_BANK0
+                sta DEST+1
+                lda #`FONT_MEMORY_BANK0
+                sta DEST+2
+
+                ldx #$06                ; 6 pages
+_nextPage       ldy #$00
+_next1          lda (SOURCE),Y
+                sta (DEST),Y
+
+                iny
+                bne _next1
+
+                inc SOURCE+1
+                inc DEST+1
+
+                dex
+                bne _nextPage
+
+                ply
+                plx
+                pla
+                plp
+                rts
                 .endproc

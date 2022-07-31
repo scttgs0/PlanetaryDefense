@@ -6,7 +6,7 @@ Planet          .proc
                 .frsMouse_off
                 .frsBorder_off
 
-                InitCharLUT
+                jsr InitCharLUT
 
                 lda #<CharResX
                 sta COLS_PER_LINE
@@ -22,7 +22,8 @@ Planet          .proc
                 lda #CharResY
                 sta LINES_VISIBLE
 
-                ClearScreen
+                jsr SetFont
+                jsr ClearScreen
 
                 cld                     ; clear decimal
 
@@ -73,7 +74,7 @@ _next2          ;sta GRAFP0,X           ; clr register
                 dex                     ; dec index
                 bpl _next2
 
-                ;jsr SIOINV             ; init sound
+                jsr InitSID             ; init sound
 
                 ;lda #<TitleDL
                 ;sta SDLSTL
