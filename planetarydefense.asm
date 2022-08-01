@@ -18,16 +18,6 @@
                 .include "macros_frs_mouse.asm"
 
 
-            .enc "atari-screen"
-                .cdef " Z",$00
-                .cdef "az",$61
-            .enc "atari-screen-inverse"
-                .cdef " @",$C0
-                .cdef "AZ",$A1
-                .cdef "az",$E1
-            .enc "none"
-
-
 ;-------------------------------------
 ;-------------------------------------
                 * = INIT-40
@@ -41,6 +31,7 @@ BOOT            clc
                 .m8i8
                 .setdp $0000
                 .setbank $00
+                cld
 
                 jmp Planet
 

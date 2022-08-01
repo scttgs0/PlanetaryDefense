@@ -82,21 +82,31 @@ GameDL          ; .byte AEMPTY8,AEMPTY8
 ; Intro Message Text
 ; ------------------
 
-MAGMSG
-            .enc "atari-screen"
-                .text " ANALOG COMPUTING'S "
-                .text $40,"planetary",$40,$40,"defense",$40
-            .enc "atari-screen-inverse"
-                .text $80,"BY",$80,"CHARLES",$80,"BACHAND",$80
-                .text "   and tom hudson   "
-            .enc "atari-screen"
-                .text $40,"koala",$40,"pad",$40,$4D,$40,"select",$40
-            .enc "atari-screen-inverse"
-                .text " joystick --- start "
-            .enc "atari-screen"
-                .text "  OR PRESS TRIGGER  "
-            .enc "none"
+MagMsg          .text "  ANALOG COMPUTING  "
+TitleMsg        ;.text " PLANETARY  DEFENSE "
+;   top
+                .byte $20,$20,$20
+                .byte $CE,$CF,$C6,$C7,$B6,$B7,$CA,$CB,$BE,$BF,$DA,$DB,$B6,$B7,$D2,$D3,$DE,$DF
+                .byte $20,$20
+                .byte $BA,$BB,$BE,$BF,$C2,$C3,$BE,$BF,$CA,$CB,$D6,$D7,$BE,$BF
+                .byte $20,$20,$20
+;   top
+                .byte $20,$20,$20
+                .byte $D0,$D1,$C8,$C9,$B8,$B9,$CC,$CD,$C0,$C1,$DC,$DD,$B8,$B9,$D4,$D5,$E0,$E1
+                .byte $20,$20
+                .byte $BC,$BD,$C0,$C1,$C4,$C5,$C0,$C1,$CC,$CD,$D8,$D9,$C0,$C1
+                .byte $20,$20,$20
 
+AuthorMsg       .text " BY CHARLES BACHAND "
+                .text "   AND TOM HUDSON   "
+StartMsg        .text "  JOYSTICK - START  "
+                .text "  OR PRESS TRIGGER  "
+
+
+;--------------------------------------
+;--------------------------------------
+                .align $100,$00
+;--------------------------------------
 
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ;

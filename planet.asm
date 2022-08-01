@@ -2,7 +2,7 @@
 ; Display the Intro Screen
 ;-------------------------------------
 Planet          .proc
-                .frsGraphics mcGraphicsOn|mcSpriteOn,mcVideoMode320
+                .frsGraphics mcTextOn|mcOverlayOn|mcGraphicsOn|mcSpriteOn,mcVideoMode320
                 .frsMouse_off
                 .frsBorder_off
 
@@ -75,11 +75,11 @@ _next2          ;sta GRAFP0,X           ; clr register
                 bpl _next2
 
                 jsr InitSID             ; init sound
-
-                ;lda #<TitleDL
-                ;sta SDLSTL
-                ;lda #>TitleDL
-                ;sta SDLSTL+1
+                
+                jsr RenderPublisher
+                jsr RenderTitle
+                jsr RenderAuthor
+                jsr RenderSelect
 
                 ;ldx #>Interrupt_VBI
                 ;ldy #<Interrupt_VBI
