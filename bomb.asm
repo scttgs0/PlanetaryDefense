@@ -6,25 +6,25 @@ BombInit        .proc
                 bne _XIT                ; done? No.
 
                 lda BOMBS               ; more bombs?
-                bne _chkLive            ; Yes. skip RTS
+                bne _chkLive            ;   Yes. skip RTS
 
 _XIT            rts
 
-_chkLive        ldx #3                  ; find..
-_next1          lda BOMACT,X            ; an available..
-                beq _gotBomb            ; bomb? Yes.
+_chkLive        ldx #3                  ; find an available bomb?
+_next1          lda BOMACT,X
+                beq _gotBomb            ;   Yes
 
-                dex                     ; No. dec index
-                bpl _next1              ; done? No.
+                dex                     ;   No
+                bpl _next1
 
                 rts
 
-_gotBomb        lda #1                  ; this one is..
-                sta BOMACT,X            ; active now
+_gotBomb        lda #1                  ; this one is active now
+                sta BOMACT,X
                 dec BOMBS               ; one less bomb
                 lda #0                  ; zero out all..
-                sta BXHOLD,X            ; vector X hold
-                sta BYHOLD,X            ; vector Y hold
+                sta BXHOLD,X            ;   vector X hold
+                sta BYHOLD,X            ;   vector Y hold
                 lda GAMCTL              ; game control
                 bmi _noSauser           ; saucer possible?
 
@@ -33,21 +33,21 @@ _gotBomb        lda #1                  ; this one is..
 ; Saucer handler
 ; --------------
 
-                cpx #3                  ; Yes. bomb #3?
-                bne _noSauser           ; No. skip next
+                cpx #3                  ;   Yes. bomb #3?
+                bne _noSauser           ;   No. skip next
 
-                lda SID_RANDOM          ; random number
+                lda SID_RANDOM
                 cmp SAUCHN              ; compare chances
                 bcs _noSauser           ; put saucer? No.
 
-                lda #1                  ; Yes. get one
+                lda #1                  ;   Yes. get one
                 sta SAUCER              ; enable saucer
-                lda SID_RANDOM          ; random number
+                lda SID_RANDOM
                 and #$03                ; range: 0..3
-                tay                     ; use as index
+                tay
                 lda STARTX,Y            ; saucer start X
                 cmp #$FF                ; random flag?
-                bne _saveSauX           ; No. use as X
+                bne _saveSauX           ;   No. use as X
 
                 jsr SauserRandom        ; random X-coord
 
@@ -56,7 +56,7 @@ _saveSauX       sta FROMX               ; from X vector
                 sta BOMBX,X             ; init X-coord
                 lda STARTY,Y            ; saucer start Y
                 cmp #$FF                ; random flag?
-                bne _saveSauY           ; No. use as Y
+                bne _saveSauY           ;   No. use as Y
 
                 jsr SauserRandom        ; random Y-coord
 
@@ -65,46 +65,46 @@ _saveSauY       sta FROMY               ; from Y vector
                 sta BOMBY,X             ; init Y-coord
                 lda ENDX,Y              ; saucer end X
                 cmp #$FF                ; random flag?
-                bne _saveEndX           ; No. use as X
+                bne _saveEndX           ;   No. use as X
 
                 lda #230                ; screen right
-                sec                     ; offset so not
-                sbc FROMY               ; to hit planet
+                sec                     ; offset so not to hit planet
+                sbc FROMY
 _saveEndX       sta TOX                 ; to X vector
                 lda ENDY,Y              ; saucer end Y
                 cmp #$FF                ; random flag?
-                bne _saveEndY           ; No. use as Y
+                bne _saveEndY           ;   No. use as Y
 
                 lda FROMX               ; use X for Y
 _saveEndY       sta TOY                 ; to Y vector
-                jmp _getBombVec         ; skip next
+                jmp _getBombVec
 
 
 ; ------------
 ; Bomb handler
 ; ------------
 
-_noSauser       lda SID_RANDOM          ; random number
+_noSauser       lda SID_RANDOM
                 bmi _bombMaxX           ; coin flip
 
-                lda SID_RANDOM          ; random number
+                lda SID_RANDOM
                 and #1                  ; make 0..1
-                tay                     ; use as index
+                tay
                 lda BMAXS,Y             ; top/bottom tbl
                 sta BOMBY,X             ; bomb Y-coord
-_next2          lda SID_RANDOM          ; random number
+_next2          lda SID_RANDOM
                 cmp #250                ; compare w/250
                 bcs _next2              ; less than? No.
 
                 sta BOMBX,X             ; bomb X-coord
-                jmp _bombvec            ; skip next
+                jmp _bombvec
 
-_bombMaxX       lda SID_RANDOM          ; random number
+_bombMaxX       lda SID_RANDOM
                 and #1                  ; make 0..1
                 tay                     ; use as index
                 lda BMAXS,Y             ; 0 or 250
                 sta BOMBX,X             ; bomb X-coord
-_next3          lda SID_RANDOM          ; random number
+_next3          lda SID_RANDOM
                 cmp #250                ; compare w/250
                 bcs _next3              ; less than? No.
 
@@ -128,6 +128,7 @@ _getBombVec     jsr VECTOR              ; calc shot vect
                 sta BOMBLR,X            ; bomb L/R table
                 lda UD                  ; bomb U/D flag
                 sta BOMBUD,X            ; bomb U/D table
+
                 lda VXINC               ; velocity X inc
                 sta BXINC,X             ; Vel X table
                 lda VYINC               ; velocity Y inc
@@ -144,7 +145,7 @@ BombAdvance     .proc
                 rts                     ; time up? No.
 
                 lda LIVES               ; any lives?
-                bpl _regBombTraj        ; Yes. skip next
+                bpl _regBombTraj        ;   Yes. skip next
 
                 lda #1                  ; speed up bombs
                 bne _setBombTraj        ; skip next
@@ -153,16 +154,16 @@ _regBombTraj    lda BOMTI               ; get bomb speed
 _setBombTraj    sta BOMTIM              ; reset timer
                 ldx #3                  ; check 4 bombs
 _next1          lda BOMACT,X            ; bomb on?
-                beq _nextbomb           ; No. try next
+                beq _nextbomb           ;   No. try next
 
                 jsr AdvanceIt           ; advance bomb
 
                 lda LIVES               ; any lives left?
-                bpl _showbomb           ; Yes. skip next
+                bpl _showbomb           ;   Yes. skip next
 
-                jsr AdvanceIt           ; No. move bombs
-                jsr AdvanceIt           ; 4 times faster
-                jsr AdvanceIt           ; than normal
+                jsr AdvanceIt           ;   No. move bombs
+                jsr AdvanceIt           ; 4 times faster than normal
+                jsr AdvanceIt
 
 
 ; --------------------------
@@ -171,20 +172,20 @@ _next1          lda BOMACT,X            ; bomb on?
 ; --------------------------
 
 _showbomb       lda BOMBY,X             ; bomb Y-coord
-                clc                     ; clear carry
+                clc
                 adc #2                  ; bomb center off
                 sta INDX1               ; save it
-                lda #0                  ; get zero
+                lda #0
                 sta LO                  ; init low byte
-                txa                     ; index to Acc
+                txa
                 ora #>PLR0              ; mask w/address
                 sta HI                  ; init high byte
                 stx INDX2               ; X temp hold
                 cpx #3                  ; saucer slot?
-                bne _notSauser          ; No. skip next
+                bne _notSauser          ;   No. skip next
 
                 lda SAUCER              ; saucer in slot?
-                bne _nextbomb           ; Yes. skip bomb
+                bne _nextbomb           ;   Yes. skip bomb
 
 _notSauser      ldy BOMBLR,X            ; L/R flag
                 lda #17                 ; do 17 bytes
@@ -192,15 +193,15 @@ _notSauser      ldy BOMBLR,X            ; L/R flag
                 ldx BPSTRT,Y            ; start position
                 ldy INDX1               ; bomb Y pos
 _bombdraw       cpy #32                 ; off screen top?
-                bcc _nobombdraw         ; Yes. skip next
+                bcc _nobombdraw         ;   Yes. skip next
 
                 cpy #223                ; screen bottom?
-                bcs _nobombdraw         ; Yes. skip next
+                bcs _nobombdraw         ;   Yes. skip next
 
-                lda BOMPIC,X            ; bomb picture
-                sta (LO),Y              ; put in PM area
+                lda BOMPIC,X            ; bomb stamp put in PM area
+                sta (LO),Y
 _nobombdraw     dey                     ; PM index
-                dex                     ; picture index
+                dex                     ; stamp index
                 dec TEMP                ; dec count
                 bne _bombdraw           ; done? No.
 
@@ -208,7 +209,7 @@ _nobombdraw     dey                     ; PM index
                 lda BOMBX,X             ; bomb X-coord
                 sta SP00_X_POS,X        ; player pos
 _nextbomb       dex                     ; more bombs?
-                bpl _next1              ; yes!
+                bpl _next1              ;   yes!
 
                 rts
                 .endproc
@@ -220,28 +221,28 @@ _nextbomb       dex                     ; more bombs?
 CheckHit        .proc
                 ldx #3                  ; 4 bombs 0..3
                 lda SAUCER              ; saucer enabled?
-                beq _next1              ; No. skip next
+                beq _next1              ;   No. skip next
 
-                lda #0                  ; get zero
+                lda #0
                 sta BOMCOL              ; collision count
                 lda GAMCTL              ; game over?
-                bmi _noscore            ; Yes. skip next
+                bmi _noscore            ;   Yes. skip next
 
                 lda BOMBX+3             ; saucer X-coord
                 cmp #39                 ; off screen lf?
-                bcc _noscore            ; Yes. kill it
+                bcc _noscore            ;   Yes. kill it
 
                 cmp #211                ; off screen rt?
-                bcs _noscore            ; Yes. kill it
+                bcs _noscore            ;   Yes. kill it
 
                 lda BOMBY+3             ; saucer Y-coord
                 cmp #19                 ; off screen up?
-                bcc _noscore            ; Yes. kill it
+                bcc _noscore            ;   Yes. kill it
 
                 cmp #231                ; off screen dn?
-                bcs _noscore            ; Yes. kill it
+                bcs _noscore            ;   Yes. kill it
 
-_next1          lda #0                  ; get zero
+_next1          lda #0
                 sta BOMCOL              ; collision count
 
                 ;lda P0PF,X             ; playf collision
@@ -249,20 +250,20 @@ _next1          lda #0                  ; get zero
                 ;beq _nobombhit         ; hit either? No.
                 bra _nobombhit  ; HACK:
 
-                inc BOMCOL              ; Yes. inc count
+                inc BOMCOL              ;   Yes. inc count
                 and #$04                ; hit shot?
-                beq _noscore            ; No. skip next
+                beq _noscore            ;   No. skip next
 
                 lda GAMCTL              ; game over?
-                bmi _noscore            ; Yes. skip next
+                bmi _noscore            ;   Yes. skip next
 
                 lda #2                  ; 1/30th second
                 sta BOMBWT              ; bomb wait time
                 cpx #3                  ; saucer player?
-                bne _addBombScore       ; No. skip this
+                bne _addBombScore       ;   No. skip this
 
                 lda SAUCER              ; saucer on?
-                beq _addBombScore       ; No. this this
+                beq _addBombScore       ;   No. this this
 
                 lda SAUVAL              ; saucer value
                 sta SCOADD+1            ; point value
@@ -282,35 +283,35 @@ _addit          stx XHOLD               ; save X register
                 jsr AddScore
 
                 ldx XHOLD               ; restore X
-_noscore        lda #0                  ; get zero
+_noscore        lda #0
                 sta BOMACT,X            ; kill bomb
                 ldy BOMBLR,X            ; L/R flag
                 lda BOMBX,X             ; bomb X-coord
-                sec                     ; set carry
+                sec
                 sbc BXOF,Y              ; bomb X offset
                 sta NEWX                ; plotter X-coord
                 lda BOMBY,X             ; bomb Y-coord
-                sec                     ; set carry
+                sec
                 sbc #40                 ; bomb Y offset
                 lsr A                   ; 2 line res.
                 sta NEWY                ; plotter Y-coord
                 lda SAUCER              ; saucer?
-                beq _explode            ; No. explode it
+                beq _explode            ;   No. explode it
 
                 cpx #3                  ; bomb player?
-                bne _explode            ; Yes. explode it
+                bne _explode            ;   Yes. explode it
 
-                lda #0                  ; get zero
+                lda #0
                 sta SAUCER              ; kill saucer
                 jsr ClearPlayer
 
                 lda GAMCTL              ; game over?
-                bmi _nobombhit          ; Yes. skip next
+                bmi _nobombhit          ;   Yes. skip next
 
 _explode        jsr ClearPlayer
 
                 lda BOMCOL              ; collisions?
-                beq _nobombhit          ; No. skip this
+                beq _nobombhit          ;   No. skip this
 
                 jsr NewExplosion        ; init explosion
 

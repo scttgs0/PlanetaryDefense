@@ -6,8 +6,6 @@ Planet          .proc
                 .frsMouse_off
                 .frsBorder_off
 
-                jsr InitCharLUT
-
                 lda #<CharResX
                 sta COLS_PER_LINE
                 lda #>CharResX
@@ -22,28 +20,30 @@ Planet          .proc
                 lda #CharResY
                 sta LINES_VISIBLE
 
+                jsr InitLUT
+                jsr InitCharLUT
+
                 jsr SetFont
                 jsr ClearScreen
 
-                cld                     ; clear decimal
-
-                lda #$00                ; get zero
-                ;sta NMIEN              ; display off
+                jsr InitSID             ; init sound
 
                 ldx #$7F                ; set index
-_next1          sta $80,X               ; clr top page 0
+_next1          sta $80,X               ; clear top of page-0
                 dex                     ; dec pointer
                 bne _next1
 
                 inc TITLE               ; title on flag
-                lda #$FF                ; get $FF
+
+                lda #$FF
                 sta LIVES               ; set dead
                 sta GAMCTL              ; game control
                 sta ESSCNT              ; no enemy shots
                 sta PSSCNT              ; no player shots
-                jsr SoundOff            ; no sound on 123
 
+                jsr SoundOff            ; no sound on 123
                 ;sta AUDC4              ; turn off snd 4
+
                 ;lda #$C4               ; medium green
                 ;sta COLOR0             ; score color
                 ;lda #$84               ; medium blue
@@ -58,24 +58,15 @@ _next1          sta $80,X               ; clr top page 0
                 ;lda #>Interrupt_DLI
                 ;sta VDSLST+1
 
-                ;lda #$C0               ; enable Display
-                ;sta NMIEN              ; List Interrupts
-
-                ;lda #$32               ; PM DMA off
-                ;sta DMACTL             ; DMA control
-                ;sta SDMCTL             ; and shadow reg
-
-                lda #0                  ; get zero
-                ;sta GRACTL             ; graphics ctrl -- disable sprites
-                ;sta AUDCTL             ; reset audio
+                ;lda #$C0               ; enable DLI
+                ;sta NMIEN
 
                 ldx #4                  ; 5 PM registers
-_next2          ;sta GRAFP0,X           ; clr register
-                dex                     ; dec index
+_next2          ;sta GRAFP0,X           ; clear register
+                dex
                 bpl _next2
 
-                jsr InitSID             ; init sound
-                
+;   render title screen
                 jsr RenderPublisher
                 jsr RenderTitle
                 jsr RenderAuthor
@@ -86,8 +77,8 @@ _next2          ;sta GRAFP0,X           ; clr register
                 ;lda #7                 ; deferred
                 ;jsr SETVBV             ; set vblank
 
-                lda #60                 ; one second
-                sta DEADTM              ; dead time
+                lda #60                 ; one second dead time
+                sta DEADTM
 
 ; --------------------------
 ; Check console and triggers
@@ -112,13 +103,13 @@ _next3          ;lda PTRIG0             ; paddle trig 0
                 and #1                  ; mask off START
 _pdev           sta DEVICE              ; device switch
 
-_next4          lda #10                 ; 1/6 second
-                sta DEADTM              ; dead time
+_next4          lda #10                 ; 1/6 second dead time
+                sta DEADTM
 _wait2          lda DEADTM              ; debounce!
                 bne _wait2
 
-                lda CONSOL              ; get console
-                cmp #7                  ; keys released?
+                lda CONSOL              ; get console keys
+                cmp #7                  ; released?
                 bne _next4
 
 
@@ -157,18 +148,8 @@ _next6          sta MISL,X              ; clear missiles
                 ;lda #>PM               ; PM address high
                 ;sta PMBASE             ; into hardware
 
-                ;lda #$3E               ; enable single
-                ;sta SDMCTL             ; line resolution
-                ;sta DMACTL             ; DMA control
-
-                ;lda #3                 ; enable player
-                ;sta GRACTL             ; and missile DMA
-
-                ;lda #$11               ; set up
-                ;sta GPRIOR             ; P/M priority
-
-                lda #0                  ; get zero
-                sta TITLE               ; title off
+                lda #0                  ; title off
+                sta TITLE
 
 ; ---------------
 ; Draw The Planet
@@ -180,6 +161,7 @@ _next6          sta MISL,X              ; clear missiles
                 lda #>PPOS              ; planet pos high
                 sta INDX1+1             ; pointer #1 high
                 sta INDX2+1             ; pointer #2 high
+
                 ldx #0                  ; table pointer
 _next7          ldy #0                  ; index pointer
 _next8          lda _tblDrawPlanet,X    ; table value
@@ -189,10 +171,10 @@ _next8          lda _tblDrawPlanet,X    ; table value
 
 _dp2            bmi _dpRepeat           ; repeat? Yes.
 
-                sta (INDX1),Y           ; put values
-                sta (INDX2),Y           ; onto screen
-                iny                     ; inc index pntr
-                inx                     ; inc table pntr
+                sta (INDX1),Y           ; put values onto screen
+                sta (INDX2),Y
+                iny
+                inx
                 jmp _next8
 
 

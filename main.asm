@@ -48,10 +48,10 @@ _next2          lda SCOINI,X            ; get byte
                 sta GAMCTL              ; game control
                 jsr ShowScore
 
-                lda #$54                ; graphic-LF of
-                sta SCRN+1939           ; planet center
-                lda #$15                ; graphic-RT of
-                sta SCRN+1940           ; planet center
+                lda #$54                ; graphic-LF of planet center
+                sta SCRN+1939
+                lda #$15                ; graphic-RT of planet center
+                sta SCRN+1940
                 ;sta HITCLR             ; reset collision
 
                 .endproc
@@ -110,8 +110,6 @@ MainLoop        .proc
                 lda PAUSED              ; game paused?
                 bne MainLoop            ; Yes. loop here
 
-                lda #0
-                ;sta ATRACT             ; attract mode
                 lda GAMCTL              ; game done?
                 bpl _checkCore          ; No. check core
 
