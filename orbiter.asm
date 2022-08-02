@@ -116,7 +116,7 @@ _live           lda LIVES               ; lives left?
                 sta SATLIV              ; kill satellite
                 sta SCNT                ; init orbit
                 ldx LIVES               ; one less life
-                sta SCOLIN+14,X         ; erase life
+                ;sta SCOLIN+14,X         ; erase life       HACK:
                 dec LIVES               ; dec lives count
                 bpl _moreSats           ; any left? Yes.
 

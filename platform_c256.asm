@@ -111,7 +111,7 @@ Custom_LUT      .dword $00282828        ; 0: Dark Jungle Green  [Editor Text bg]
                 .dword $00BC605E        ; C: Medium Carmine     [Define]
                 .dword $00C9A765        ; D: Satin Sheen Gold   [Type]
                 .dword $0062C36B        ; E: Mantis Green       [Highlight]
-                .dword $00BC605E        ; F: Medium Carmine     [Warning]
+                .dword $0003540A        ; F: Pakistan Green     [Warning]
 
                 .endproc
 
@@ -611,6 +611,113 @@ _cont           sta CS_COLOR_MEM_PTR+v_displayLine,X
 
 _XIT            plp
                 rts
+                .endproc
+
+
+;======================================
+; Render Score Line
+;======================================
+RenderScoreLine .proc
+v_displayLine   .var 2*CharResX
+;---
+                php
+                .m8i8
+
+                ldx #$FF
+                ldy #$FF
+_nextChar       inx
+                iny
+                cpy #$14
+                beq _XIT2
+
+                lda v_SCOLIN,Y
+                cmp #$20
+                beq _space
+
+                cmp #$2A
+                beq _symbol
+
+                cmp #$41
+                bcc _number
+                bra _letter
+
+_space          lda #$00
+                sta CS_COLOR_MEM_PTR+v_displayLine,X
+                sta CS_TEXT_MEM_PTR+v_displayLine,X
+                inx
+                sta CS_COLOR_MEM_PTR+v_displayLine,X
+                sta CS_TEXT_MEM_PTR+v_displayLine,X
+
+                bra _nextChar
+
+_symbol         phx
+                lda #$30
+                sta CS_COLOR_MEM_PTR+v_displayLine,X
+                inx
+                sta CS_COLOR_MEM_PTR+v_displayLine,X
+                plx
+
+                lda #$9E
+                sta CS_TEXT_MEM_PTR+v_displayLine,X
+                inx
+                inc A
+                sta CS_TEXT_MEM_PTR+v_displayLine,X
+
+                bra _nextChar
+
+_XIT2           bra _XIT
+
+;   (ascii-30)*2+$A0
+_number         pha
+                cpy #$07
+                bcs _lvl
+
+_score          lda #$F0
+                bra _cont
+
+_lvl            lda #$20
+_cont           phx
+                sta CS_COLOR_MEM_PTR+v_displayLine,X
+                inx
+                sta CS_COLOR_MEM_PTR+v_displayLine,X
+                plx
+                pla
+
+                sec
+                sbc #$30
+                asl A
+                clc
+                adc #$A0
+
+                sta CS_TEXT_MEM_PTR+v_displayLine,X
+                inx
+                inc A
+                sta CS_TEXT_MEM_PTR+v_displayLine,X
+
+                bra _nextChar
+
+_letter         pha
+
+                phx
+                lda #$20
+                sta CS_COLOR_MEM_PTR+v_displayLine,X
+                inx
+                sta CS_COLOR_MEM_PTR+v_displayLine,X
+                plx
+                pla
+
+                sta CS_TEXT_MEM_PTR+v_displayLine,X
+                inx
+                clc
+                adc #$40
+                sta CS_TEXT_MEM_PTR+v_displayLine,X
+
+                jmp _nextChar
+
+_XIT            plp
+                rts
+
+v_SCOLIN        .text ' 000010 LVL01 ***** '
                 .endproc
 
 

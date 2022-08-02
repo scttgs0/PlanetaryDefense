@@ -107,4 +107,5 @@ BOMBLR          .fill 4                 ; bomb left/right
 PROJLR          .fill 8                 ; proj. left/right
 BOMBUD          .fill 4                 ; bomb up/down
 PROJUD          .fill 8                 ; proj. up/down
-SCOLIN          .fill 20                ; score line
+;SCOLIN          .fill 20                ; score line
+SCOLIN          .text ' 000010 LVL01 ***** '

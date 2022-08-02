@@ -59,13 +59,13 @@ ShowBCD         .proc
                 sta SHOBYT              ; save digits
                 and #$0F                ; get lower digit
                 ora SHCOLR              ; add color
-                sta SCOLIN+1,X          ; show it
+                ;sta SCOLIN+1,X          ; show it      HACK:
                 lda SHOBYT              ; get both again
                 lsr A                   ; mask...
                 lsr A                   ; off...
                 lsr A                   ; upper...
                 lsr A                   ; digit
                 ora SHCOLR              ; add color
-                sta SCOLIN,X            ; show it!
+                ;sta SCOLIN,X            ; show it!     HACK:
                 rts
                 .endproc

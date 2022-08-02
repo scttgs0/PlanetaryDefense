@@ -20,7 +20,7 @@ _next1          sta BOMACT,X            ; deactivate
 
                 ldx #19                 ; zero score line
 _next2          lda SCOINI,X            ; get byte
-                sta SCOLIN,X            ; put score line
+                ;sta SCOLIN,X            ; put score line       HACK:
                 dex                     ; next byte
                 bpl _next2              ; done? No.
 

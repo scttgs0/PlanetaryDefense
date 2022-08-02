@@ -66,6 +66,8 @@ _next2          ;sta GRAFP0,X           ; clear register
                 dex
                 bpl _next2
 
+                jsr InitIRQs
+
 ;   render title screen
                 jsr RenderPublisher
                 jsr RenderTitle
@@ -77,7 +79,8 @@ _next2          ;sta GRAFP0,X           ; clear register
                 ;lda #7                 ; deferred
                 ;jsr SETVBV             ; set vblank
 
-                lda #60                 ; one second dead time
+                ;lda #60                 ; one second dead time
+                lda #0      ; HACK:
                 sta DEADTM
 
 ; --------------------------
@@ -103,7 +106,8 @@ _next3          ;lda PTRIG0             ; paddle trig 0
                 and #1                  ; mask off START
 _pdev           sta DEVICE              ; device switch
 
-_next4          lda #10                 ; 1/6 second dead time
+_next4          ;lda #10                 ; 1/6 second dead time
+                lda #0      ; HACK:
                 sta DEADTM
 _wait2          lda DEADTM              ; debounce!
                 bne _wait2
@@ -140,10 +144,9 @@ _next6          sta MISL,X              ; clear missiles
                 dex                     ; done 256 bytes?
                 bne _next6
 
-                ;lda #<GameDL
-                ;sta SDLSTL
-                ;lda #>GameDL
-                ;sta SDLSTL+1
+                jsr ClearScreen
+                jsr RenderScoreLine
+_endless        bra _endless
 
                 ;lda #>PM               ; PM address high
                 ;sta PMBASE             ; into hardware
