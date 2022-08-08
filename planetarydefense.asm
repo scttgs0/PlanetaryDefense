@@ -65,7 +65,7 @@ BOOT            clc
                 .include "explosion.asm"
                 .include "plot.asm"
                 .include "bomb.asm"
-                .include "sauser.asm"
+                .include "saucer.asm"
                 .include "projectile.asm"
                 .include "console.asm"
                 .include "sound.asm"

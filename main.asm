@@ -192,7 +192,7 @@ _noTrig         jsr BombAdvance         ; advance bombs
                 lda SAUCER              ; saucer flag
                 beq _resetTimer         ; saucer? No.
 
-                jsr SauserShoot         ; Yes. let shoot
+                jsr SaucerShoot         ; Yes. let shoot
 
 _resetTimer     lda #1                  ; get one
                 sta EXPTIM              ; reset timer

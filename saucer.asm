@@ -1,11 +1,11 @@
 ;======================================
 ; Saucer random generator 0..99
 ;======================================
-SauserRandom    .proc
+SaucerRandom    .proc
                 .randomByte             ; random number
                 and #$7F                ; 0..127
                 cmp #100                ; compare w/100
-                bcs SauserRandom        ; less than? No.
+                bcs SaucerRandom        ; less than? No.
 
                 rts
                 .endproc
@@ -14,7 +14,7 @@ SauserRandom    .proc
 ;======================================
 ; Saucer shoot routine
 ;======================================
-SauserShoot     .proc
+SaucerShoot     .proc
                 .randomByte             ; random number
                 cmp #6                  ; 2.3% chance?
                 bcs _XIT                ; less than? No.

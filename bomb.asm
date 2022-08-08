@@ -26,7 +26,7 @@ _gotBomb        lda #1                  ; this one is active now
                 sta BXHOLD,X            ;   vector X hold
                 sta BYHOLD,X            ;   vector Y hold
                 lda GAMCTL              ; game control
-                bmi _noSauser           ; saucer possible?
+                bmi _noSaucer           ; saucer possible?
 
 
 ; --------------
@@ -34,11 +34,11 @@ _gotBomb        lda #1                  ; this one is active now
 ; --------------
 
                 cpx #3                  ;   Yes. bomb #3?
-                bne _noSauser           ;   No. skip next
+                bne _noSaucer           ;   No. skip next
 
                 .randomByte
                 cmp SAUCHN              ; compare chances
-                bcs _noSauser           ; put saucer? No.
+                bcs _noSaucer           ; put saucer? No.
 
                 lda #1                  ;   Yes. get one
                 sta SAUCER              ; enable saucer
@@ -49,7 +49,7 @@ _gotBomb        lda #1                  ; this one is active now
                 cmp #NIL                ; random flag?
                 bne _saveSauX           ;   No. use as X
 
-                jsr SauserRandom        ; random X-coord
+                jsr SaucerRandom        ; random X-coord
 
                 adc #35                 ; add X offset
 _saveSauX       sta FROMX               ; from X vector
@@ -58,7 +58,7 @@ _saveSauX       sta FROMX               ; from X vector
                 cmp #NIL                ; random flag?
                 bne _saveSauY           ;   No. use as Y
 
-                jsr SauserRandom        ; random Y-coord
+                jsr SaucerRandom        ; random Y-coord
 
                 adc #55                 ; add Y offset
 _saveSauY       sta FROMY               ; from Y vector
@@ -84,7 +84,7 @@ _saveEndY       sta TOY                 ; to Y vector
 ; Bomb handler
 ; ------------
 
-_noSauser       .randomByte
+_noSaucer       .randomByte
                 bmi _bombMaxX           ; coin flip
 
                 .randomByte
@@ -182,12 +182,12 @@ _showbomb       lda BOMBY,X             ; bomb Y-coord
                 sta HI                  ; init high byte
                 stx INDX2               ; X temp hold
                 cpx #3                  ; saucer slot?
-                bne _notSauser          ;   No. skip next
+                bne _notSaucer          ;   No. skip next
 
                 lda SAUCER              ; saucer in slot?
                 bne _nextbomb           ;   Yes. skip bomb
 
-_notSauser      ldy BOMBLR,X            ; L/R flag
+_notSaucer      ldy BOMBLR,X            ; L/R flag
                 lda #17                 ; do 17 bytes
                 sta TEMP                ; set counter
                 ldx BombPosStart,Y      ; start position
