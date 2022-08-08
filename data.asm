@@ -2,28 +2,71 @@
 ; Data areas
 ; ----------
 
-BMAXS           .byte 0,250             ; bomb limits
-BOMPIC          .byte 0,0,0,0,0,0,$DC,$3E
-                .byte $7E,$3E,$DC,0,0,0,0
-                .byte 0,0,$76,$F8,$FC
-                .byte $F8,$76,0,0,0,0,0,0
-BPSTRT          .byte 27,16
-BXOF            .byte 47,42
-P3COLR          .byte $34,$F8
-SAUPIC          .byte 0,0,$18,$7E,0,0
-                .byte $7E,$18,0,0
-SAUMID          .byte $92,$49,$24,$92
-STARTX          .byte 40,$FF,210,$FF
-STARTY          .byte $FF,20,$FF,230
-ENDX            .byte $FF,210,$FF,40
-ENDY            .byte 20,$FF,230,$FF
+BombLimits      .byte 0,250             ; top/bottom limits
+
+SHAPE_Bomb      .byte $00    ; ................
+                .byte $00    ; ................
+                .byte $00    ; ................
+                .byte $00    ; ................
+                .byte $00    ; ................
+                .byte $00    ; ................
+                .byte $DC    ; ####..######....
+                .byte $3E    ; ....##########..
+                .byte $7E    ; ..############..
+                .byte $3E    ; ....##########..
+                .byte $DC    ; ####..######....
+                .byte $00    ; ................
+                .byte $00    ; ................
+                .byte $00    ; ................
+
+                .byte $00    ; ................
+                .byte $00    ; ................
+                .byte $00    ; ................
+                .byte $76    ; ..######..####..
+                .byte $F8    ; ##########......
+                .byte $FC    ; ############....
+                .byte $F8    ; ##########......
+                .byte $76    ; ..######..####..
+                .byte $00    ; ................
+                .byte $00    ; ................
+                .byte $00    ; ................
+                .byte $00    ; ................
+                .byte $00    ; ................
+                .byte $00    ; ................
+BombPosStart    .byte 27,16
+BombOffsetX     .byte 47,42
+
+;--------------------------------------
+
+SaucerColor     .byte $34,$F8
+
+SHAPE_Saucer    .byte $00    ; ........
+                .byte $00    ; ........
+                .byte $18    ; ...##...
+                .byte $7E    ; .######.
+                .byte $00    ; ........
+                .byte $00    ; ........
+                .byte $7E    ; .######.
+                .byte $18    ; ...##...
+                .byte $00    ; ........
+                .byte $00    ; ........
+
+SaucerMiddle    .byte $92    ; #..#..#.
+                .byte $49    ; .#..#..#
+                .byte $24    ; ..#..#..
+                .byte $92    ; #..#..#.
+
+SaucerStartX    .byte 40,$FF,210,$FF
+SaucerStartY    .byte $FF,20,$FF,230
+SaucerEndX      .byte $FF,210,$FF,40
+SaucerEndY      .byte 20,$FF,230,$FF
 
 ; ---------------------
 ; Explosion data tables
 ; ---------------------
 
-PLOTBL          .byte $C0,$30,$0C,$03
-ERABIT          .byte $3F,$CF,$F3,$FC
+PlotBits        .byte $C0,$30,$0C,$03
+EraseBits       .byte $3F,$CF,$F3,$FC
 PROMSK          .byte 0,0,0,0
                 .byte $FF,$FF,$FF,$FF
                 .byte $FF,$FF,$AA,$AA
@@ -44,31 +87,31 @@ COORD2          .byte 0,0,1,255,0,1
 ; Initial score line
 ; ------------------
 
-SCOINI          .byte $00,$00,$00,$00
+ScoreINI        .byte $00,$00,$00,$00   ; '        '
                 .byte $00,$00,$00,$00
-                .byte $6C,$76,$6C,$00
-                .byte $00,$00,$CA,$CA
+                .byte $6C,$76,$6C,$00   ; 'LVL '
+                .byte $00,$00,$CA,$CA   ; '  ***** '
                 .byte $CA,$CA,$CA,$00
 
 ; ------------
 ; Level tables
 ; ------------
 
-INIBOM          .byte 10,15,20,25,20,25
+INIBOM          .byte 10,15,20,25,20,25         ; bombs/level
                 .byte 15,20,25,20,25,30
-INIBS           .byte 12,11,10,9,8,7
+INIBS           .byte 12,11,10,9,8,7            ; bomb speed
                 .byte 7,6,5,5,4,3
-INISC           .byte 0,10,50,90,50,80
+INISC           .byte 0,10,50,90,50,80          ; saucer chance
                 .byte 40,60,100,80,120,125
-INIPC           .byte $20,$30,$40,$50,$60
+INIPC           .byte $20,$30,$40,$50,$60       ; planet color
                 .byte $70,$80,$A0,$B0,$C0
                 .byte $D0,$FF
-INIBVH          .byte 0,0,0,0,0,0
+INIBVH          .byte 0,0,0,0,0,0               ; bomb value high
                 .byte 0,0,0,$01,$01,$01
-INIBVL          .byte $10,$20,$30,$40,$50
+INIBVL          .byte $10,$20,$30,$40,$50       ; bomb value low
                 .byte $60,$70,$80,$90,$00
                 .byte $10,$20
-INISV           .byte 0,1,1,1,2,2
+INISV           .byte 0,1,1,1,2,2               ; saucer value
                 .byte 3,3,3,4,4,4
 
 ; ----------

@@ -484,8 +484,9 @@ HACK
                 cld                     ; clear decimal
 
                 ldx SAUCER              ; saucer flag as
-                lda P3COLR,X            ; index 0 or 1
+                lda SaucerColor,X       ; index 0 or 1
                 ;sta PCOLR3             ; saucer color
+
                 lda #5                  ; get 5
                 sta DLICNT              ; reset DLI count
 
@@ -500,7 +501,7 @@ HACK
                 eor #$FF                ; invert it
                 sta PAUSED              ; save pause flag
 
-                lda #$FF                ; get $FF
+                lda #NIL
                 sta KEYCHAR             ; reset keyboard
 
 _1              lda PAUSED              ; pause flag
@@ -514,7 +515,7 @@ _next1          ;sta AUDF1,X            ; zero sound
 
                 rti
 
-_nopau          lda TITLE               ; title flag
+_nopau          lda isTitleScreen       ; title flag
                 bne _nocyc              ; title? Yes.
 
                 ;lda COLOR2             ; No. get color
@@ -658,7 +659,7 @@ _next5          cpy #32                 ; above top?
                 cpy #223                ; below bottom?
                 bcs _nxtsp              ; Yes. skip it
 
-                lda SAUPIC,X            ; saucer image
+                lda SHAPE_Saucer,X      ; saucer image
                 sta PLR3,Y              ; store player 3
 _nxtsp          dey                     ; next scan line
                 dex                     ; dec index
@@ -671,9 +672,9 @@ _nxtsp          dey                     ; next scan line
                 lsr A                   ; /2
                 and #$03                ; use only 0..3
                 tax                     ; as X index
-                lda SAUMID,X            ; saucer middle
-                sta SAUPIC+4            ; put in
-                sta SAUPIC+5            ; saucer image
+                lda SaucerMiddle,X            ; saucer middle
+                sta SHAPE_Saucer+4      ; put in
+                sta SHAPE_Saucer+5      ; saucer image
 
 _sounds         ldx PSSCNT              ; shot sound
                 bpl _doSnd1             ; shot? Yes.

@@ -7,6 +7,10 @@
 ;   and Tom Hudson
 ; ------------------
 
+;   SP00        player
+;   SP03        saucer
+;   SP04        satellite
+
                 .cpu "65816"
 
                 .include "equates_system_c256.asm"
@@ -16,6 +20,7 @@
                 .include "macros_65816.asm"
                 .include "macros_frs_graphic.asm"
                 .include "macros_frs_mouse.asm"
+                .include "macros_frs_random.asm"
 
 
 ;-------------------------------------

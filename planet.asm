@@ -2,6 +2,8 @@
 ; Display the Intro Screen
 ;-------------------------------------
 Planet          .proc
+                jsr Random_Seed
+
                 .frsGraphics mcTextOn|mcOverlayOn|mcGraphicsOn|mcSpriteOn,mcVideoMode320
                 .frsMouse_off
                 .frsBorder_off
@@ -33,9 +35,9 @@ _next1          sta $80,X               ; clear top of page-0
                 dex                     ; dec pointer
                 bne _next1
 
-                inc TITLE               ; title on flag
+                inc isTitleScreen       ; title on flag
 
-                lda #$FF
+                lda #NIL
                 sta LIVES               ; set dead
                 sta GAMCTL              ; game control
                 sta ESSCNT              ; no enemy shots
@@ -135,14 +137,14 @@ _next5          sta (INDEX),Y           ; clear ram
                 dex                     ; page counter
                 bpl _next5              ; scrn done? No.
 
-                ldx #0                  ; now clear P/m
-_next6          sta MISL,X              ; clear missiles
-                sta PLR0,X              ; clear plyr 0
-                sta PLR1,X              ; clear plyr 1
-                sta PLR2,X              ; clear plyr 2
-                sta PLR3,X              ; clear plyr 3
-                dex                     ; done 256 bytes?
-                bne _next6
+;                ldx #0                  ; now clear P/m
+;_next6          sta MISL,X              ; clear missiles
+;                sta PLR0,X              ; clear plyr 0
+;                sta PLR1,X              ; clear plyr 1
+;                sta PLR2,X              ; clear plyr 2
+;                sta PLR3,X              ; clear plyr 3
+;                dex                     ; done 256 bytes?
+;                bne _next6
 
                 jsr ClearScreen
                 jsr RenderScoreLine
@@ -151,8 +153,8 @@ _endless        bra _endless
                 ;lda #>PM               ; PM address high
                 ;sta PMBASE             ; into hardware
 
-                lda #0                  ; title off
-                sta TITLE
+                lda #FALSE              ; title off
+                sta isTitleScreen
 
 ; ---------------
 ; Draw The Planet
@@ -161,6 +163,7 @@ _endless        bra _endless
                 lda #<PPOS              ; planet pos high
                 sta INDX1               ; pointer #1 low
                 sta INDX2               ; pointer #2 low
+
                 lda #>PPOS              ; planet pos high
                 sta INDX1+1             ; pointer #1 high
                 sta INDX2+1             ; pointer #2 high
@@ -178,7 +181,7 @@ _dp2            bmi _dpRepeat           ; repeat? Yes.
                 sta (INDX2),Y
                 iny
                 inx
-                jmp _next8
+                bra _next8
 
 
 ; -------------------
@@ -198,6 +201,7 @@ _fill1          pha                     ; save color byte
                 and #$0F                ; mask 4 bits
                 sta COUNT               ; save as count
                 pla                     ; restore color
+
 _next9          sta (INDX1),Y           ; put bytes
                 sta (INDX2),Y           ; onto screen
                 iny                     ; inc index
@@ -226,9 +230,9 @@ _dpN1           clc                     ; clear carry
 
 ;--------------------------------------
 
-; ---------------
+; ----------------
 ; Planet Draw Data
-; ---------------
+; ----------------
 
 _tblDrawPlanet  .byte $EA,$EA,$EA,$EA
                 .byte $EA,$15,$A8,$54

@@ -55,7 +55,7 @@ SSSCNT          .byte ?                 ; saucer snd cnt
 EXSCNT          .byte ?                 ; expl. snd count
 ESSCNT          .byte ?                 ; enemy shot snd
 PSSCNT          .byte ?                 ; player shot snd
-TITLE           .byte ?                 ; title scrn flag
+isTitleScreen   .byte ?                 ; title scrn flag
 EXPCNT          .byte ?                 ; explosion counter
 NEWX            .byte ?                 ; explosion x
 NEWY            .byte ?                 ; explosion y
@@ -85,3 +85,10 @@ CONSOL          .byte ?                 ; state of OPTION,SELECT,START
 SOURCE          .dword ?                ; Starting address for the source data (4 bytes)
 DEST            .dword ?                ; Starting address for the destination block (4 bytes)
 SIZE            .dword ?                ; Number of bytes to copy (4 bytes)
+
+zpSource        .addr ?
+zpDest          .addr ?
+
+RND_MIN         .byte ?
+RND_SEC         .byte ?
+RND_RESULT      .word ?

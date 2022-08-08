@@ -2,7 +2,7 @@
 ; Saucer random generator 0..99
 ;======================================
 SauserRandom    .proc
-                lda SID_RANDOM          ; random number
+                .randomByte             ; random number
                 and #$7F                ; 0..127
                 cmp #100                ; compare w/100
                 bcs SauserRandom        ; less than? No.
@@ -15,7 +15,7 @@ SauserRandom    .proc
 ; Saucer shoot routine
 ;======================================
 SauserShoot     .proc
-                lda SID_RANDOM          ; random number
+                .randomByte             ; random number
                 cmp #6                  ; 2.3% chance?
                 bcs _XIT                ; less than? No.
 

@@ -17,3 +17,7 @@ ORBY            = $1F00                 ; orbit Y
 
 CharResX        = 40
 CharResY        = 30
+
+FALSE           = 0
+TRUE            = 1
+NIL             = $FF

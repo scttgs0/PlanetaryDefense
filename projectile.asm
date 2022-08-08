@@ -66,7 +66,7 @@ _next1          lda BOMACT,X            ; active?
                 jsr PLOT                ; calc plot addr
 
                 lda (LO),Y              ; get plot byte
-                and ERABIT,X            ; erase bit
+                and EraseBits,X         ; erase bit
                 sta (LO),Y              ; replace byte
                 ldx XHOLD               ; restore X
                 jsr AdvanceIt           ; advance proj
@@ -83,7 +83,7 @@ _next1          lda BOMACT,X            ; active?
                 sta PLOTY               ; plotter Y
                 jsr PLOT                ; calc plot addr
 
-                lda PLOTBL,X            ; get plot mask
+                lda PlotBits,X          ; get plot mask
                 and (LO),Y              ; chk collision
                 beq _projOK             ; No. plot it
 
@@ -98,7 +98,7 @@ _killProj       lda #0                  ; get zero
                 sta BOMACT,X            ; kill proj
                 jmp _nextProj           ; skip next
 
-_projOK         lda PLOTBL,X            ; plot mask
+_projOK         lda PlotBits,X          ; plot mask
                 ldx XHOLD               ; restore X
                 and PROMSK,X            ; mask color
                 ora (LO),Y              ; add playfield

@@ -12,6 +12,55 @@ BITMAPTXT3      = $B31400
 
 
 ;======================================
+; seed = elapsed seconds this hour
+;======================================
+Random_Seed     .proc
+                .m8
+                lda RTC_MIN
+                sta RND_MIN
+                lda RTC_SEC
+                sta RND_SEC
+
+                .m16
+;   elapsed minutes * 60
+                lda RND_MIN
+                asl A
+                asl A
+                pha
+                asl A
+                pha
+                asl A
+                pha
+                asl A
+                sta RND_RESULT      ; *32
+                pla
+                clc
+                adc RND_RESULT      ; *16
+                sta RND_RESULT
+                pla
+                clc
+                adc RND_RESULT      ; *8
+                sta RND_RESULT
+                pla
+                clc
+                adc RND_RESULT      ; *4
+                sta RND_RESULT
+
+;   + elapsed seconds
+                lda RND_SEC
+                adc RND_RESULT
+
+                sta GABE_RNG_SEED_LO
+
+                .m8
+                lda #grcEnable|grcDV
+                sta GABE_RNG_CTRL
+                lda #grcEnable
+                sta GABE_RNG_CTRL
+                .endproc
+
+
+;======================================
 ; Initialize SID
 ;======================================
 InitSID         .proc
@@ -366,41 +415,104 @@ InitBitmap      .proc
 
 
 ;======================================
-; Clear the visible screen
+; Clear the play area of the screen
 ;======================================
 ClearScreen     .proc
 v_QtyPages      .var $04                ; 40x30 = $4B0... 4 pages + 176 bytes
+                                        ; remaining 176 bytes cleared via ClearGamePanel
 
-v_Empty         .var $00
+v_EmptyText     .var $00
 v_TextColor     .var $40
 ;---
 
                 php
-                .m16i8
+                .m8i8
 
-;   reset the addresses to make this reentrant
-                lda #<>CS_TEXT_MEM_PTR
-                sta _setAddr1+1
-                lda #<>CS_COLOR_MEM_PTR
-                sta _setAddr2+1
+;   clear color
+                lda #<CS_COLOR_MEM_PTR
+                sta zpDest
+                lda #>CS_COLOR_MEM_PTR
+                sta zpDest+1
+                lda #`CS_COLOR_MEM_PTR
+                sta zpDest+2
 
-                .m8
-                ldx #$00
-                ldy #v_QtyPages
+                ldx #v_QtyPages
+                lda #v_TextColor
+_nextPageC      ldy #$00
+_next1C         sta [zpDest],Y
 
-_clearNext      lda #v_Empty
-_setAddr1       sta CS_TEXT_MEM_PTR,x   ; SMC
+                iny
+                bne _next1C
+
+                inc zpDest+1            ; advance to next memory page
+                dex
+                bne _nextPageC
+
+;   clear text
+                lda #<CS_TEXT_MEM_PTR
+                sta zpDest
+                lda #>CS_TEXT_MEM_PTR
+                sta zpDest+1
+                lda #`CS_TEXT_MEM_PTR
+                sta zpDest+2
+
+                ldx #v_QtyPages
+                lda #v_EmptyText
+_nextPageT      ldy #$00
+_next1T         sta [zpDest],Y
+
+                iny
+                bne _next1T
+
+                inc zpDest+1            ; advance to next memory page
+                dex
+                bne _nextPageT
+
+                plp
+                rts
+                .endproc
+
+
+;======================================
+; Clear the bottom of the screen
+;======================================
+ClearGamePanel  .proc
+v_EmptyText     .var $00
+v_TextColor     .var $40
+;---
+
+                php
+                .m8i8
+
+                lda #<CS_COLOR_MEM_PTR+24*CharResX
+                sta zpDest
+                lda #>CS_COLOR_MEM_PTR+24*CharResX
+                sta zpDest+1
+                lda #`CS_COLOR_MEM_PTR+24*CharResX
+                sta zpDest+2
 
                 lda #v_TextColor
-_setAddr2       sta CS_COLOR_MEM_PTR,x  ; SMC
+                ldy #$00
+_next1          sta [zpDest],Y
 
-                inx
-                bne _clearNext
+                iny
+                cpy #$F0                ; 6 lines
+                bne _next1
 
-                inc _setAddr1+2         ; advance to next memory page
-                inc _setAddr2+2         ; advance to next memory page
-                dey
-                bne _clearNext
+                lda #<CS_TEXT_MEM_PTR+24*CharResX
+                sta zpDest
+                lda #>CS_TEXT_MEM_PTR+24*CharResX
+                sta zpDest+1
+                lda #`CS_TEXT_MEM_PTR+24*CharResX
+                sta zpDest+2
+
+                lda #v_EmptyText
+                ldy #$00
+_next2          sta [zpDest],Y
+
+                iny
+                cpy #$F0                ; 6 lines
+                bne _next2
 
                 plp
                 rts
@@ -849,7 +961,7 @@ _relocate       ;lda @l $024000,X        ; HandleIrq address
                 ;lda @l vecIRQ
                 ;sta IRQ_PRIOR
 
-                lda #<>$002300
+                lda #<>HandleIrq
                 sta @l vecIRQ
 
                 .m8

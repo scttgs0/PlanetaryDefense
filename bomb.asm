@@ -36,17 +36,17 @@ _gotBomb        lda #1                  ; this one is active now
                 cpx #3                  ;   Yes. bomb #3?
                 bne _noSauser           ;   No. skip next
 
-                lda SID_RANDOM
+                .randomByte
                 cmp SAUCHN              ; compare chances
                 bcs _noSauser           ; put saucer? No.
 
                 lda #1                  ;   Yes. get one
                 sta SAUCER              ; enable saucer
-                lda SID_RANDOM
+                .randomByte
                 and #$03                ; range: 0..3
                 tay
-                lda STARTX,Y            ; saucer start X
-                cmp #$FF                ; random flag?
+                lda SaucerStartX,Y      ; saucer start X
+                cmp #NIL                ; random flag?
                 bne _saveSauX           ;   No. use as X
 
                 jsr SauserRandom        ; random X-coord
@@ -54,8 +54,8 @@ _gotBomb        lda #1                  ; this one is active now
                 adc #35                 ; add X offset
 _saveSauX       sta FROMX               ; from X vector
                 sta BOMBX,X             ; init X-coord
-                lda STARTY,Y            ; saucer start Y
-                cmp #$FF                ; random flag?
+                lda SaucerStartY,Y      ; saucer start Y
+                cmp #NIL                ; random flag?
                 bne _saveSauY           ;   No. use as Y
 
                 jsr SauserRandom        ; random Y-coord
@@ -63,16 +63,16 @@ _saveSauX       sta FROMX               ; from X vector
                 adc #55                 ; add Y offset
 _saveSauY       sta FROMY               ; from Y vector
                 sta BOMBY,X             ; init Y-coord
-                lda ENDX,Y              ; saucer end X
-                cmp #$FF                ; random flag?
+                lda SaucerEndX,Y        ; saucer end X
+                cmp #NIL                ; random flag?
                 bne _saveEndX           ;   No. use as X
 
                 lda #230                ; screen right
                 sec                     ; offset so not to hit planet
                 sbc FROMY
 _saveEndX       sta TOX                 ; to X vector
-                lda ENDY,Y              ; saucer end Y
-                cmp #$FF                ; random flag?
+                lda SaucerEndY,Y        ; saucer end Y
+                cmp #NIL                ; random flag?
                 bne _saveEndY           ;   No. use as Y
 
                 lda FROMX               ; use X for Y
@@ -84,27 +84,27 @@ _saveEndY       sta TOY                 ; to Y vector
 ; Bomb handler
 ; ------------
 
-_noSauser       lda SID_RANDOM
+_noSauser       .randomByte
                 bmi _bombMaxX           ; coin flip
 
-                lda SID_RANDOM
+                .randomByte
                 and #1                  ; make 0..1
                 tay
-                lda BMAXS,Y             ; top/bottom tbl
+                lda BombLimits,Y        ; top/bottom tbl
                 sta BOMBY,X             ; bomb Y-coord
-_next2          lda SID_RANDOM
+_next2          .randomByte
                 cmp #250                ; compare w/250
                 bcs _next2              ; less than? No.
 
                 sta BOMBX,X             ; bomb X-coord
                 jmp _bombvec
 
-_bombMaxX       lda SID_RANDOM
+_bombMaxX       .randomByte
                 and #1                  ; make 0..1
                 tay                     ; use as index
-                lda BMAXS,Y             ; 0 or 250
+                lda BombLimits,Y        ; 0 or 250
                 sta BOMBX,X             ; bomb X-coord
-_next3          lda SID_RANDOM
+_next3          .randomByte
                 cmp #250                ; compare w/250
                 bcs _next3              ; less than? No.
 
@@ -190,7 +190,7 @@ _showbomb       lda BOMBY,X             ; bomb Y-coord
 _notSauser      ldy BOMBLR,X            ; L/R flag
                 lda #17                 ; do 17 bytes
                 sta TEMP                ; set counter
-                ldx BPSTRT,Y            ; start position
+                ldx BombPosStart,Y      ; start position
                 ldy INDX1               ; bomb Y pos
 _bombdraw       cpy #32                 ; off screen top?
                 bcc _nobombdraw         ;   Yes. skip next
@@ -198,7 +198,7 @@ _bombdraw       cpy #32                 ; off screen top?
                 cpy #223                ; screen bottom?
                 bcs _nobombdraw         ;   Yes. skip next
 
-                lda BOMPIC,X            ; bomb stamp put in PM area
+                lda SHAPE_Bomb,X        ; bomb stamp put in PM area
                 sta (LO),Y
 _nobombdraw     dey                     ; PM index
                 dex                     ; stamp index
@@ -288,7 +288,7 @@ _noscore        lda #0
                 ldy BOMBLR,X            ; L/R flag
                 lda BOMBX,X             ; bomb X-coord
                 sec
-                sbc BXOF,Y              ; bomb X offset
+                sbc BombOffsetX,Y              ; bomb X offset
                 sta NEWX                ; plotter X-coord
                 lda BOMBY,X             ; bomb Y-coord
                 sec

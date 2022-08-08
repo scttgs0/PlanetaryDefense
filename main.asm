@@ -1,7 +1,6 @@
-; ----------------
+; -------------------------------------
 ; Initialize Misc.
-; ----------------
-
+; -------------------------------------
 INIT            .proc
                 lda #0                  ; zero out..
                 sta SCORE               ; score byte 0
@@ -19,7 +18,7 @@ _next1          sta BOMACT,X            ; deactivate
                 bpl _next1              ; done? No.
 
                 ldx #19                 ; zero score line
-_next2          lda SCOINI,X            ; get byte
+_next2          lda ScoreINI,X          ; get byte
                 ;sta SCOLIN,X            ; put score line       HACK:
                 dex                     ; next byte
                 bpl _next2              ; done? No.
@@ -52,6 +51,7 @@ _next2          lda SCOINI,X            ; get byte
                 sta SCRN+1939
                 lda #$15                ; graphic-RT of planet center
                 sta SCRN+1940
+
                 ;sta HITCLR             ; reset collision
 
                 .endproc
@@ -72,11 +72,12 @@ SetLevel        .proc
                 sta BOMTI               ; bomb timer
                 lda INISC,X             ; % chance of
                 sta SAUCHN              ; saucer in level
+
                 lda INIPC,X             ; planet color
                 cmp #$FF                ; level >14?
                 bne _savePC             ; No. skip next
 
-                lda SID_RANDOM          ; random color
+                .randomByte             ; random color
                 and #$F0                ; mask off lum.
 _savePC         sta vPlanetColor
 
@@ -142,7 +143,7 @@ _planetDead     lda #0                  ; get zero
                 sta BOMBS               ; zero bombs
                 sta SATLIV              ; satelite dead
 
-                lda #$FF                ; get #$FF
+                lda #NIL
                 sta LIVES               ; no lives left
                 sta GAMCTL              ; game control
                 jsr SoundOff

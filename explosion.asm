@@ -88,12 +88,12 @@ _doPlot         inc CNT,X               ; inc pointer
                 lda PLOTCLR             ; erase it?
                 bne _clearIt            ; Yes. clear it
 
-                lda PLOTBL,X            ; get plot bits
+                lda PlotBits,X          ; get plot bits
                 ora (LO),Y              ; alter display
 _next3          sta (LO),Y              ; and replot it!
                 jmp _next1
 
-_clearIt        lda ERABIT,X            ; erase bits
+_clearIt        lda EraseBits,X         ; erase bits
                 and (LO),Y              ; turn off pixel
                 jmp _next3              ; put it back
 
