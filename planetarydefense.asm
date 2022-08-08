@@ -86,4 +86,11 @@ GameFont_end
 Palette         .include "PALETTE.asm"
 Palette_end
 
+
+;--------------------------------------
+                .align $100
+;--------------------------------------
+
+Stamps          .include "SPRITES.asm"
+Stamps_end
                 .end

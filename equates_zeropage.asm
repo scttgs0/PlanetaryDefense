@@ -82,12 +82,9 @@ itKeyboard  = 1
 KEYCHAR         .byte ?                 ; last key pressed
 CONSOL          .byte ?                 ; state of OPTION,SELECT,START
 
-SOURCE          .dword ?                ; Starting address for the source data (4 bytes)
-DEST            .dword ?                ; Starting address for the destination block (4 bytes)
-SIZE            .dword ?                ; Number of bytes to copy (4 bytes)
-
-zpSource        .addr ?
-zpDest          .addr ?
+zpSource        .dword ?                ; Starting address for the source data (4 bytes)
+zpDest          .dword ?                ; Starting address for the destination block (4 bytes)
+zpSize          .dword ?                ; Number of bytes to copy (4 bytes)
 
 RND_MIN         .byte ?
 RND_SEC         .byte ?

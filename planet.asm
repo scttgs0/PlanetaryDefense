@@ -30,6 +30,8 @@ Planet          .proc
 
                 jsr InitSID             ; init sound
 
+                jsr InitSprites
+
                 ldx #$7F                ; set index
 _next1          sta $80,X               ; clear top of page-0
                 dex                     ; dec pointer
