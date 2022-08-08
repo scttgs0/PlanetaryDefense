@@ -4,7 +4,13 @@
 ;======================================
 ClearPlayer     .proc
                 lda #0                  ; move player...
+                plx
+                asl A                   ; *8
+                asl A
+                asl A
                 sta SP00_X_POS,X        ; off screen,
+                plx
+
                 tay                     ; init index
                 txa                     ; get X
                 ora #>PLR0              ; mask w/address

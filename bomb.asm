@@ -207,7 +207,12 @@ _nobombdraw     dey                     ; PM index
 
                 ldx INDX2               ; restore X
                 lda BOMBX,X             ; bomb X-coord
+                plx
+                asl A                   ; *8
+                asl A
+                asl A
                 sta SP00_X_POS,X        ; player pos
+                plx
 _nextbomb       dex                     ; more bombs?
                 bpl _next1              ;   yes!
 

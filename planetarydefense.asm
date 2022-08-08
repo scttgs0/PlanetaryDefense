@@ -10,6 +10,7 @@
 ;   SP00        player
 ;   SP03        saucer
 ;   SP04        satellite
+;   SP05        satellite
 
                 .cpu "65816"
 

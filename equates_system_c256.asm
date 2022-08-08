@@ -168,6 +168,16 @@ SP03_ADDR               = $AF_0C19
 SP03_X_POS              = $AF_0C1C
 SP03_Y_POS              = $AF_0C1E
 
+SP04_CTRL               = $AF_0C20
+SP04_ADDR               = $AF_0C21
+SP04_X_POS              = $AF_0C24
+SP04_Y_POS              = $AF_0C26
+
+SP05_CTRL               = $AF_0C28
+SP05_ADDR               = $AF_0C29
+SP05_X_POS              = $AF_0C2C
+SP05_Y_POS              = $AF_0C2E
+
 ;---------------------------------------
 
 KEYBOARD_SCAN_CODE      = $AF_115F

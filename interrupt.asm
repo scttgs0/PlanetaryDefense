@@ -621,9 +621,9 @@ _notGameOver    lda SATLIV              ; get satellite
                 lda ORBX,Y              ; get X coord
                 sta SATX                ; save Pfield x
                 adc #47                 ; X offset
-                ;--sta SP05_X_POS          ; horizontal pos
+                sta SP05_X_POS          ; horizontal pos
                 adc #2                  ; +2 offset for
-                ;--sta SP04_X_POS          ; right side
+                sta SP04_X_POS          ; right side
                 lda ORBY,Y              ; get Y coord
                 lsr A                   ; divide by 2
                 sta SATY                ; for playfield
@@ -666,7 +666,7 @@ _nxtsp          dey                     ; next scan line
                 bpl _next5              ; done? No.
 
                 lda BOMBX+3             ; saucer X pos
-                ;--sta SP03_X_POS          ; move it
+                sta SP03_X_POS          ; move it
                 inc SAUTIM              ; saucer time
                 lda SAUTIM              ; get counter
                 lsr A                   ; /2
