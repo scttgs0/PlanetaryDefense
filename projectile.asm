@@ -16,8 +16,8 @@ _next1          lda PROACT,X            ; get status
 ; Got a projectile!
 ; -----------------
 
-_gotpro         lda #13                 ; shot snd time
-                sta PSSCNT              ; player sht snd
+_gotpro         lda #13                 ; shot sound time
+                sta PSSCNT              ; player shot sound
                 lda SATX                ; satellite X
                 sta FROMX               ; shot from X
                 sta PROJX,X             ; proj X table

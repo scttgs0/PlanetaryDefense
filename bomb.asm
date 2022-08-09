@@ -205,6 +205,7 @@ _nobombdraw     dey                     ; PM index
                 dec TEMP                ; dec count
                 bne _bombdraw           ; done? No.
 
+                .m16
                 ldx INDX2               ; restore X
                 lda BOMBX,X             ; bomb X-coord
                 plx
@@ -213,6 +214,8 @@ _nobombdraw     dey                     ; PM index
                 asl A
                 sta SP00_X_POS,X        ; player pos
                 plx
+                .m8
+
 _nextbomb       dex                     ; more bombs?
                 bpl _next1              ;   yes!
 

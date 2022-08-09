@@ -7,6 +7,7 @@
 ;   and Tom Hudson
 ; ------------------
 
+;   MISL        cursor
 ;   SP00        player
 ;   SP03        saucer
 ;   SP04        satellite

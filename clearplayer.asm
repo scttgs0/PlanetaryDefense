@@ -3,6 +3,7 @@
 ; by the X register!
 ;======================================
 ClearPlayer     .proc
+                .m16
                 lda #0                  ; move player...
                 plx
                 asl A                   ; *8
@@ -10,6 +11,7 @@ ClearPlayer     .proc
                 asl A
                 sta SP00_X_POS,X        ; off screen,
                 plx
+                .m8
 
                 tay                     ; init index
                 txa                     ; get X

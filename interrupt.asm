@@ -635,6 +635,7 @@ _notGameOver    lda SATLIV              ; get satellite
                 and #$08                ; use bit 3
                 tay                     ; use as index
 
+; satellite y-pos
                 lda #8                  ; do 8 bytes
                 sta SATEMP              ; save count
 _next4          lda MISL,X              ; missile graphic
@@ -659,20 +660,24 @@ _next5          cpy #32                 ; above top?
                 cpy #223                ; below bottom?
                 bcs _nxtsp              ; Yes. skip it
 
+; saucer y-pos
                 lda SHAPE_Saucer,X      ; saucer image
                 sta PLR3,Y              ; store player 3
 _nxtsp          dey                     ; next scan line
                 dex                     ; dec index
                 bpl _next5              ; done? No.
 
+                .m16
                 lda BOMBX+3             ; saucer X pos
                 sta SP03_X_POS          ; move it
+                .m8
+
                 inc SAUTIM              ; saucer time
                 lda SAUTIM              ; get counter
                 lsr A                   ; /2
                 and #$03                ; use only 0..3
                 tax                     ; as X index
-                lda SaucerMiddle,X            ; saucer middle
+                lda SaucerMiddle,X      ; saucer middle
                 sta SHAPE_Saucer+4      ; put in
                 sta SHAPE_Saucer+5      ; saucer image
 
