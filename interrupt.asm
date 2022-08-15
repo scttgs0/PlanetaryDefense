@@ -426,7 +426,7 @@ Interrupt_DLI   .proc
                 ;sta COLPF0             ; color planet
 
                 ;lda #$8C               ; bright blue
-                ;sta COLPF0+1           ; shot color
+                ;sta COLPF1             ; shot color
 
                 pla                     ; restore X
                 tax                     ; Acc --> X
