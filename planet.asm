@@ -4,7 +4,7 @@
 Planet          .proc
                 jsr Random_Seed
 
-                .frsGraphics mcTextOn|mcOverlayOn|mcGraphicsOn|mcSpriteOn,mcVideoMode320
+                .frsGraphics mcTextOn|mcOverlayOn|mcGraphicsOn|mcBitmapOn|mcSpriteOn,mcVideoMode320
                 .frsMouse_off
                 .frsBorder_off
 
@@ -30,6 +30,7 @@ Planet          .proc
 
                 jsr InitSID             ; init sound
 
+                jsr InitBitmap
                 jsr InitSprites
 
                 ldx #$7F                ; set index
@@ -125,10 +126,11 @@ _wait2          lda DEADTM              ; debounce!
 ; Clear PM Area and Playfield
 ; ---------------------------
 
-                lda #>SCRN              ; scrn addr high
+                lda #>Playfield         ; scrn addr high
                 sta INDEX+1             ; pointer high
-                lda #0                  ; get zero
+                lda #<Playfield         ; get addr low
                 sta INDEX               ; pointer low
+
                 ldx #15                 ; 16 pages 0..15
                 tay                     ; use as index
 _next5          sta (INDEX),Y           ; clear ram
@@ -150,7 +152,6 @@ _next5          sta (INDEX),Y           ; clear ram
 
                 jsr ClearScreen
                 jsr RenderScoreLine
-_endless        bra _endless
 
                 ;lda #>PM               ; PM address high
                 ;sta PMBASE             ; into hardware
@@ -174,6 +175,8 @@ _endless        bra _endless
 _next7          ldy #0                  ; index pointer
 _next8          lda _tblDrawPlanet,X    ; table value
                 bne _dp2                ; done? No.
+
+                jsr BlitPlayfield
 
                 jmp SetupOrbiter
 

@@ -13,6 +13,11 @@
 ;   SP04        satellite
 ;   SP05        satellite
 
+;   Graphics    160x120                 ; 96 graphic; 16 blanks; 8 text
+;       ours    320x240                 ; 76,800 bytes [$12C00 = 300 pages]
+;   Playfield   320x216                 ; 9 vertical sections of 24-lines/each
+
+
                 .cpu "65816"
 
                 .include "equates_system_c256.asm"
@@ -95,4 +100,14 @@ Palette_end
 
 Stamps          .include "SPRITES.asm"
 Stamps_end
+
+Playfield       .fill 96*40,$00
+
+;--------------------------------------
+;--------------------------------------
+                .align $100
+;--------------------------------------
+
+Video8K         .fill 8192,$00
+
                 .end

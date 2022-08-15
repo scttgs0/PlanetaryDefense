@@ -40,7 +40,7 @@ GameDL          ; .byte AEMPTY8,AEMPTY8
                 ;    .addr SCOLIN
 
                 ; .byte $0D+ALMS
-                ;    .addr SCRN
+                ;    .addr Playfield
                 ; .byte $0D+ADLI,$0D+ADLI,$0D+ADLI
                 ; .byte $0D+ADLI,$0D+ADLI,$0D+ADLI
                 ; .byte $0D+ADLI,$0D+ADLI,$0D+ADLI

@@ -2,8 +2,7 @@
 ; Screen + Player/Missile Area
 ;--------------------------------------
 
-SCRN            = $3000                 ; screen area
-PPOS            = SCRN+1935             ; planet pos
+PPOS            = Playfield+1935        ; planet pos
 
 PM              = $00
 MISL            = PM+$0300              ; missiles

@@ -32,11 +32,11 @@ PLOT            .proc
 ; Get offset into screen memory
 ; -----------------------------
 
-                lda #<SCRN              ; screen addr lo
+                lda #<Playfield         ; screen addr lo
                 clc                     ; clear carry
                 adc LO                  ; add low offset
                 sta LO                  ; save addr low
-                lda #>SCRN              ; screen addr hi
+                lda #>Playfield         ; screen addr hi
                 adc HI                  ; add high offset
                 sta HI                  ; save addr hi
                 lda PLOTX               ; mask PLOTX for

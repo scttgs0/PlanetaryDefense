@@ -48,9 +48,9 @@ _next2          lda ScoreINI,X          ; get byte
                 jsr ShowScore
 
                 lda #$54                ; graphic-LF of planet center
-                sta SCRN+1939
+                sta Playfield+1939
                 lda #$15                ; graphic-RT of planet center
-                sta SCRN+1940
+                sta Playfield+1940
 
                 ;sta HITCLR             ; reset collision
 
@@ -124,12 +124,12 @@ MainLoop        .proc
 ; Check planet core for hit!
 ; --------------------------
 
-_checkCore      lda SCRN+1939           ; center LF
+_checkCore      lda Playfield+1939      ; center LF
                 and #$03                ; RT color clock
                 cmp #$03                ; explosion colr?
                 beq _planetDead         ; Yes. go dead
 
-                lda SCRN+1940           ; center RT
+                lda Playfield+1940      ; center RT
                 and #$C0                ; LF color clock
                 cmp #$C0                ; explosion colr?
                 bne _planetOK           ; No. skip next
