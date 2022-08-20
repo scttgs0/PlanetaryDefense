@@ -2,26 +2,30 @@
 ; Setup Orbiter Coordinates
 ;-------------------------------------
 SetupOrbiter    .proc
-                ldx #64                 ; do 65 bytes
-                ldy #0                  ; quad 2/4 offset
-_next1          clc                     ; clear carry
-                lda #96                 ; center Y
-                adc _tblOrbiterY,X      ; add offset Y
-                sta ORBY+$40,Y          ; quad-2 Y
-                sta ORBY+$80,X          ; quad-3 Y
+                ldx #64                 ; do 65 bytes               ;               |
+                ldy #0                  ; quad 2/4 offset           ;    quad-4     |    quad-1
+_next1          clc                     ; clear carry               ;               |
+                lda #96                 ; center Y                  ; ----------------------------
+                adc _tblOrbiterY,X      ; add offset Y              ;               |
+                sta ORBY+$40,Y          ; quad-2 Y                  ;    quad-3     |    quad-2
+                sta ORBY+$80,X          ; quad-3 Y                  ;               |
+
                 lda #80                 ; center X
                 adc _tblOrbiterX,X      ; add offset X
-                sta ORBX,X              ; quad-1 X
+                sta ORBX,X              ; quad-1 X                  ; ORBX/Y :=     [00-3F]:quad-1  [40-7F]:quad-2  [80-BF]:quad-3  [C0-FF]:quad-4
                 sta ORBX+$40,Y          ; quad-2 X
+
                 sec                     ; set carry
                 lda #80                 ; center X
                 sbc _tblOrbiterX,X      ; sub offset X
                 sta ORBX+$80,X          ; quad-3 X
                 sta ORBX+$C0,Y          ; quad-4 X
+
                 lda #96                 ; center Y
                 sbc _tblOrbiterY,X      ; sub offset Y
                 sta ORBY,X              ; quad-1 Y
                 sta ORBY+$C0,Y          ; quad-4 Y
+
                 iny                     ; quad 2/4 offset
                 dex                     ; quad 1/3 offset
                 bpl _next1
@@ -97,19 +101,19 @@ SHAPE_Satellite ;.byte $00,$00,$00,$0A,$04,$0A,$00,$00
 ;======================================
 CheckSatellite  .proc
                 lda DEADTM              ; satellite ok?
-                beq _live               ; No. skip next
+                beq _live               ;   No. skip next
 
 _XIT            rts
 
 _live           lda LIVES               ; lives left?
-                bmi _XIT                ; No. exit
+                bmi _XIT                ;   No. exit
 
                 lda #1                  ; get one
                 sta SATLIV              ; set alive flag
 
                 ;lda M0PL               ; did satellite
                 ;ora M0PL+1             ; hit any bombs?
-                ;beq _XIT               ; No. exit
+                ;beq _XIT               ;   No. exit
                 bra _XIT    ; HACK:
 
                 lda #0                  ; get zero
