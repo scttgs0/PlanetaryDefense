@@ -34,9 +34,9 @@ _XIT            rts                     ; return, no shot
 ;-------------------
 
 _gotSauShot     lda #48                 ; PF center, Y
-                sta TOY                 ; shot to Y-coord
+                sta zpTargetY           ; shot to Y-coord
                 lda #80                 ; PF center X
-                sta TOX                 ; shot to X-coord
+                sta zpTargetX           ; shot to X-coord
                 lda BOMBX+3             ; saucer x-coord
                 sec                     ; set carry
                 sbc #44                 ; PF offset

@@ -24,15 +24,17 @@ _gotpro         lda #13                 ; shot sound time
                 lda SATY                ; satellite Y
                 sta FROMY               ; shot from Y
                 sta PROJY,X             ; proj Y table
+
                 lda CURX                ; cursor X-coord
                 sec                     ; set carry
                 sbc #48                 ; playfld offset
-                sta TOX                 ; shot to X-coord
+                sta zpTargetX           ; shot to X-coord
+
                 lda CURY                ; cursor Y-coord
                 sec                     ; set carry
                 sbc #32                 ; playfld offset
                 lsr A                   ; 2 line res
-                sta TOY                 ; shot to Y-coord
+                sta zpTargetY           ; shot to Y-coord
 
 _PROVEC         jsr VECTOR              ; compute vect
 

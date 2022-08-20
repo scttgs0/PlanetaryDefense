@@ -70,13 +70,13 @@ _saveSauY       sta FROMY               ; from Y vector
                 lda #230                ; screen right
                 sec                     ; offset so not to hit planet
                 sbc FROMY
-_saveEndX       sta TOX                 ; to X vector
+_saveEndX       sta zpTargetX           ; to X vector
                 lda SaucerEndY,Y        ; saucer end Y
                 cmp #NIL                ; random flag?
                 bne _saveEndY           ;   No. use as Y
 
                 lda FROMX               ; use X for Y
-_saveEndY       sta TOY                 ; to Y vector
+_saveEndY       sta zpTargetY           ; to Y vector
                 jmp _getBombVec
 
 
@@ -114,8 +114,8 @@ _bombvec        lda BOMBX,X             ; bomb X-coord
                 lda BOMBY,X             ; bomb Y-coord
                 sta FROMY               ; shot from Y
                 lda #128                ; planet center
-                sta TOX                 ; shot to X-coord
-                sta TOY                 ; shot to Y-coord
+                sta zpTargetX           ; shot to X-coord
+                sta zpTargetY           ; shot to Y-coord
 
 _getBombVec     jsr VECTOR              ; calc shot vect
 

@@ -24,8 +24,8 @@ CURX            .byte ?                 ; cursor x
 CURY            .byte ?                 ; cursor y
 FROMX           .byte ?                 ; vector from X
 FROMY           .byte ?                 ; vector from Y
-TOX             .byte ?                 ; vector to X
-TOY             .byte ?                 ; vector to Y
+zpTargetX       .byte ?                 ; vector to X
+zpTargetY       .byte ?                 ; vector to Y
 SATX            .byte ?                 ; satellite x
 SATY            .byte ?                 ; satellite y
 XHOLD           .byte ?                 ; x reg hold area
@@ -86,12 +86,12 @@ zpSource        .dword ?                ; Starting address for the source data (
 zpDest          .dword ?                ; Starting address for the destination block (4 bytes)
 zpSize          .dword ?                ; Number of bytes to copy (4 bytes)
 
-zpTemp1             .byte ?
-zpTemp2             .byte ?
+zpTemp1         .byte ?
+zpTemp2         .byte ?
 
-zpIndex1            .word ?
-zpIndex2            .word ?
-zpIndex3            .word ?
+zpIndex1        .word ?
+zpIndex2        .word ?
+zpIndex3        .word ?
 
 RND_MIN         .byte ?
 RND_SEC         .byte ?
