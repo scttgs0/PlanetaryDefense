@@ -1088,6 +1088,10 @@ _relocate       ;lda @l $024000,X        ; HandleIrq address
                 and #~FNX0_INT00_SOF    ; enable Start-of-Frame IRQ
                 sta @l INT_MASK_REG0
 
+                ;lda @l INT_MASK_REG0
+                ;and #~FNX0_INT01_SOL    ; enable Start-of-Line IRQ
+                ;sta @l INT_MASK_REG0
+
                 lda @l INT_MASK_REG1
                 and #~FNX1_INT00_KBD    ; enable Keyboard IRQ
                 sta @l INT_MASK_REG1

@@ -6,6 +6,7 @@ INT_PENDING_REG0        = $00_0140
 INT_PENDING_REG1        = $00_0141
 INT_MASK_REG0           = $00_014C
 FNX0_INT00_SOF      = $01
+FNX0_INT01_SOL      = $02
 INT_MASK_REG1           = $00_014D
 FNX1_INT00_KBD      = $01
 

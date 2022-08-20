@@ -125,17 +125,31 @@ HandleIrq       .m16i16
                 jsl KeyboardHandler
 
                 lda @l INT_PENDING_REG1
+                ;and #FNX1_INT00_KBD
                 sta @l INT_PENDING_REG1
 
 _1              lda @l INT_PENDING_REG0
                 and #FNX0_INT00_SOF
                 cmp #FNX0_INT00_SOF
+                ;bne _2
                 bne _XIT
 
                 jsl VbiHandler
 
                 lda @l INT_PENDING_REG0
+                ;and #FNX0_INT00_SOF
                 sta @l INT_PENDING_REG0
+
+_2              ;lda @l INT_PENDING_REG0
+                ;and #FNX0_INT01_SOL
+                ;cmp #FNX0_INT01_SOL
+                ;bne _XIT
+
+                ;jsl DliHandler
+
+                ;lda @l INT_PENDING_REG0
+                ;and #FNX0_INT01_SOL
+                ;sta @l INT_PENDING_REG0
 
 _XIT            .m16i16
                 ply
@@ -410,30 +424,59 @@ _XIT            .m16i16
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ; Display list interrupt
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Interrupt_DLI   .proc
+DliHandler     .proc
                 pha                     ; save Acc
-                txa                     ; X --> Acc
-                pha                     ; save X register
+                phx                     ; save X register
 
                 inc DLICNT              ; inc counter
                 lda DLICNT              ; get counter
                 and #$07                ; only 3 bits
+                asl A                   ; *2
 
                 tax                     ; use as index
-                ;lda _Brightness,X      ; planet brightness
-                ;ora vPlanetColor
-                ;sta WSYNC              ; start of scan
-                ;sta COLPF0             ; color planet
+                .m16
+                lda _BrightnessBase,X   ; planet brightness
+                sta zpSource
+                stz zpSource+2
+                .m8
 
-                ;lda #$8C               ; bright blue
-                ;sta COLPF1             ; shot color
+                lda vPlanetColor
+                lsr A                   ; /4
+                lsr A
+                sta zpTemp1
 
-                pla                     ; restore X
-                tax                     ; Acc --> X
+                lda zpSource
+                clc
+                adc zpTemp1
+                sta zpSource
+
+                .setbank $AF
+                ldy #3
+_next1          lda [zpSource],Y
+                sta GRPH_LUT0_PTR+4,Y   ; color planet  (COLPF0)
+                dey
+                bpl _next1
+
+                ldx #3
+_next2          lda _Color8C,X          ; bright blue
+                sta GRPH_LUT0_PTR+8,X   ; shot color    (COLPF1)
+                dex
+                bpl _next2
+
+                .setbank $00
+
+                plx                     ; restore X
                 pla                     ; restore Acc
-                rti
+                rtl
 
 ;-------------------------------------
+
+_Color8C        .dword $00b0acfc
+
+_BrightnessBase .addr Palette+$068,Palette+$084
+                .addr Palette+$0C4,Palette+$104
+                .addr Palette+$144,Palette+$104
+                .addr Palette+$0C4,Palette+$084
 
 _Brightness     .byte 0,2,4,6,8,6,4,2
 
@@ -452,6 +495,8 @@ VbiHandler      .proc
                 .m8i8
                 .setbank $00
 
+                cld                     ; clear decimal
+
                 lda JIFFYCLOCK
                 inc A
                 sta JIFFYCLOCK
@@ -464,24 +509,13 @@ VbiHandler      .proc
                 sta InputFlags          ; joystick activity -- override keyboard input
                 lda #itJoystick
                 sta InputType
-                bra _1
 
 _1              ldx InputType
-                bne _XIT                ; keyboard, move on
+                bne _2                  ; keyboard, move on
 
                 sta InputFlags
 
-_XIT            .m16i16
-                ply
-                plx
-                pla
-
-                .m8i8
-                rtl
-
-;//////////
-HACK
-                cld                     ; clear decimal
+_2              jmp _XIT    ; HACK:
 
                 ldx SAUCER              ; saucer flag as
                 lda SaucerColor,X       ; index 0 or 1
@@ -494,17 +528,17 @@ HACK
                 ;sta NMIEN
 
                 lda KEYCHAR             ; keyboard char
-                cmp #$21                ; space bar?
-                bne _1                  ; No. skip it
+                cmp #$39                ; space bar?
+                bne _3                  ;   No. skip it
 
                 lda PAUSED              ; pause flag
                 eor #$FF                ; invert it
                 sta PAUSED              ; save pause flag
 
-                lda #NIL
+                lda #0
                 sta KEYCHAR             ; reset keyboard
 
-_1              lda PAUSED              ; pause flag
+_3              lda PAUSED              ; pause flag
                 beq _nopau              ; paused? No.
 
                 lda #0                  ; get zero
@@ -513,7 +547,7 @@ _next1          ;sta AUDF1,X            ; zero sound
                 dex                     ; dec index
                 bpl _next1              ; done? No.
 
-                rti
+                rtl
 
 _nopau          lda isTitleScreen       ; title flag
                 bne _nocyc              ; title? Yes.
@@ -523,7 +557,7 @@ _nopau          lda isTitleScreen       ; title flag
                 adc #$10                ; next color
                 ;sta COLOR2             ; explosion col.
 _nocyc          lda EXSCNT              ; explosion cnt
-                beq _2                  ; any? No.
+                beq _4                  ; any? No.
 
                 lsr A                   ; count/2
                 lsr A                   ; count/4
@@ -532,7 +566,7 @@ _nocyc          lda EXSCNT              ; explosion cnt
                 ;sta AUDC4              ; explo frequency
                 dec EXSCNT              ; dec count
 
-_2              lda GAMCTL              ; game control
+_4              lda GAMCTL              ; game control
                 bpl _cursor             ; cursor? Yes.
 
                 jmp _timers             ; No. skip
@@ -551,7 +585,7 @@ _next2          lda #$0F                ; now clear out
                 dex                     ; dec count
                 bpl _next2              ; loop until done
 
-                lda JOYSTICK0           ; read joystick
+                lda InputFlags          ; read joystick
                 and $0F
                 ldx CURX                ; get X value
                 ldy CURY                ; get Y value
@@ -592,25 +626,25 @@ _badX           cpy #32                 ; too far up?
 ; Handle timers and orbit
 ;-------------------------------------
 _timers         lda BOMBWT              ; bomb wait cnt
-                beq _3                  ; wait over? Yes.
+                beq _5                  ; wait over? Yes.
 
                 dec BOMBWT              ; dec count
-_3              lda DEADTM              ; death timer
-                beq _4                  ; zero? yes.
+_5              lda DEADTM              ; death timer
+                beq _6                  ; zero? yes.
 
                 dec DEADTM              ; decrement it!
-_4              lda EXPTIM              ; exp timer
-                beq _5                  ; zero? Yes.
+_6              lda EXPTIM              ; exp timer
+                beq _7                  ; zero? Yes.
 
                 dec EXPTIM              ; decrement it!
-_5              lda BOMTIM              ; get bomb time
-                beq _6                  ; zero? Yes.
+_7              lda BOMTIM              ; get bomb time
+                beq _8                  ; zero? Yes.
 
                 dec BOMTIM              ; dec bomb time
-_6              lda GAMCTL              ; game control
+_8              lda GAMCTL              ; game control
                 bpl _notGameOver        ; game over? No.
 
-                rti                     ; exit VBLANK
+                rtl                     ; exit VBLANK
 
 _notGameOver    lda SATLIV              ; get satellite
                 beq _noSat              ; alive? No.
@@ -730,5 +764,12 @@ _setSnd3        lda #$A8                ; saucer volume
                 sta SID_CTRL3           ; set hardware
                 lda SAUSND,X            ; saucer sound
                 sta SID_FREQ3           ; set hardware
-_XIT            rti
+
+_XIT            .m16i16
+                ply
+                plx
+                pla
+
+                .m8i8
+                rtl
                 .endproc
