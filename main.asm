@@ -23,15 +23,15 @@ _next2          lda ScoreINI,X          ; get byte
                 dex                     ; next byte
                 bpl _next2              ; done? No.
 
-                lda #$01                ; get one
+                lda #$01
                 sta LEVEL               ; game level
                 sta SATLIV              ; live satellite
 
-                lda #4                  ; get 4
+                lda #4
                 sta LIVES               ; number of lives
 
-                lda #$0C                ; set explosion
-                ;sta COLOR2             ; brightness
+                lda #$0C                ; set explosion brightness
+                ;sta COLOR2
 
                 lda #$34                ; medium red
                 ;sta PCOLR0             ; bomb 0 color
@@ -43,7 +43,7 @@ _next2          lda ScoreINI,X          ; get byte
                 lda #129                ; center screen Y
                 sta CURY                ; cursor Y pos
 
-                lda #1                  ; get one
+                lda #1
                 sta GAMCTL              ; game control
                 jsr ShowScore
 
@@ -75,7 +75,7 @@ SetLevel        .proc
 
                 lda INIPC,X             ; planet color
                 cmp #$FF                ; level >14?
-                bne _savePC             ; No. skip next
+                bne _savePC             ;   No. skip next
 
                 .randomByte             ; random color
                 and #$F0                ; mask off lum.
@@ -88,7 +88,7 @@ _savePC         sta vPlanetColor
                 lda INISV,X             ; saucer value
                 sta SAUVAL              ; save that too
                 cpx #11                 ; at level 11?
-                beq _sameLevel          ; Yes. skip next
+                beq _sameLevel          ;   Yes. skip next
 
                 inc vBombLevel
 
@@ -109,12 +109,12 @@ _sameLevel      sed                     ; decimal mode
 ;-------------------------------------
 MainLoop        .proc
                 lda PAUSED              ; game paused?
-                bne MainLoop            ; Yes. loop here
+                bne MainLoop            ;   Yes. loop here
 
                 lda GAMCTL              ; game done?
-                bpl _checkCore          ; No. check core
+                bpl _checkCore          ;   No. check core
 
-                lda EXPCNT              ; Yes. expl count
+                lda EXPCNT              ;   Yes. expl count
                 bne _checkCore          ; count done? No.
 
                 jmp EndGame             ; The End!
@@ -127,12 +127,12 @@ MainLoop        .proc
 _checkCore      lda Playfield+1939      ; center LF
                 and #$03                ; RT color clock
                 cmp #$03                ; explosion colr?
-                beq _planetDead         ; Yes. go dead
+                beq _planetDead         ;   Yes. go dead
 
                 lda Playfield+1940      ; center RT
                 and #$C0                ; LF color clock
                 cmp #$C0                ; explosion colr?
-                bne _planetOK           ; No. skip next
+                bne _planetOK           ;   No. skip next
 
 
 ; ---------------
@@ -155,7 +155,7 @@ _planetDead     lda #0                  ; get zero
 
 _planetOK       lda CONSOL              ; get console
                 cmp #7                  ; any pressed?
-                beq _noRestart          ; No. skip next
+                beq _noRestart          ;   No. skip next
 
                 jmp Planet              ; restart game!
 
@@ -169,14 +169,14 @@ _noRestart      jsr BombInit            ; try new bomb
                 lda SATLIV              ; satellite stat
                 beq _noTrig             ; alive? No.
 
-                lda JOYSTICK0           ; get trigger
+                lda InputFlags          ; get trigger
                 and #$10
                 cmp LASTRG              ; same as last VB
-                beq _noTrig             ; Yes. skip next
+                beq _noTrig             ;   Yes. skip next
 
-                sta LASTRG              ; No. save trig
+                sta LASTRG              ;   No. save trig
                 cmp #0                  ; pressed?
-                bne _noTrig             ; No. skip next
+                bne _noTrig             ;   No. skip next
 
                 jsr ProjectileInit      ; start projectile
 _noTrig         jsr BombAdvance         ; advance bombs
@@ -192,7 +192,7 @@ _noTrig         jsr BombAdvance         ; advance bombs
                 lda SAUCER              ; saucer flag
                 beq _resetTimer         ; saucer? No.
 
-                jsr SaucerShoot         ; Yes. let shoot
+                jsr SaucerShoot         ;   Yes. let shoot
 
 _resetTimer     lda #1                  ; get one
                 sta EXPTIM              ; reset timer
