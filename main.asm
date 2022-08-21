@@ -9,7 +9,7 @@ INIT            .proc
                 sta DEADTM              ; dead timer
                 sta PAUSED              ; pause flag
                 sta EXPCNT              ; expl. counter
-                sta SAUCER              ; no saucer
+                sta isSaucerActive      ; no saucer
                 sta vBombLevel
 
                 ldx #11                 ; no bombs!
@@ -82,7 +82,7 @@ SetLevel        .proc
 
                 ldx vBombLevel
                 lda INIBOM,X            ; bombs / level
-                sta BOMBS               ; bomb count
+                sta zpBombCount         ; bomb count
                 lda INIBS,X             ; bomb speed
                 sta BOMTI               ; bomb timer
                 lda INISC,X             ; % chance of
@@ -155,7 +155,7 @@ _checkCore      lda Playfield+1939      ; center LF
 ; ---------------
 
 _planetDead     lda #0
-                sta BOMBS               ; zero bombs
+                sta zpBombCount         ; zero bombs
                 sta isSatelliteAlive    ; satelite dead
 
                 lda #NIL
@@ -181,22 +181,23 @@ _planetOK       lda CONSOL              ; get console
 
 _noRestart      jsr BombInit            ; try new bomb
 
-                lda isSatelliteAlive    ; satellite stat
-                beq _noTrig             ; alive? No.
+                lda isSatelliteAlive    ; satellite alive?
+                beq _noTrig             ;   No.
 
                 lda InputFlags          ; get trigger
                 and #$10
-                cmp LASTRG              ; same as last VB
+                cmp zpLastTrigger       ; same as last VB
                 beq _noTrig             ;   Yes. skip next
 
-                sta LASTRG              ;   No. save trig
+                sta zpLastTrigger       ;   No. save trig
                 cmp #0                  ; pressed?
                 bne _noTrig             ;   No. skip next
 
                 jsr ProjectileInit      ; start projectile
+
 _noTrig         jsr BombAdvance         ; advance bombs
 
-                lda EXPTIM              ; do explosion?
+                lda zpExplosionTimer    ; do explosion?
                 bne _noExplode          ;   no!
 
                 jsr CheckSatellite      ; satellite ok?
@@ -204,15 +205,15 @@ _noTrig         jsr BombAdvance         ; advance bombs
                 jsr HandleExplosion
                 jsr ProjectileAdvance   ; advance shots
 
-                lda SAUCER              ; saucer flag
-                beq _resetTimer         ; saucer? No.
+                lda isSaucerActive      ; saucer active?
+                beq _resetTimer         ;   No
 
                 jsr SaucerShoot         ;   Yes. let shoot
 
 _resetTimer     lda #1
-                sta EXPTIM              ; reset timer
+                sta zpExplosionTimer    ; reset timer
 
-_noExplode      lda BOMBS               ; # bombs to go
+_noExplode      lda zpBombCount         ; # bombs to go
                 bne MainLoop            ; any left? Yes.
 
                 lda GAMCTL              ; game control

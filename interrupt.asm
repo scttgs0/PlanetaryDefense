@@ -517,7 +517,7 @@ _1              ldx InputType
 
 _2              ;jmp _XIT    ; HACK:
 
-                ldx SAUCER              ; saucer flag as
+                ldx isSaucerActive      ; saucer flag as
                 lda SaucerColor,X       ; index 0 or 1
                 ;sta PCOLR3             ; saucer color
 
@@ -642,12 +642,12 @@ _5              lda DEADTM              ; death timer
                 beq _6                  ; zero? yes.
 
                 dec DEADTM              ; decrement it!
-_6              lda EXPTIM              ; exp timer
-                beq _7                  ; zero? Yes.
+_6              lda zpExplosionTimer    ; exp timer zero?
+                beq _7                  ;   Yes.
 
-                dec EXPTIM              ; decrement it!
-_7              lda BOMTIM              ; get bomb time
-                beq _8                  ; zero? Yes.
+                dec zpExplosionTimer    ; decrement it!
+_7              lda BOMTIM              ; get bomb time zero?
+                beq _8                  ;   Yes.
 
                 dec BOMTIM              ; dec bomb time
 _8              lda GAMCTL              ; game control
@@ -691,8 +691,8 @@ _pixB           lda #$800
 _setPix         sta SP01_ADDR
                 .m8
 
-_noSat          lda SAUCER              ; saucer flag
-                beq _sounds             ; saucer? No.
+_noSat          lda isSaucerActive      ; saucer active?
+                beq _sounds             ;   No
 
                 ldy BombY+3             ; saucer Y pos
                 dey                     ; 1
@@ -749,8 +749,8 @@ _doSnd2         lda #$A6                ; shot sound vol
                 lda ENSHOT,X            ; shot sound
                 sta SID_FREQ2           ; frequency
                 dec ESSCNT              ; dec shot snd
-_trySnd3        lda SAUCER              ; saucer flag
-                beq _noSnd3             ; saucer? No.
+_trySnd3        lda isSaucerActive      ; saucer active?
+                beq _noSnd3             ;   No
 
                 lda BombY+3             ; saucer Y pos
                 cmp #36                 ; above top?

@@ -124,8 +124,8 @@ _live           lda LIVES               ; lives left?
                 dec LIVES               ; dec lives count
                 bpl _moreSats           ; any left? Yes.
 
-                lda #NIL                ; lot of bombs
-                sta BOMBS               ; into bomb count
+                lda #NIL
+                sta zpBombCount         ; lot of bombs into bomb count
                 sta GAMCTL              ; end game
                 jsr SoundOff            ; no sound 1 2 3
 

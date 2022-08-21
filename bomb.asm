@@ -5,7 +5,7 @@ BombInit        .proc
                 lda BOMBWT              ; bomb wait time
                 bne _XIT                ; done? No.
 
-                lda BOMBS               ; more bombs?
+                lda zpBombCount         ; more bombs?
                 bne _chkLive            ;   Yes
 
 _XIT            rts
@@ -21,7 +21,7 @@ _next1          lda isBombActive,X
 
 _gotBomb        lda #TRUE               ; this one is active now
                 sta isBombActive,X
-                dec BOMBS               ; one less bomb
+                dec zpBombCount         ; one less bomb
 
                 lda #0                  ; zero out all..
                 sta BXHOLD,X            ;   vector X hold
@@ -43,7 +43,7 @@ _gotBomb        lda #TRUE               ; this one is active now
                 bcs _noSaucer           ; put saucer? No.
 
                 lda #TRUE               ;   Yes. enable saucer
-                sta SAUCER
+                sta isSaucerActive
 
                 .randomByte
                 and #$03                ; range: 0..3
@@ -192,7 +192,7 @@ _showbomb       lda BombY,X             ; bomb Y-coord
                 cpx #3                  ; saucer slot?
                 bne _notSaucer          ;   No. skip next
 
-                lda SAUCER              ; saucer in slot?
+                lda isSaucerActive      ; saucer active?
                 bne _nextbomb           ;   Yes. skip bomb
 
 _notSaucer      ldy lrBomb,X            ; L/R flag
@@ -236,7 +236,7 @@ _XIT            rts
 ;======================================
 CheckHit        .proc
                 ldx #3                  ; 4 bombs 0..3
-                lda SAUCER              ; saucer enabled?
+                lda isSaucerActive      ; saucer active?
                 beq _next1              ;   No. skip next
 
                 lda #0
@@ -278,8 +278,8 @@ _next1          lda #0
                 cpx #3                  ; saucer player?
                 bne _addBombScore       ;   No. skip this
 
-                lda SAUCER              ; saucer on?
-                beq _addBombScore       ;   No. this this
+                lda isSaucerActive      ; saucer active?
+                beq _addBombScore       ;   No. skip this
 
                 lda SAUVAL              ; saucer value
                 sta SCOADD+1            ; point value
@@ -311,14 +311,14 @@ _noscore        lda #0
                 sbc #40                 ; bomb Y offset
                 lsr A                   ; 2 line res.
                 sta NEWY                ; plotter Y-coord
-                lda SAUCER              ; saucer?
+                lda isSaucerActive      ; saucer active?
                 beq _explode            ;   No. explode it
 
                 cpx #3                  ; bomb player?
                 bne _explode            ;   Yes. explode it
 
-                lda #0
-                sta SAUCER              ; kill saucer
+                lda #FALSE
+                sta isSaucerActive      ; kill saucer
                 jsr ClearPlayer
 
                 lda GAMCTL              ; game over?

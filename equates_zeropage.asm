@@ -17,7 +17,7 @@ SCNT            .byte ?                 ; orbit index
 LO              .byte ?                 ; plot low byte
 HI              .byte ?                 ; plot high byte
 DEADTM          .byte ?                 ; death timer
-EXPTIM          .byte ?                 ; explosion timer
+zpExplosionTimer .byte ?                ; explosion timer
 BOMTIM          .byte ?                 ; bomb timer
 zpSatPix        .byte ?                 ; sat. pic cntr
 zpCursorX       .byte ?                 ; cursor x/y
@@ -29,7 +29,7 @@ zpTargetY       .byte ?
 zpSatelliteX    .byte ?                 ; satellite x/y
 zpSatelliteY    .byte ?
 XHOLD           .byte ?                 ; x reg hold area
-LASTRG          .byte ?                 ; last trigger
+zpLastTrigger   .byte ?                 ; last trigger
 LEVEL           .byte ?                 ; level number
 vBombLevel      .byte ?                 ; bomb level #
 LIVES           .byte ?                 ; lives left
@@ -43,7 +43,7 @@ BOMVH           .byte ?                 ; bomb value high
 SAUVAL          .byte ?                 ; saucer value
 GAMCTL          .byte ?                 ; game ctrl flag    1=game in progress; -1=game over
 DLICNT          .byte ?                 ; DLI counter
-SAUCER          .byte ?                 ; saucer flag
+isSaucerActive  .byte ?                 ; saucer flag
 SAUTIM          .byte ?                 ; image timer
 SAUCHN          .byte ?                 ; saucer chance
 BOMBWT          .byte ?                 ; bomb wait time
@@ -65,7 +65,7 @@ PLOTX           .byte ?                 ; plot x coord
 PLOTY           .byte ?                 ; plot y coord
 HIHLD           .byte ?                 ; plot work area
 LOHLD           .byte ?                 ; plot work area
-BOMBS           .byte ?                 ; bombs to come
+zpBombCount     .byte ?                 ; bombs to come
 BOMTI           .byte ?                 ; bomb speeds
 VXINC           .byte ?                 ; vector x hold
 VYINC           .byte ?                 ; vector y hold
