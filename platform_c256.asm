@@ -264,40 +264,94 @@ InitSprites     .proc
                 lda #`Stamps
                 sta zpSource+2
 
+                lda #`(SPRITES-VRAM)
+                sta zpDest+2
                 lda #<>(SPRITES-VRAM)   ; Set the destination address
                 sta zpDest
+
+;   cursor
                 sta SP00_ADDR           ; And set the Vicky register
+
+;   satellite/orbiter
                 clc
                 adc #$400               ; 1024
                 sta SP01_ADDR
-                clc
-                adc #$1000              ; 1024*4
-                sta SP02_ADDR
 
-                lda #`(SPRITES-VRAM)
-                sta zpDest+2
+;   bomb left
+                clc
+                adc #$800               ; 1024*2
+                sta SP04_ADDR
+                sta SP05_ADDR
+                sta SP06_ADDR
+                sta SP07_ADDR
+
+;   bomb right
+                clc
+                adc #$400               ; 1024
+                sta SP08_ADDR
+                sta SP09_ADDR
+                sta SP10_ADDR
+                sta SP11_ADDR
+
+;   saucer
+                clc
+                adc #$400               ; 1024
+                sta SP03_ADDR
 
                 .m8
+                lda #0
                 sta SP00_ADDR+2
                 sta SP01_ADDR+2
-                sta SP02_ADDR+2
+                sta SP03_ADDR+2
+                sta SP04_ADDR+2
+                sta SP05_ADDR+2
+                sta SP06_ADDR+2
+                sta SP07_ADDR+2
+                sta SP08_ADDR+2
+                sta SP09_ADDR+2
+                sta SP10_ADDR+2
+                sta SP11_ADDR+2
 
                 jsr Copy2VRAM
 
                 .m16
-                lda #$00
+                lda #$40
                 sta SP00_X_POS
-                sta SP00_Y_POS
+                lda #$60
                 sta SP01_X_POS
+                lda #$80
+                sta SP03_X_POS
+                lda #$A0
+                sta SP04_X_POS
+                lda #$C0
+                sta SP08_X_POS
+
+                lda #$40
+                sta SP00_Y_POS
                 sta SP01_Y_POS
-                sta SP02_X_POS
-                sta SP02_Y_POS
+                sta SP03_Y_POS
+                sta SP04_Y_POS
+                sta SP05_Y_POS
+                sta SP06_Y_POS
+                sta SP07_Y_POS
+                sta SP08_Y_POS
+                sta SP09_Y_POS
+                sta SP10_Y_POS
+                sta SP11_Y_POS
 
                 .m8
                 lda #scEnable
                 sta SP00_CTRL
                 sta SP01_CTRL
-                sta SP02_CTRL
+                sta SP03_CTRL
+                sta SP04_CTRL
+                sta SP05_CTRL
+                sta SP06_CTRL
+                sta SP07_CTRL
+                sta SP08_CTRL
+                sta SP09_CTRL
+                sta SP10_CTRL
+                sta SP11_CTRL
 
                 plb
                 plp

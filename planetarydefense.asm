@@ -7,11 +7,12 @@
 ;   and Tom Hudson
 ; ------------------
 
-;   MISL        cursor
-;   SP00        player
+;   SP00        player/cursor
+;   SP01        satellite
+;   SP02        <unused>
 ;   SP03        saucer
-;   SP04        satellite
-;   SP05        satellite
+;   SP04-07     bomb left
+;   SP08-11     bomb right
 
 ;   Graphics    160x120                 ; 96 graphic; 16 blanks; 8 text
 ;       ours    320x240                 ; 76,800 bytes [$12C00 = 300 pages]
