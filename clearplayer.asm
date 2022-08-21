@@ -1,28 +1,26 @@
 ;======================================
-; Clear out player indicated
-; by the X register!
+; Move the player indicated off-screen
+;--------------------------------------
+; on entry:
+;   X           player index to move
+; perserves:
+;   X
 ;======================================
 ClearPlayer     .proc
+                phx
+
                 .m16
-                lda #0                  ; move player...
-                plx
+                txa
+                and #$FF
                 asl A                   ; *8
                 asl A
                 asl A
-                sta SP00_X_POS,X        ; off screen,
-                plx
+                tax
+                lda #0                  ; move player...
+                sta SP00_X_POS,X        ; off screen
+                sta SP00_Y_POS,X
                 .m8
 
-                tay                     ; init index
-                txa                     ; get X
-                ora #>PLR0              ; mask w/address
-                sta HI                  ; plr addr high
-                tya                     ; Acc = 0
-                sta LO                  ; plr addr low
-
-_next1          sta (LO),Y              ; zero player
-                dey
-                bne _next1
-
+                plx
                 rts
                 .endproc
