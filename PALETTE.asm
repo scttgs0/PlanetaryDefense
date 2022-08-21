@@ -1,6 +1,6 @@
 BkColor         .dword $00000000    ; [00]
 
-PfColor0        .dword $00444cdc    ; [01]
+PfColor0        .dword $00ac9838    ; [01]      planet
 PfColor1        .dword $00b0acfc
 PfColor2        .dword $00e4e4e4
 PfColor3        .dword $00dc241c
@@ -9,9 +9,9 @@ PfColor5        .dword $00300400
 PfColor6        .dword $000000e2
 PfColor7        .dword $00400000
 
-SprColor0       .dword $00fc901c    ; [09]
-SprColor1       .dword $00fcfcfc
-SprColor2       .dword $00fcfcfc
+SprColor0       .dword $00444cdc    ; [09]      cursor/satellite
+SprColor1       .dword $00fc901c    ;           saucer
+SprColor2       .dword $00462075    ;           bomb
 SprColor3       .dword $00fcfcfc
 SprColor4       .dword $00480800
 SprColor5       .dword $00002000
