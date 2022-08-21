@@ -148,7 +148,8 @@ _getBombVec     jsr VECTOR              ; calc shot vect
 ;======================================
 BombAdvance     .proc
                 lda BOMTIM              ; bomb timer
-                bne _XIT                ; time up? No.
+                ;bne _XIT                ; time up? No.
+                bra _XIT      ; HACK:
 
                 lda LIVES               ; any lives?
                 bpl _regBombTraj        ;   Yes. skip next
