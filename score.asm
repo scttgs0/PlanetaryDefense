@@ -4,7 +4,7 @@
 AddScore        .proc
                 ldy #0                  ; init index
                 sed                     ; decimal mode
-                clc                     ; clear carry
+                clc
                 ldx #2                  ; do 3 bytes
 _next1          lda SCORE,X             ; get score
                 adc SCOADD,X            ; add bomb value
@@ -32,7 +32,7 @@ _next1          lda SCORE,Y             ; get digits
                 inx                     ; line pointer
                 iny                     ; next 2 digits
                 cpy #3                  ; done 6?
-                bne _next1              ; no!
+                bne _next1              ;   no!
 
                 rts
                 .endproc

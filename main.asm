@@ -13,7 +13,7 @@ INIT            .proc
                 sta vBombLevel
 
                 ldx #11                 ; no bombs!
-_next1          sta BOMACT,X            ; deactivate
+_next1          sta isBombActive,X      ; deactivate
                 dex                     ; next bomb
                 bpl _next1              ; done? No.
 
@@ -109,8 +109,8 @@ _savePC         sta vPlanetColor
 
 _sameLevel      sed                     ; decimal mode
                 lda LEVEL               ; game level #
-                clc                     ; clear carry
-                adc #1                  ; add one
+                clc
+                adc #1
                 sta LEVEL               ; save game level
                 cld                     ; clear decimal
 
@@ -209,7 +209,7 @@ _noTrig         jsr BombAdvance         ; advance bombs
 
                 jsr SaucerShoot         ;   Yes. let shoot
 
-_resetTimer     lda #1                  ; get one
+_resetTimer     lda #1
                 sta EXPTIM              ; reset timer
 
 _noExplode      lda BOMBS               ; # bombs to go
@@ -218,10 +218,10 @@ _noExplode      lda BOMBS               ; # bombs to go
                 lda GAMCTL              ; game control
                 bmi MainLoop            ; dead? Yes.
 
-                lda BOMACT              ; bomb 0 status
-                ora BOMACT+1            ; bomb 1 status
-                ora BOMACT+2            ; bomb 2 status
-                ora BOMACT+3            ; bomb 3 status
+                lda isBombActive        ; bomb 0 status
+                ora isBombActive+1      ; bomb 1 status
+                ora isBombActive+2      ; bomb 2 status
+                ora isBombActive+3      ; bomb 3 status
                 beq _doSetLevel         ; any bombs? No.
 
                 jmp MainLoop

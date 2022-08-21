@@ -6,7 +6,7 @@ PLOT            .proc
                 lda PLOTY               ; get Y-coord
                 asl A                   ; shift it left
                 sta LO                  ; save low *2
-                lda #0                  ; get zero
+                lda #0
                 sta HI                  ; init high byte
                 asl LO                  ; shift low byte
                 rol HI                  ; rotate high *4
@@ -21,7 +21,7 @@ PLOT            .proc
                 asl LO                  ; shift low byte
                 rol HI                  ; rotate high *32
                 lda LO                  ; get low *32
-                clc                     ; clear carry
+                clc
                 adc LOHLD               ; add low *8
                 sta LO                  ; save low *40
                 lda HI                  ; get high *32
@@ -33,7 +33,7 @@ PLOT            .proc
 ; -----------------------------
 
                 lda #<Playfield         ; screen addr lo
-                clc                     ; clear carry
+                clc
                 adc LO                  ; add low offset
                 sta LO                  ; save addr low
                 lda #>Playfield         ; screen addr hi

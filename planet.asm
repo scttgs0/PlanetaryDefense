@@ -217,14 +217,14 @@ _next9          sta (INDX1),Y           ; put bytes
                 lda TEMP                ; get flag
                 bpl _next8              ; new line? No.
 
-                sec                     ; set carry
-                lda INDX1               ; Yes. get low
+                sec
+                lda INDX1               ;   Yes. get low
                 sbc #40                 ; subtract 40
                 sta INDX1               ; new low
                 bcs _dpN1               ; overflow? No.
 
                 dec INDX1+1             ; decrement high
-_dpN1           clc                     ; clear carry
+_dpN1           clc
                 lda INDX2               ; get low
                 adc #40                 ; add 40
                 sta INDX2               ; new low

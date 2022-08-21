@@ -521,7 +521,7 @@ _2              ;jmp _XIT    ; HACK:
                 lda SaucerColor,X       ; index 0 or 1
                 ;sta PCOLR3             ; saucer color
 
-                lda #5                  ; get 5
+                lda #5
                 sta DLICNT              ; reset DLI count
 
                 ;lda #$C0               ; enable VBI+DLI
@@ -541,7 +541,7 @@ _2              ;jmp _XIT    ; HACK:
 _3              lda PAUSED              ; pause flag
                 beq _nopau              ; paused? No.
 
-                lda #0                  ; get zero
+                lda #0
                 ldx #7                  ; do 8 bytes
 _next1          ;sta AUDF1,X            ; zero sound
                 dex                     ; dec index
@@ -553,7 +553,7 @@ _nopau          lda isTitleScreen       ; title flag
                 bne _nocyc              ; title? Yes.
 
                 ;lda COLOR2             ;   No. get color
-                clc                     ; clear carry
+                clc
                 adc #$10                ; next color
                 ;sta COLOR2             ; explosion col.
 
@@ -694,15 +694,15 @@ _setPix         sta SP01_ADDR
 _noSat          lda SAUCER              ; saucer flag
                 beq _sounds             ; saucer? No.
 
-                ldy BOMBY+3             ; saucer Y pos
+                ldy BombY+3             ; saucer Y pos
                 dey                     ; 1
                 dey                     ; 2
                 ldx #9                  ; 10 scan lines
 _next5          cpy #32                 ; above top?
-                bcc _nxtsp              ; Yes. skip it
+                bcc _nxtsp              ;   Yes. skip it
 
                 cpy #223                ; below bottom?
-                bcs _nxtsp              ; Yes. skip it
+                bcs _nxtsp              ;   Yes. skip it
 
 ; saucer y-pos
                 lda SHAPE_Saucer,X      ; saucer image
@@ -712,7 +712,7 @@ _nxtsp          dey                     ; next scan line
                 bpl _next5              ; done? No.
 
                 .m16
-                lda BOMBX+3             ; saucer X pos
+                lda BombX+3             ; saucer X pos
                 sta SP03_X_POS          ; move it
                 .m8
 
@@ -728,7 +728,7 @@ _nxtsp          dey                     ; next scan line
 _sounds         ldx PSSCNT              ; shot sound
                 bpl _doSnd1             ; shot? Yes.
 
-                lda #0                  ; No. get zero
+                lda #0                  ;   No
                 sta SID_CTRL1           ; volume for shot
                 beq _trySnd2            ; skip next
 
@@ -740,7 +740,7 @@ _doSnd1         lda #$A6                ; shot sound vol
 _trySnd2        ldx ESSCNT              ; enemy shots
                 bpl _doSnd2             ; shots? Yes.
 
-                lda #0                  ; No. get zero
+                lda #0                  ;   No
                 sta SID_CTRL2           ; into volume
                 beq _trySnd3            ; skip rest
 
@@ -752,23 +752,23 @@ _doSnd2         lda #$A6                ; shot sound vol
 _trySnd3        lda SAUCER              ; saucer flag
                 beq _noSnd3             ; saucer? No.
 
-                lda BOMBY+3             ; saucer Y pos
+                lda BombY+3             ; saucer Y pos
                 cmp #36                 ; above top?
-                bcc _noSnd3             ; Yes. skip
+                bcc _noSnd3             ;   Yes. skip
 
                 cmp #231                ; below bottom?
-                bcc _doSnd3             ; No. make sound
+                bcc _doSnd3             ;   No. make sound
 
-_noSnd3         lda #0                  ; get zero
+_noSnd3         lda #0
                 sta SID_CTRL3           ; no saucer snd
                 beq _XIT                ; skip next
 
 _doSnd3         inc SSSCNT              ; inc saucer cnt
                 ldx SSSCNT              ; saucer count
                 cpx #12                 ; at limit?
-                bmi _setSnd3            ; No. skip next
+                bmi _setSnd3            ;   No. skip next
 
-                ldx #0                  ; get zero
+                ldx #0
                 stx SSSCNT              ; zero saucer cnt
 _setSnd3        lda #$A8                ; saucer volume
                 sta SID_CTRL3           ; set hardware

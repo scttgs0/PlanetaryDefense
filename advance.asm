@@ -15,28 +15,28 @@ AdvanceIt       .proc
                 lda #0
                 rol A                   ; carry = 1
                 sta DELTAY              ; Y-delta
-                lda BOMBLR,X            ; bomb L/R flag
+                lda lrBomb,X            ; bomb L/R flag
                 beq _left               ; go left? Yes.
 
-                lda BOMBX,X             ; bomb X-coord
+                lda BombX,X             ; bomb X-coord
                 adc DELTAX              ; add X-delta
                 jmp _advY               ; skip next
 
-_left           lda BOMBX,X             ; bomb X-coord
+_left           lda BombX,X             ; bomb X-coord
                 sec
                 sbc DELTAX              ; sub X-delta
-_advY           sta BOMBX,X             ; save X-coord
-                lda BOMBUD,X            ; bomb U/D flag
+_advY           sta BombX,X             ; save X-coord
+                lda udBomb,X            ; bomb U/D flag
                 beq _down               ; go down? Yes.
 
-                lda BOMBY,X             ; bomb Y-coord
+                lda BombY,X             ; bomb Y-coord
                 sec
                 sbc DELTAY              ; sub Y-delta
                 jmp _XIT                ; skip next
 
-_down           lda BOMBY,X             ; bomb Y-coord
+_down           lda BombY,X             ; bomb Y-coord
                 clc
                 adc DELTAY              ; add Y-delta
-_XIT            sta BOMBY,X             ; save Y-coord
+_XIT            sta BombY,X             ; save Y-coord
                 rts
                 .endproc

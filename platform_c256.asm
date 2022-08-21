@@ -1090,7 +1090,7 @@ wait_vdma       lda VDMA_STATUS         ; Get the VDMA status
                 bit #vdsSize_Err|vdsDst_Add_Err|vdsSrc_Add_Err
                 bne vdma_err            ; Go to monitor if there is a VDMA error
                 bit #vdsVDMA_IPS        ; Is it still in process?
-                bne wait_vdma           ; Yes: keep waiting
+                bne wait_vdma           ;   Yes: keep waiting
 
                 lda #0                  ; Make sure DMA registers are cleared
                 sta SDMA0_CTRL

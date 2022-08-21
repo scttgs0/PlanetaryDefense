@@ -4,7 +4,7 @@
 SetupOrbiter    .proc
                 ldx #64                 ; do 65 bytes               ;               |
                 ldy #0                  ; quad 2/4 offset           ;    quad-4     |    quad-1
-_next1          clc                     ; clear carry               ;               |
+_next1          clc                                                 ;               |
                 lda #96                 ; center Y                  ; ----------------------------
                 adc _tblOrbiterY,X      ; add offset Y              ;               |
                 sta ORBY+$40,Y          ; quad-2 Y                  ;    quad-3     |    quad-2
@@ -15,7 +15,7 @@ _next1          clc                     ; clear carry               ;           
                 sta ORBX,X              ; quad-1 X                  ; ORBX/Y :=     [00-3F]:quad-1  [40-7F]:quad-2  [80-BF]:quad-3  [C0-FF]:quad-4
                 sta ORBX+$40,Y          ; quad-2 X
 
-                sec                     ; set carry
+                sec
                 lda #80                 ; center X
                 sbc _tblOrbiterX,X      ; sub offset X
                 sta ORBX+$80,X          ; quad-3 X

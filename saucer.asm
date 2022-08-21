@@ -2,10 +2,10 @@
 ; Saucer random generator 0..99
 ;======================================
 SaucerRandom    .proc
-                .randomByte             ; random number
+_tryAgain       .randomByte             ; random number
                 and #$7F                ; 0..127
                 cmp #100                ; compare w/100
-                bcs SaucerRandom        ; less than? No.
+                bcs _tryAgain           ; less than? No.
 
                 rts
                 .endproc
@@ -20,14 +20,15 @@ SaucerShoot     .proc
                 bcs _XIT                ; less than? No.
 
                 ldx #7                  ; 7 = index
-                lda PROACT,X            ; projectile #7
+                lda isProjActive,X      ; projectile #7
                 beq _gotSauShot         ; active? No.
 
                 dex                     ; 6 = index
-                lda PROACT,X            ; projectile #6
+                lda isProjActive,X      ; projectile #6
                 beq _gotSauShot         ; active? No.
 
 _XIT            rts                     ; return, no shot
+
 
 ;-------------------
 ; Enable a saucer shot
@@ -37,19 +38,19 @@ _gotSauShot     lda #48                 ; PF center, Y
                 sta zpTargetY           ; shot to Y-coord
                 lda #80                 ; PF center X
                 sta zpTargetX           ; shot to X-coord
-                lda BOMBX+3             ; saucer x-coord
-                sec                     ; set carry
+                lda BombX+3             ; saucer x-coord
+                sec
                 sbc #44                 ; PF offset
                 sta FROMX               ; shot from X
-                sta PROJX,X             ; X-coord table
+                sta ProjX,X             ; X-coord table
                 cmp #160                ; screen X limit
                 bcs _XIT                ; on screen? No.
 
-                lda BOMBY+3             ; saucer Y-coord
+                lda BombY+3             ; saucer Y-coord
                 sbc #37                 ; PF offset
                 lsr A                   ; 2 scan lines
                 sta FROMY               ; shot from Y
-                sta PROJY,X             ; Y-coord table
+                sta ProjY,X             ; Y-coord table
                 cmp #95                 ; screen Y limit
                 bcs _XIT                ; on screen? No.
 

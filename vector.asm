@@ -2,7 +2,7 @@
 ; Calculate target vector
 ;======================================
 VECTOR          .proc
-                lda #0                  ; get zero
+                lda #0
                 sta LR                  ; going left
                 lda FROMX               ; from X-coord
                 cmp zpTargetX           ; w/to X-coord
@@ -13,10 +13,10 @@ VECTOR          .proc
 
 _right          inc LR                  ; going right
                 lda zpTargetX           ; to X-coord
-                sec                     ; set carry
+                sec
                 sbc FROMX               ; get X-diff
 _vecY           sta VXINC               ; save difference
-                lda #1                  ; get one
+                lda #1
                 sta UD                  ; going up flag
                 lda FROMY               ; from Y-coord
                 cmp zpTargetY           ; w/to Y-coord
@@ -27,11 +27,11 @@ _vecY           sta VXINC               ; save difference
 
 _down           dec UD                  ; going down flag
                 lda zpTargetY           ; to Y-coord
-                sec                     ; set carry
+                sec
                 sbc FROMY               ; get Y-diff
 _vecSet         sta VYINC               ; are both
                 ora VXINC               ; distances 0?
-                bne _next1              ; No. skip next
+                bne _next1              ;   No. skip next
 
                 lda #$80                ; set x increment
                 sta VXINC               ; to default.

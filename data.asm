@@ -33,6 +33,7 @@ SHAPE_Bomb      .byte $00    ; ................
                 .byte $00    ; ................
                 .byte $00    ; ................
                 .byte $00    ; ................
+
 BombPosStart    .byte 27,16
 BombOffsetX     .byte 47,42
 
@@ -131,24 +132,30 @@ SAUSND          .byte 10,11,12,14,16,17
 ; Program variables
 ; -----------------
 
-XPOS            .fill 20                ; all expl. x's
-YPOS            .fill 20                ; all expl. y's
-CNT             .fill 20                ; all expl. counts
-BOMACT          .fill 4                 ; bomb active flags
-PROACT          .fill 8                 ; proj. active flags
-BOMBX           .fill 4                 ; bomb x positions
-PROJX           .fill 8                 ; proj. x positions
-BOMBY           .fill 4                 ; bomb y positions
-PROJY           .fill 8                 ; proj. y positions
+ExplosionX      .fill 20                ; all expl. x's
+ExplosionY      .fill 20                ; all expl. y's
+ExplosionCount  .fill 20                ; all expl. counts
+
+isBombActive    .fill 4                 ; bomb active flags
+isProjActive    .fill 8                 ; proj. active flags
+
+BombX           .fill 4                 ; bomb x positions
+ProjX           .fill 8                 ; proj. x positions
+BombY           .fill 4                 ; bomb y positions
+ProjY           .fill 8                 ; proj. y positions
+
 BXINC           .fill 4                 ; bomb x vectors
 PXINC           .fill 8                 ; proj. x vectors
 BYINC           .fill 4                 ; bomb y vectors
 PYINC           .fill 8                 ; proj. y vectors
+
 BXHOLD          .fill 12                ; b/p hold areas
 BYHOLD          .fill 12                ; b/p hold areas
-BOMBLR          .fill 4                 ; bomb left/right
-PROJLR          .fill 8                 ; proj. left/right
-BOMBUD          .fill 4                 ; bomb up/down
-PROJUD          .fill 8                 ; proj. up/down
+
+lrBomb          .fill 4                 ; bomb left/right
+lrProj          .fill 8                 ; proj. left/right
+udBomb          .fill 4                 ; bomb up/down
+udProj          .fill 8                 ; proj. up/down
+
 ;SCOLIN          .fill 20                ; score line
 SCOLIN          .text ' 000010 LVL01 ***** '
