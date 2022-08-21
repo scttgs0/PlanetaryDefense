@@ -18,7 +18,7 @@ LO              .byte ?                 ; plot low byte
 HI              .byte ?                 ; plot high byte
 DEADTM          .byte ?                 ; death timer
 zpExplosionTimer .byte ?                ; explosion timer
-BOMTIM          .byte ?                 ; bomb timer
+zpBombTimer     .byte ?                 ; bomb timer
 zpSatPix        .byte ?                 ; sat. pic cntr
 zpCursorX       .byte ?                 ; cursor x/y
 zpCursorY       .byte ?
@@ -45,8 +45,8 @@ GAMCTL          .byte ?                 ; game ctrl flag    1=game in progress; 
 DLICNT          .byte ?                 ; DLI counter
 isSaucerActive  .byte ?                 ; saucer flag
 SAUTIM          .byte ?                 ; image timer
-SAUCHN          .byte ?                 ; saucer chance
-BOMBWT          .byte ?                 ; bomb wait time
+zpSaucerChance  .byte ?                 ; saucer chance
+zpBombWait      .byte ?                 ; bomb wait time
 BOMCOL          .byte ?                 ; bomb collis flg
 DEVICE          .byte ?                 ; koala pad sw
 vPlanetColor    .byte ?
@@ -66,7 +66,7 @@ PLOTY           .byte ?                 ; plot y coord
 HIHLD           .byte ?                 ; plot work area
 LOHLD           .byte ?                 ; plot work area
 zpBombCount     .byte ?                 ; bombs to come
-BOMTI           .byte ?                 ; bomb speeds
+zpBombSpeedTime .byte ?                 ; bomb speeds
 VXINC           .byte ?                 ; vector x hold
 VYINC           .byte ?                 ; vector y hold
 LR              .byte ?                 ; vector left/right hold

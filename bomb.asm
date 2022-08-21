@@ -2,8 +2,8 @@
 ; Bomb initializer
 ;======================================
 BombInit        .proc
-                lda BOMBWT              ; bomb wait time
-                bne _XIT                ; done? No.
+                lda zpBombWait          ; bomb wait time done?
+                bne _XIT                ;   No
 
                 lda zpBombCount         ; more bombs?
                 bne _chkLive            ;   Yes
@@ -39,8 +39,8 @@ _gotBomb        lda #TRUE               ; this one is active now
                 bne _noSaucer           ;   No. skip next
 
                 .randomByte
-                cmp SAUCHN              ; compare chances
-                bcs _noSaucer           ; put saucer? No.
+                cmp zpSaucerChance      ; compare chance to place saucer?
+                bcs _noSaucer           ;   No
 
                 lda #TRUE               ;   Yes. enable saucer
                 sta isSaucerActive
@@ -147,7 +147,7 @@ _getBombVec     jsr VECTOR              ; calc shot vect
 ; Bomb advance handler
 ;======================================
 BombAdvance     .proc
-                lda BOMTIM              ; bomb timer
+                lda zpBombTimer         ; bomb timer
                 ;bne _XIT                ; time up? No.
                 bra _XIT      ; HACK:
 
@@ -157,8 +157,8 @@ BombAdvance     .proc
                 lda #1                  ; speed up bombs
                 bne _setBombTraj        ; skip next
 
-_regBombTraj    lda BOMTI               ; get bomb speed
-_setBombTraj    sta BOMTIM              ; reset timer
+_regBombTraj    lda zpBombSpeedTime     ; get bomb speed
+_setBombTraj    sta zpBombTimer         ; reset timer
 
                 ldx #3                  ; check 4 bombs
 _next1          lda isBombActive,X      ; bomb on?
@@ -274,7 +274,7 @@ _next1          lda #0
                 bmi _noscore            ;   Yes. skip next
 
                 lda #2                  ; 1/30th second
-                sta BOMBWT              ; bomb wait time
+                sta zpBombWait          ; bomb wait time
                 cpx #3                  ; saucer player?
                 bne _addBombScore       ;   No. skip this
 

@@ -81,12 +81,15 @@ SetLevel        .proc
                 jsr ShowLevel
 
                 ldx vBombLevel
+
                 lda INIBOM,X            ; bombs / level
                 sta zpBombCount         ; bomb count
-                lda INIBS,X             ; bomb speed
-                sta BOMTI               ; bomb timer
+
+                lda INIBS,X             ; bomb speed into
+                sta zpBombSpeedTime     ; bomb time
+
                 lda INISC,X             ; % chance of
-                sta SAUCHN              ; saucer in level
+                sta zpSaucerChance      ; saucer in level
 
                 lda INIPC,X             ; planet color
                 cmp #$FF                ; level >14?

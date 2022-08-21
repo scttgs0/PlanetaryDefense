@@ -634,10 +634,10 @@ _badX           cpy #32                 ; too far up?
 ;-------------------------------------
 ; Handle timers and orbit
 ;-------------------------------------
-_timers         lda BOMBWT              ; bomb wait cnt
+_timers         lda zpBombWait          ; bomb wait cnt
                 beq _5                  ; wait over? Yes.
 
-                dec BOMBWT              ; dec count
+                dec zpBombWait          ; dec count
 _5              lda DEADTM              ; death timer
                 beq _6                  ; zero? yes.
 
@@ -646,10 +646,10 @@ _6              lda zpExplosionTimer    ; exp timer zero?
                 beq _7                  ;   Yes.
 
                 dec zpExplosionTimer    ; decrement it!
-_7              lda BOMTIM              ; get bomb time zero?
+_7              lda zpBombTimer         ; get bomb time zero?
                 beq _8                  ;   Yes.
 
-                dec BOMTIM              ; dec bomb time
+                dec zpBombTimer         ; dec bomb time
 _8              lda GAMCTL              ; game control
                 bpl _notGameOver        ; game over? No.
 
