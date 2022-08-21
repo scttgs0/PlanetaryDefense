@@ -18,19 +18,19 @@ _next1          lda PROACT,X            ; get status
 
 _gotpro         lda #13                 ; shot sound time
                 sta PSSCNT              ; player shot sound
-                lda SATX                ; satellite X
+                lda zpSatelliteX        ; satellite X
                 sta FROMX               ; shot from X
                 sta PROJX,X             ; proj X table
-                lda SATY                ; satellite Y
+                lda zpSatelliteY        ; satellite Y
                 sta FROMY               ; shot from Y
                 sta PROJY,X             ; proj Y table
 
-                lda CURX                ; cursor X-coord
+                lda zpCursorX           ; cursor X-coord
                 sec                     ; set carry
                 sbc #48                 ; playfld offset
                 sta zpTargetX           ; shot to X-coord
 
-                lda CURY                ; cursor Y-coord
+                lda zpCursorY           ; cursor Y-coord
                 sec                     ; set carry
                 sbc #32                 ; playfld offset
                 lsr A                   ; 2 line res

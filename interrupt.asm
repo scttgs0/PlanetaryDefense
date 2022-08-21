@@ -515,7 +515,7 @@ _1              ldx InputType
 
                 sta InputFlags
 
-_2              jmp _XIT    ; HACK:
+_2              ;jmp _XIT    ; HACK:
 
                 ldx SAUCER              ; saucer flag as
                 lda SaucerColor,X       ; index 0 or 1
@@ -547,15 +547,16 @@ _next1          ;sta AUDF1,X            ; zero sound
                 dex                     ; dec index
                 bpl _next1              ; done? No.
 
-                rtl
+                jmp _XIT
 
 _nopau          lda isTitleScreen       ; title flag
                 bne _nocyc              ; title? Yes.
 
-                ;lda COLOR2             ; No. get color
+                ;lda COLOR2             ;   No. get color
                 clc                     ; clear carry
                 adc #$10                ; next color
                 ;sta COLOR2             ; explosion col.
+
 _nocyc          lda EXSCNT              ; explosion cnt
                 beq _4                  ; any? No.
 
@@ -569,26 +570,17 @@ _nocyc          lda EXSCNT              ; explosion cnt
 _4              lda GAMCTL              ; game control
                 bpl _cursor             ; cursor? Yes.
 
-                jmp _timers             ; No. skip
+                jmp _timers             ;   No. skip
 
 
 ; --------------
 ; Cursor handler
 ; --------------
 
-_cursor         ldy CURY                ; get y pos
-                ldx #5                  ; clear 6 bytes
-_next2          lda #$0F                ; now clear out
-                and MISL-3,Y            ; old cursor
-                sta MISL-3,Y            ; graphics,
-                iny                     ; next Y position
-                dex                     ; dec count
-                bpl _next2              ; loop until done
-
-                lda InputFlags          ; read joystick
+_cursor         lda InputFlags          ; read joystick
                 and $0F
-                ldx CURX                ; get X value
-                ldy CURY                ; get Y value
+                ldx zpCursorX           ; get X value
+                ldy zpCursorY           ; get Y value
                 lsr A                   ; shift right
                 bcs _notN               ; North? No.
 
@@ -608,19 +600,36 @@ _notW           lsr A                   ; shift right
 
                 inx                     ; cursor right
 _notE           cpx #48                 ; too far left?
-                bcc _badX               ; Yes. skip next
+                bcc _badX               ;   Yes. skip next
 
                 cpx #208                ; too far right?
-                bcs _badX               ; Yes. skip next
+                bcs _badX               ;   Yes. skip next
 
-                stx CURX                ; No. it's ok!
+                stx zpCursorX           ;   No. it's ok!
+
+                .m16
+                lda zpCursorX
+                and #$FF
+                clc
+                adc #61
+                sta SP00_X_POS
+                .m8
+
 _badX           cpy #32                 ; too far up?
-                bcc _timers             ; Yes. skip next
+                bcc _timers             ;   Yes. skip next
 
                 cpy #224                ; too far down?
-                bcs _timers             ; Yes. skip next
+                bcs _timers             ;   Yes. skip next
 
-                sty CURY                ; No. it's ok!
+                sty zpCursorY           ;   No. it's ok!
+
+                .m16
+                lda zpCursorY
+                and #$FF
+                clc
+                adc #20
+                sta SP00_Y_POS
+                .m8
 
 ;-------------------------------------
 ; Handle timers and orbit
@@ -644,42 +653,43 @@ _7              lda BOMTIM              ; get bomb time
 _8              lda GAMCTL              ; game control
                 bpl _notGameOver        ; game over? No.
 
-                rtl                     ; exit VBLANK
+                jmp _XIT                ; exit VBLANK
 
-_notGameOver    lda SATLIV              ; get satellite
+_notGameOver    lda isSatelliteAlive    ; get satellite
                 beq _noSat              ; alive? No.
 
                 inc SCNT                ; inc count
                 ldy SCNT                ; orbit index
-                clc                     ; clear carry
-                lda ORBX,Y              ; get X coord
-                sta SATX                ; save Pfield x
-                adc #47                 ; X offset
-                sta SP05_X_POS          ; horizontal pos
-                adc #2                  ; +2 offset for
-                sta SP04_X_POS          ; right side
-                lda ORBY,Y              ; get Y coord
-                lsr A                   ; divide by 2
-                sta SATY                ; for playfield
-                rol A                   ; restore for PM
-                adc #36                 ; screen offset
-                tax                     ; use as index
-                inc SATPIX              ; next sat. image
-                lda SATPIX              ; get number
-                and #$08                ; use bit 3
-                tay                     ; use as index
 
-; satellite y-pos
-                lda #8                  ; do 8 bytes
-                sta SATEMP              ; save count
-_next4          lda MISL,X              ; missile graphic
-                and #$F0                ; mask off 1,2
-                ora SHAPE_Satellite,Y   ; add sat shape
-                sta MISL,X              ; put player #1
-                dex                     ; dec position
-                iny                     ; dec index
-                dec SATEMP              ; dec count
-                bne _next4              ; done? No.
+                lda ORBX,Y              ; get X coord
+                asl A
+                sta zpSatelliteX        ; save Pfield x
+                clc
+                adc #28                 ; X offset
+                sta SP01_X_POS          ; horizontal pos
+
+                lda ORBY,Y              ; get Y coord
+                sta zpSatelliteY
+                clc
+                adc #52
+                sta SP01_Y_POS
+
+;   toggle between satellite A & B
+                inc zpSatPix            ; next sat. image
+                lda zpSatPix            ; get number
+                and #$08                ; use bit 3
+
+                .m16
+                and #$FF
+                bne _pixB
+
+                lda #$400
+                bra _setPix
+
+_pixB           lda #$800
+
+_setPix         sta SP01_ADDR
+                .m8
 
 _noSat          lda SAUCER              ; saucer flag
                 beq _sounds             ; saucer? No.

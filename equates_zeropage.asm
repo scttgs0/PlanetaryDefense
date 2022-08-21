@@ -19,15 +19,15 @@ HI              .byte ?                 ; plot high byte
 DEADTM          .byte ?                 ; death timer
 EXPTIM          .byte ?                 ; explosion timer
 BOMTIM          .byte ?                 ; bomb timer
-SATPIX          .byte ?                 ; sat. pic cntr
-CURX            .byte ?                 ; cursor x
-CURY            .byte ?                 ; cursor y
+zpSatPix        .byte ?                 ; sat. pic cntr
+zpCursorX       .byte ?                 ; cursor x/y
+zpCursorY       .byte ?
 FROMX           .byte ?                 ; vector from X
 FROMY           .byte ?                 ; vector from Y
-zpTargetX       .byte ?                 ; vector to X
-zpTargetY       .byte ?                 ; vector to Y
-SATX            .byte ?                 ; satellite x
-SATY            .byte ?                 ; satellite y
+zpTargetX       .byte ?                 ; vector to x/y
+zpTargetY       .byte ?
+zpSatelliteX    .byte ?                 ; satellite x/y
+zpSatelliteY    .byte ?
 XHOLD           .byte ?                 ; x reg hold area
 LASTRG          .byte ?                 ; last trigger
 LEVEL           .byte ?                 ; level number
@@ -37,11 +37,11 @@ SCORE           .fill 3                 ; score digits
 SCOADD          .fill 3                 ; score inc.
 SHOBYT          .byte ?                 ; digit hold
 SHCOLR          .byte ?                 ; digit color
-SATLIV          .byte ?                 ; satellite flag
+isSatelliteAlive .byte ?                 ; satellite flag
 BOMVL           .byte ?                 ; bomb value low
 BOMVH           .byte ?                 ; bomb value high
 SAUVAL          .byte ?                 ; saucer value
-GAMCTL          .byte ?                 ; game ctrl flag
+GAMCTL          .byte ?                 ; game ctrl flag    1=game in progress; -1=game over
 DLICNT          .byte ?                 ; DLI counter
 SAUCER          .byte ?                 ; saucer flag
 SAUTIM          .byte ?                 ; image timer

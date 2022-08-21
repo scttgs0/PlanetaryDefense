@@ -296,7 +296,7 @@ _noscore        lda #0
                 ldy BOMBLR,X            ; L/R flag
                 lda BOMBX,X             ; bomb X-coord
                 sec
-                sbc BombOffsetX,Y              ; bomb X offset
+                sbc BombOffsetX,Y       ; bomb X offset
                 sta NEWX                ; plotter X-coord
                 lda BOMBY,X             ; bomb Y-coord
                 sec

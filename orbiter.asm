@@ -108,37 +108,37 @@ _XIT            rts
 _live           lda LIVES               ; lives left?
                 bmi _XIT                ;   No. exit
 
-                lda #1                  ; get one
-                sta SATLIV              ; set alive flag
+                lda #TRUE
+                sta isSatelliteAlive    ; set alive flag
 
                 ;lda M0PL               ; did satellite
                 ;ora M0PL+1             ; hit any bombs?
                 ;beq _XIT               ;   No. exit
                 bra _XIT    ; HACK:
 
-                lda #0                  ; get zero
-                sta SATLIV              ; kill satellite
+                lda #0
+                sta isSatelliteAlive    ; kill satellite
                 sta SCNT                ; init orbit
                 ldx LIVES               ; one less life
                 ;sta SCOLIN+14,X         ; erase life       HACK:
                 dec LIVES               ; dec lives count
                 bpl _moreSats           ; any left? Yes.
 
-                lda #255                ; lot of bombs
+                lda #NIL                ; lot of bombs
                 sta BOMBS               ; into bomb count
                 sta GAMCTL              ; end game
                 jsr SoundOff            ; no sound 1 2 3
 
-_moreSats       lda SATX                ; sat X-coord
+_moreSats       lda zpSatelliteX        ; sat X-coord
                 sta NEWX                ; explo X-coord
-                lda SATY                ; sat Y-coord
+                lda zpSatelliteY        ; sat Y-coord
                 sta NEWY                ; explo Y-coord
                 jsr NewExplosion        ; set off explo
 
                 lda #80                 ; init sat X
-                sta SATX                ; sat X-coord
+                sta zpSatelliteX        ; sat X-coord
                 lda #21                 ; init sat Y
-                sta SATY                ; sat Y-coord
+                sta zpSatelliteY        ; sat Y-coord
 
                 ldx #0                  ; don't show the
 _clearSat       lda MISL,X              ; satellite pic

@@ -25,7 +25,7 @@ _next2          lda ScoreINI,X          ; get byte
 
                 lda #$01
                 sta LEVEL               ; game level
-                sta SATLIV              ; live satellite
+                sta isSatelliteAlive    ; live satellite
 
                 lda #4
                 sta LIVES               ; number of lives
@@ -39,9 +39,24 @@ _next2          lda ScoreINI,X          ; get byte
                 ;sta PCOLR2             ; bomb 2 color
 
                 lda #127                ; center screen X
-                sta CURX                ; cursor X pos
+                sta zpCursorX           ; cursor X pos
                 lda #129                ; center screen Y
-                sta CURY                ; cursor Y pos
+                sta zpCursorY           ; cursor Y pos
+
+                .m16
+                lda zpCursorX
+                and #$FF
+                clc
+                adc #33+32-4
+                sta SP00_X_POS
+
+                lda zpCursorY
+                and #$FF
+                ;asl A
+                clc
+                adc #20
+                sta SP00_Y_POS
+                .m8
 
                 lda #1
                 sta GAMCTL              ; game control
@@ -139,9 +154,9 @@ _checkCore      lda Playfield+1939      ; center LF
 ; Planet is Dead!
 ; ---------------
 
-_planetDead     lda #0                  ; get zero
+_planetDead     lda #0
                 sta BOMBS               ; zero bombs
-                sta SATLIV              ; satelite dead
+                sta isSatelliteAlive    ; satelite dead
 
                 lda #NIL
                 sta LIVES               ; no lives left
@@ -166,7 +181,7 @@ _planetOK       lda CONSOL              ; get console
 
 _noRestart      jsr BombInit            ; try new bomb
 
-                lda SATLIV              ; satellite stat
+                lda isSatelliteAlive    ; satellite stat
                 beq _noTrig             ; alive? No.
 
                 lda InputFlags          ; get trigger
