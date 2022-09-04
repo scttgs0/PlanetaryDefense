@@ -107,7 +107,10 @@ _next1          sta $AF_E400,X
 ;======================================
 InitLUT         .proc
                 php
-                phb
+                phb                     ; required for mvn
+                pha
+                phx
+                phy
 
                 .m16i16
                 lda #Palette_end-Palette ; Copy the palette to LUT0
@@ -116,6 +119,9 @@ InitLUT         .proc
                 mvn `Palette,`GRPH_LUT0_PTR
 
                 .m8i8
+                ply
+                plx
+                pla
                 plb
                 plp
                 rts
@@ -501,11 +507,11 @@ _XIT            .i8
 ;======================================
 BlitVideoRam    .proc
                 php
-                phb
+                pha
 
                 .m16
 
-                lda #$1E00              ; Set the size
+                lda #$1E00              ; 24 lines (320 bytes/line)
                 sta zpSize
                 lda #0
                 sta zpSize+2
@@ -516,10 +522,9 @@ BlitVideoRam    .proc
                 sta zpSource+2
 
                 .m8
-
                 jsr Copy2VRAM
 
-                plb
+                pla
                 plp
                 rts
                 .endproc
@@ -530,6 +535,9 @@ BlitVideoRam    .proc
 ;======================================
 BlitPlayfield   .proc
                 php
+                pha
+                phx
+                phy
 
                 ldy #8
                 ldx #0
@@ -564,6 +572,9 @@ _nextBank       .m16
                 dey
                 bpl _nextBank
 
+                ply
+                plx
+                pla
                 plp
                 rts
 
@@ -592,6 +603,9 @@ v_TextColor     .var $40
 ;---
 
                 php
+                pha
+                phx
+                phy
                 .m8i8
 
 ;   clear color
@@ -634,6 +648,9 @@ _next1T         sta [zpDest],Y
                 dex
                 bne _nextPageT
 
+                ply
+                plx
+                pla
                 plp
                 rts
                 .endproc
@@ -1041,9 +1058,10 @@ BlitText        .proc
 ;======================================
 Copy2VRAM       .proc
                 php
+                phb
                 .setbank `SDMA_SRC_ADDR
                 .setdp zpSource
-                .m8
+                .m8i8
 
     ; Set SDMA to go from system to video RAM, 1D copy
                 lda #sdcSysRAM_Src|sdcEnable
@@ -1064,7 +1082,6 @@ Copy2VRAM       .proc
                 ldx zpDest+2
                 stx VDMA_DST_ADDR+2
 
-                .m16
                 lda zpSize              ; Set the size of the block
                 sta SDMA_SIZE
                 sta VDMA_SIZE
@@ -1099,10 +1116,21 @@ wait_vdma       lda VDMA_STATUS         ; Get the VDMA status
                 .setdp $0000
                 .setbank $00
                 .m8i8
+                plb
                 plp
                 rts
 
-vdma_err        brk
+vdma_err        lda #0                  ; Make sure DMA registers are cleared
+                sta SDMA0_CTRL
+                sta VDMA_CTRL
+
+                .setdp $0000
+                .setbank $00
+                .m8i8
+                plb
+                plp
+
+                jmp Copy2VRAM           ; retry
                 .endproc
 
 
@@ -1113,9 +1141,8 @@ InitIRQs        .proc
                 pha
 
 ;   enable vertical blank interrupt
-
                 .m8i8
-                ldx #HandleIrq_END-HandleIrq
+                ldx #HandleIrq.HandleIrq_END-HandleIrq
 _relocate       ;lda @l $024000,X        ; HandleIrq address
                 ;sta @l $002000,X        ; new address within Bank 00
                 ;dex
@@ -1138,16 +1165,20 @@ _relocate       ;lda @l $024000,X        ; HandleIrq address
                 sta InputFlags
                 stz InputType           ; joystick
 
+;   enable Start-of-Frame + Start-of-Line IRQs
+                lda #160
+                sta DLI_LINE0_LO
+                lda #1
+                sta DLI_CTRL
+
                 lda @l INT_MASK_REG0
-                and #~FNX0_INT00_SOF    ; enable Start-of-Frame IRQ
+                and #~(FNX0_INT00_SOF|FNX0_INT01_SOL)
+                ;and #~FNX0_INT01_SOL
                 sta @l INT_MASK_REG0
 
-                ;lda @l INT_MASK_REG0
-                ;and #~FNX0_INT01_SOL    ; enable Start-of-Line IRQ
-                ;sta @l INT_MASK_REG0
-
+;   enable Keyboard IRQ
                 lda @l INT_MASK_REG1
-                and #~FNX1_INT00_KBD    ; enable Keyboard IRQ
+                and #~FNX1_INT00_KBD
                 sta @l INT_MASK_REG1
 
                 cli                     ; enable IRQ
@@ -1165,6 +1196,9 @@ SetFont         .proc
                 pha
                 phx
                 phy
+
+;   DEBUG: helpful if you need to see the trace
+                ; bra _XIT
 
                 .m8i8
                 lda #<GameFont
@@ -1195,7 +1229,7 @@ _next1          lda [zpSource],Y
                 dex
                 bne _nextPage
 
-                ply
+_XIT            ply
                 plx
                 pla
                 plp
