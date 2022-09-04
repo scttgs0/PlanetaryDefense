@@ -43,6 +43,15 @@ BORDER_COLOR_R          = $AF_0007
 BORDER_X_SIZE           = $AF_0008      ; Values: 0 - 32 (Default: 32)
 BORDER_Y_SIZE           = $AF_0009      ; Values: 0 - 32 (Default: 32)
 
+;--------------------------------------
+
+; Line Interrupt Registers
+DLI_CTRL                = $AF_001B      ; [0] - Enable Line 0, [1] -Enable Line 1
+DLI_LINE0_LO            = $AF_001C      ; (W) [7:0]
+DLI_LINE0_HI            = $AF_001D      ; (W) [3:0]
+DLI_LINE1_LO            = $AF_001E      ; (W) [7:0]
+DLI_LINE1_HI            = $AF_001F      ; (W) [3:0]
+
 ;---------------------------------------
 
 BITMAP0_CTRL            = $AF_0100

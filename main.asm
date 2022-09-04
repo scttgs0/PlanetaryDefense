@@ -38,23 +38,24 @@ _next2          lda ScoreINI,X          ; get byte
                 ;sta PCOLR1             ; bomb 1 color
                 ;sta PCOLR2             ; bomb 2 color
 
-                lda #127                ; center screen X
+                lda #128                ; center screen X/Y
                 sta zpCursorX           ; cursor X pos
-                lda #129                ; center screen Y
                 sta zpCursorY           ; cursor Y pos
 
                 .m16
                 lda zpCursorX
                 and #$FF
+                asl A                   ; *2
+                sec
+                sbc #96
                 clc
-                adc #33+32-4
+                adc #32-3
                 sta SP00_X_POS
 
                 lda zpCursorY
                 and #$FF
-                ;asl A
                 clc
-                adc #20
+                adc #32-8-3
                 sta SP00_Y_POS
                 .m8
 
@@ -100,11 +101,12 @@ SetLevel        .proc
 _savePC         sta vPlanetColor
 
                 lda INIBVL,X            ; bomb value low
-                sta BOMVL               ; save it
+                sta zpBombValueLO       ; save it
                 lda INIBVH,X            ; bomb value hi
-                sta BOMVH               ; save it
+                sta zpBombValueHI       ; save it
                 lda INISV,X             ; saucer value
-                sta SAUVAL              ; save that too
+                sta zpSaucerValue       ; save that too
+
                 cpx #11                 ; at level 11?
                 beq _sameLevel          ;   Yes. skip next
 

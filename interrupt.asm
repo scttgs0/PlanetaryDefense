@@ -111,16 +111,16 @@ StartMsg        .text "  JOYSTICK - START  "
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ;
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-HandleIrq       .m16i16
+HandleIrq       .proc
+                .m16i16
                 pha
                 phx
                 phy
 
                 .m8i8
                 lda @l INT_PENDING_REG1
-                and #FNX1_INT00_KBD
-                cmp #FNX1_INT00_KBD
-                bne _1
+                bit #FNX1_INT00_KBD
+                beq _1
 
                 jsl KeyboardHandler
 
@@ -128,28 +128,32 @@ HandleIrq       .m16i16
                 ;and #FNX1_INT00_KBD
                 sta @l INT_PENDING_REG1
 
-_1              lda @l INT_PENDING_REG0
-                and #FNX0_INT00_SOF
-                cmp #FNX0_INT00_SOF
-                ;bne _2
-                bne _XIT
+_1              stz isDirty
+
+                lda @l INT_PENDING_REG0
+                bit #FNX0_INT00_SOF
+                beq _2
 
                 jsl VbiHandler
 
+                lda #TRUE
+                sta isDirty
+
+_2              lda @l INT_PENDING_REG0
+                bit #FNX0_INT01_SOL
+                beq _cleanUp
+
+                jsl DliHandler
+
+                lda #TRUE
+                sta isDirty
+
+_cleanUp        lda isDirty
+                beq _XIT
+
                 lda @l INT_PENDING_REG0
-                ;and #FNX0_INT00_SOF
+                ;and #FNX0_INT00_SOF|FNX0_INT01_SOL
                 sta @l INT_PENDING_REG0
-
-_2              ;lda @l INT_PENDING_REG0
-                ;and #FNX0_INT01_SOL
-                ;cmp #FNX0_INT01_SOL
-                ;bne _XIT
-
-                ;jsl DliHandler
-
-                ;lda @l INT_PENDING_REG0
-                ;and #FNX0_INT01_SOL
-                ;sta @l INT_PENDING_REG0
 
 _XIT            .m16i16
                 ply
@@ -159,6 +163,10 @@ _XIT            .m16i16
                 .m8i8
 HandleIrq_END   rti
                 ;jmp IRQ_PRIOR
+
+isDirty        .byte ?
+
+                .endproc
 
 
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -408,7 +416,7 @@ _8r             pla
                 stz KEYCHAR
                 bra _XIT
 
-_CleanUpXIT     ;stz KEYCHAR    HACK:
+_CleanUpXIT     stz KEYCHAR
                 pla
 
 _XIT            .m16i16
@@ -424,9 +432,16 @@ _XIT            .m16i16
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ; Display list interrupt
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-DliHandler     .proc
-                pha                     ; save Acc
-                phx                     ; save X register
+DliHandler      .proc
+                pha
+                phx
+
+;   preserve zpSource
+                ldx #3
+_nextA          lda zpSource,X
+                sta saveSource,X
+                dex
+                bpl _nextA
 
                 inc DLICNT              ; inc counter
                 lda DLICNT              ; get counter
@@ -438,16 +453,17 @@ DliHandler     .proc
                 lda _BrightnessBase,X   ; planet brightness
                 sta zpSource
                 stz zpSource+2
+                stz zpSource+3
                 .m8
 
                 lda vPlanetColor
-                lsr A                   ; /4
+                lsr A                   ; /4 :: ignore luminance ( val / 16 * 4 == /4 )
                 lsr A
-                sta zpTemp1
+                sta _temp1
 
                 lda zpSource
                 clc
-                adc zpTemp1
+                adc _temp1
                 sta zpSource
 
                 .setbank $AF
@@ -465,8 +481,15 @@ _next2          lda _Color8C,X          ; bright blue
 
                 .setbank $00
 
-                plx                     ; restore X
-                pla                     ; restore Acc
+;   restore zpSource
+                ldx #3
+_nextB          lda saveSource,X
+                sta zpSource,X
+                dex
+                bpl _nextB
+
+                plx
+                pla
                 rtl
 
 ;-------------------------------------
@@ -479,6 +502,9 @@ _BrightnessBase .addr Palette+$068,Palette+$084
                 .addr Palette+$0C4,Palette+$084
 
 _Brightness     .byte 0,2,4,6,8,6,4,2
+
+saveSource      .dword ?
+_temp1          .byte ?
 
                 .endproc
 
@@ -497,9 +523,7 @@ VbiHandler      .proc
 
                 cld                     ; clear decimal
 
-                lda JIFFYCLOCK
-                inc A
-                sta JIFFYCLOCK
+                inc JIFFYCLOCK
 
                 lda JOYSTICK0           ; read joystick0
                 and #$1F
@@ -578,7 +602,7 @@ _4              lda GAMCTL              ; game control
 ; --------------
 
 _cursor         lda InputFlags          ; read joystick
-                and $0F
+                and #$0F
                 ldx zpCursorX           ; get X value
                 ldy zpCursorY           ; get Y value
                 lsr A                   ; shift right
@@ -599,10 +623,10 @@ _notW           lsr A                   ; shift right
                 bcs _notE               ; East? No.
 
                 inx                     ; cursor right
-_notE           cpx #48                 ; too far left?
+_notE           cpx #52                 ; too far left?
                 bcc _badX               ;   Yes. skip next
 
-                cpx #208                ; too far right?
+                cpx #205                ; too far right?
                 bcs _badX               ;   Yes. skip next
 
                 stx zpCursorX           ;   No. it's ok!
@@ -610,8 +634,11 @@ _notE           cpx #48                 ; too far left?
                 .m16
                 lda zpCursorX
                 and #$FF
+                asl A                   ; *2
+                sec
+                sbc #96
                 clc
-                adc #61
+                adc #32-3
                 sta SP00_X_POS
                 .m8
 
@@ -627,7 +654,7 @@ _badX           cpy #32                 ; too far up?
                 lda zpCursorY
                 and #$FF
                 clc
-                adc #20
+                adc #32-8-3
                 sta SP00_Y_POS
                 .m8
 
