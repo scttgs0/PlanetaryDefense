@@ -41,7 +41,7 @@ _gotSauShot     lda #48                 ; PF center, Y
                 lda BombX+3             ; saucer x-coord
                 sec
                 sbc #44                 ; PF offset
-                sta FROMX               ; shot from X
+                sta zpFromX             ; shot from X
                 sta ProjX,X             ; X-coord table
                 cmp #160                ; screen X limit
                 bcs _XIT                ; on screen? No.
@@ -49,7 +49,7 @@ _gotSauShot     lda #48                 ; PF center, Y
                 lda BombY+3             ; saucer Y-coord
                 sbc #37                 ; PF offset
                 lsr A                   ; 2 scan lines
-                sta FROMY               ; shot from Y
+                sta zpFromY             ; shot from Y
                 sta ProjY,X             ; Y-coord table
                 cmp #95                 ; screen Y limit
                 bcs _XIT                ; on screen? No.

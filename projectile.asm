@@ -19,10 +19,10 @@ _next1          lda isProjActive,X      ; get status
 _gotpro         lda #13                 ; shot sound time
                 sta PSSCNT              ; player shot sound
                 lda zpSatelliteX        ; satellite X
-                sta FROMX               ; shot from X
+                sta zpFromX             ; shot from X
                 sta ProjX,X             ; proj X table
                 lda zpSatelliteY        ; satellite Y
-                sta FROMY               ; shot from Y
+                sta zpFromY             ; shot from Y
                 sta ProjY,X             ; proj Y table
 
                 lda zpCursorX           ; cursor X-coord
@@ -36,7 +36,7 @@ _gotpro         lda #13                 ; shot sound time
                 lsr A                   ; 2 line res
                 sta zpTargetY           ; shot to Y-coord
 
-_PROVEC         jsr VECTOR              ; compute vect
+_PROVEC         jsr CalcVector          ; compute vect
 
                 lda VXINC               ; X increment
                 sta PXINC,X             ; X inc table

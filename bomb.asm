@@ -55,7 +55,7 @@ _gotBomb        lda #TRUE               ; this one is active now
                 jsr SaucerRandom        ; random X-coord
 
                 adc #35                 ; add X offset
-_saveSauX       sta FROMX               ; from X vector
+_saveSauX       sta zpFromX             ; from X vector
                 sta BombX,X             ; init X-coord
                 lda SaucerStartY,Y      ; saucer start Y
                 cmp #NIL                ; random flag?
@@ -64,7 +64,7 @@ _saveSauX       sta FROMX               ; from X vector
                 jsr SaucerRandom        ; random Y-coord
 
                 adc #55                 ; add Y offset
-_saveSauY       sta FROMY               ; from Y vector
+_saveSauY       sta zpFromY             ; from Y vector
                 sta BombY,X             ; init Y-coord
                 lda SaucerEndX,Y        ; saucer end X
                 cmp #NIL                ; random flag?
@@ -72,13 +72,13 @@ _saveSauY       sta FROMY               ; from Y vector
 
                 lda #230                ; screen right
                 sec                     ; offset so not to hit planet
-                sbc FROMY
+                sbc zpFromY
 _saveEndX       sta zpTargetX           ; to X vector
                 lda SaucerEndY,Y        ; saucer end Y
                 cmp #NIL                ; random flag?
                 bne _saveEndY           ;   No. use as Y
 
-                lda FROMX               ; use X for Y
+                lda zpFromX             ; use X for Y
 _saveEndY       sta zpTargetY           ; to Y vector
                 jmp _getBombVec
 
@@ -90,6 +90,7 @@ _saveEndY       sta zpTargetY           ; to Y vector
 _noSaucer       .randomByte
                 bmi _bombMaxX           ; coin flip
 
+;   randX, maxY :: x=0..250, y=0|250
                 .randomByte
                 and #1                  ; make 0..1
                 tay
@@ -103,6 +104,7 @@ _next2          .randomByte
                 sta BombX,X             ; bomb X-coord
                 jmp _bombvec
 
+;   maxX, randY :: x=0|250, y=0..250
 _bombMaxX       .randomByte
                 and #1                  ; make 0..1
                 tay                     ; use as index
@@ -114,16 +116,17 @@ _next3          .randomByte
                 bcs _next3              ; less than? No.
 
                 sta BombY,X             ; bomb Y-coord
+
 _bombvec        lda BombX,X             ; bomb X-coord
-                sta FROMX               ; shot from X
+                sta zpFromX             ; shot from X
                 lda BombY,X             ; bomb Y-coord
-                sta FROMY               ; shot from Y
+                sta zpFromY             ; shot from Y
 
                 lda #128                ; planet center
                 sta zpTargetX           ; shot to X-coord
                 sta zpTargetY           ; shot to Y-coord
 
-_getBombVec     jsr VECTOR              ; calc shot vect
+_getBombVec     jsr CalcVector          ; calc shot vect
 
 
 ; ---------------------
@@ -148,11 +151,10 @@ _getBombVec     jsr VECTOR              ; calc shot vect
 ;======================================
 BombAdvance     .proc
                 lda zpBombTimer         ; bomb timer
-                ;bne _XIT                ; time up? No.
-                bra _XIT      ; HACK:
+                bne _XIT                ; time up? No.
 
                 lda LIVES               ; any lives?
-                bpl _regBombTraj        ;   Yes. skip next
+                bpl _regBombTraj        ;   Yes
 
                 lda #1                  ; speed up bombs
                 bne _setBombTraj        ; skip next
@@ -169,8 +171,8 @@ _next1          lda isBombActive,X      ; bomb on?
                 lda LIVES               ; any lives left?
                 bpl _showbomb           ;   Yes. skip next
 
-                jsr AdvanceIt           ;   No. move bombs
-                jsr AdvanceIt           ; 4 times faster than normal
+                jsr AdvanceIt           ;   No. move bombs 4 times
+                jsr AdvanceIt           ;   faster than normal
                 jsr AdvanceIt
 
 
@@ -216,11 +218,16 @@ _nobombdraw     dey                     ; PM index
                 .m16
                 ldx INDX2               ; restore X
                 lda BombX,X             ; bomb X-coord
-                plx
+                phx
+                pha
+                txa
+                and #$FF
                 asl A                   ; *8
                 asl A
                 asl A
-                sta SP00_X_POS,X        ; player pos
+                tax
+                pla
+                sta SP04_X_POS,X        ; player pos
                 plx
                 .m8
 
@@ -240,7 +247,8 @@ CheckHit        .proc
                 beq _next1              ;   No. skip next
 
                 lda #0
-                sta BOMCOL              ; collision count
+                sta zpBombCollCnt       ; collision count
+
                 lda GAMCTL              ; game over?
                 bmi _noscore            ;   Yes. skip next
 
@@ -259,14 +267,14 @@ CheckHit        .proc
                 bcs _noscore            ;   Yes. kill it
 
 _next1          lda #0
-                sta BOMCOL              ; collision count
+                sta zpBombCollCnt       ; clear collision count
 
                 ;lda P0PF,X             ; playf collision
                 ;and #$05               ; w/shot+planet
                 ;beq _nobombhit         ; hit either? No.
                 bra _nobombhit  ; HACK:
 
-                inc BOMCOL              ;   Yes. inc count
+                inc zpBombCollCnt       ;   Yes. inc count
                 and #$04                ; hit shot?
                 beq _noscore            ;   No. skip next
 
@@ -281,7 +289,7 @@ _next1          lda #0
                 lda isSaucerActive      ; saucer active?
                 beq _addBombScore       ;   No. skip this
 
-                lda SAUVAL              ; saucer value
+                lda zpSaucerValue       ; saucer value
                 sta SCOADD+1            ; point value
                 jmp _addit              ; add to score
 
@@ -290,27 +298,30 @@ _next1          lda #0
 ; Add bomb value to score
 ; -----------------------
 
-_addBombScore   lda BOMVL               ; bomb value low
+_addBombScore   lda zpBombValueLO       ; bomb value low
                 sta SCOADD+2            ; score inc low
-                lda BOMVH               ; bomb value high
+                lda zpBombValueHI       ; bomb value high
                 sta SCOADD+1            ; score inc high
 
 _addit          stx XHOLD               ; save X register
                 jsr AddScore
 
                 ldx XHOLD               ; restore X
-_noscore        lda #0
+_noscore        lda #FALSE
                 sta isBombActive,X      ; kill bomb
+
                 ldy lrBomb,X            ; L/R flag
                 lda BombX,X             ; bomb X-coord
                 sec
                 sbc BombOffsetX,Y       ; bomb X offset
                 sta NEWX                ; plotter X-coord
+
                 lda BombY,X             ; bomb Y-coord
                 sec
                 sbc #40                 ; bomb Y offset
                 lsr A                   ; 2 line res.
                 sta NEWY                ; plotter Y-coord
+
                 lda isSaucerActive      ; saucer active?
                 beq _explode            ;   No. explode it
 
@@ -326,7 +337,7 @@ _noscore        lda #0
 
 _explode        jsr ClearPlayer
 
-                lda BOMCOL              ; collisions?
+                lda zpBombCollCnt       ; collisions?
                 beq _nobombhit          ;   No. skip this
 
                 jsr NewExplosion        ; init explosion

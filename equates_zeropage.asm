@@ -22,8 +22,8 @@ zpBombTimer     .byte ?                 ; bomb timer
 zpSatPix        .byte ?                 ; sat. pic cntr
 zpCursorX       .byte ?                 ; cursor x/y
 zpCursorY       .byte ?
-FROMX           .byte ?                 ; vector from X
-FROMY           .byte ?                 ; vector from Y
+zpFromX         .byte ?                 ; vector from X
+zpFromY         .byte ?                 ; vector from Y
 zpTargetX       .byte ?                 ; vector to x/y
 zpTargetY       .byte ?
 zpSatelliteX    .byte ?                 ; satellite x/y
@@ -38,16 +38,16 @@ SCOADD          .fill 3                 ; score inc.
 SHOBYT          .byte ?                 ; digit hold
 SHCOLR          .byte ?                 ; digit color
 isSatelliteAlive .byte ?                 ; satellite flag
-BOMVL           .byte ?                 ; bomb value low
-BOMVH           .byte ?                 ; bomb value high
-SAUVAL          .byte ?                 ; saucer value
+zpBombValueLO   .byte ?                 ; bomb value low
+zpBombValueHI   .byte ?                 ; bomb value high
+zpSaucerValue   .byte ?                 ; saucer value
 GAMCTL          .byte ?                 ; game ctrl flag    1=game in progress; -1=game over
 DLICNT          .byte ?                 ; DLI counter
 isSaucerActive  .byte ?                 ; saucer flag
 SAUTIM          .byte ?                 ; image timer
 zpSaucerChance  .byte ?                 ; saucer chance
 zpBombWait      .byte ?                 ; bomb wait time
-BOMCOL          .byte ?                 ; bomb collis flg
+zpBombCollCnt   .byte ?                 ; bomb collis flg
 DEVICE          .byte ?                 ; koala pad sw
 vPlanetColor    .byte ?
 PAUSED          .byte ?                 ; pause flag
@@ -69,8 +69,8 @@ zpBombCount     .byte ?                 ; bombs to come
 zpBombSpeedTime .byte ?                 ; bomb speeds
 VXINC           .byte ?                 ; vector x hold
 VYINC           .byte ?                 ; vector y hold
-LR              .byte ?                 ; vector left/right hold
-UD              .byte ?                 ; vector up/down hold
+LR              .byte ?                 ; vector left/right hold    0=left, 1=right
+UD              .byte ?                 ; vector up/down hold       1=up, 0=down
 DELTAX          .byte ?                 ; vector work area
 DELTAY          .byte ?                 ; vector work area
 

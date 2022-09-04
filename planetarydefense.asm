@@ -18,6 +18,12 @@
 ;       ours    320x240                 ; 76,800 bytes [$12C00 = 300 pages]
 ;   Playfield   320x216                 ; 9 vertical sections of 24-lines/each
 
+;   PF          256x256
+;   PF cursor   (48,32)(208,224)    (8,26)(311-6,225-6)
+;   PF bomb     (0,0)(250,250)
+;   PF saucer   (39,19)(211,231)
+
+;   planet      (160,120)
 
                 .cpu "65816"
 

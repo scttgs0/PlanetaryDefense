@@ -99,7 +99,7 @@ _next3          ;lda PTRIG0             ; paddle trig 0
                 ;eor PTRIG1             ; mask w/PTRIG1
                 ;bne _pdev              ; pushed? Yes.
 
-                lda InputFlags          ; stick trig
+                lda InputFlags          ; stick trigger
                 and #$10
                 beq _pdev               ; pushed? Yes.
 

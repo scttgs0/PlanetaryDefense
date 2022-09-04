@@ -1,48 +1,56 @@
 ;======================================
 ; Calculate target vector
 ;======================================
-VECTOR          .proc
+CalcVector      .proc
+;   calculate delta X
                 lda #0
                 sta LR                  ; going left
-                lda FROMX               ; from X-coord
+
+                lda zpFromX             ; from X-coord
                 cmp zpTargetX           ; w/to X-coord
                 bcc _right              ; to right? Yes.
 
                 sbc zpTargetX           ; get X-diff
-                jmp _vecY               ; skip next
+                jmp _vecY
 
 _right          inc LR                  ; going right
                 lda zpTargetX           ; to X-coord
                 sec
-                sbc FROMX               ; get X-diff
+                sbc zpFromX             ; get X-diff
+
 _vecY           sta VXINC               ; save difference
+
+;   calculate delta Y
                 lda #1
                 sta UD                  ; going up flag
-                lda FROMY               ; from Y-coord
+
+                lda zpFromY             ; from Y-coord
                 cmp zpTargetY           ; w/to Y-coord
                 bcc _down               ; down? Yes.
 
                 sbc zpTargetY           ; get Y-diff
-                jmp _vecSet             ; skip next
+                jmp _vecSet
 
 _down           dec UD                  ; going down flag
                 lda zpTargetY           ; to Y-coord
                 sec
-                sbc FROMY               ; get Y-diff
-_vecSet         sta VYINC               ; are both
-                ora VXINC               ; distances 0?
-                bne _next1              ;   No. skip next
+                sbc zpFromY             ; get Y-diff
 
-                lda #$80                ; set x increment
-                sta VXINC               ; to default.
-_next1          lda VXINC               ; X vector incre
-                bmi _XIT                ; >127? Yes.
+_vecSet         sta VYINC               ; are both distances 0?
+                ora VXINC
+                bne _next1              ;   No
 
-                lda VYINC               ; Y vector incre
-                bmi _XIT                ; >127? Yes.
+                lda #$80                ; set x increment to default
+                sta VXINC
 
-                asl VXINC               ; times 2 until
-                asl VYINC               ; one is >127
+_next1          lda VXINC               ; X vector increment >127?
+                bmi _XIT                ;   Yes
+
+                lda VYINC               ; Y vector increment >127?
+                bmi _XIT                ;   Yes
+
+                asl VXINC               ; times 2 until one is >127
+                asl VYINC
                 jmp _next1
 
 _XIT            rts
