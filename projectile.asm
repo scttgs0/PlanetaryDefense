@@ -3,11 +3,11 @@
 ;======================================
 ProjectileInit  .proc
                 ldx #5                  ; 6 projectiles
-_next1          lda isProjActive,X      ; get status
-                beq _gotpro             ; active? No.
+_next1          lda isProjActive,X      ; get status - active?
+                beq _gotproj            ;   No, use it
 
-                dex                     ;   Yes. try again
-                bpl _next1              ; done? No.
+                dex                     ;   Yes, try again
+                bpl _next1
 
                 rts
 
@@ -16,14 +16,16 @@ _next1          lda isProjActive,X      ; get status
 ; Got a projectile!
 ; -----------------
 
-_gotpro         lda #13                 ; shot sound time
+_gotproj        lda #13                 ; shot sound time
                 sta PSSCNT              ; player shot sound
 
                 lda zpSatelliteX        ; satellite X
+                lsr A
                 sta zpFromX             ; shot from X
                 sta ProjX,X             ; proj X table
 
                 lda zpSatelliteY        ; satellite Y
+                lsr A
                 sta zpFromY             ; shot from Y
                 sta ProjY,X             ; proj Y table
 
