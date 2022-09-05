@@ -1209,9 +1209,16 @@ vdma_err        lda #0                  ; Make sure DMA registers are cleared
 InitIRQs        .proc
                 pha
 
-;   enable vertical blank interrupt
                 .m8i8
-                ldx #HandleIrq.HandleIrq_END-HandleIrq
+                lda #$07                ; reset consol
+                sta CONSOL
+
+                lda #$1F
+                sta InputFlags
+                stz InputType           ; joystick
+
+;   enable vertical blank interrupt
+                ;ldx #HandleIrq.HandleIrq_END-HandleIrq
 _relocate       ;lda @l $024000,X        ; HandleIrq address
                 ;sta @l $002000,X        ; new address within Bank 00
                 ;dex
@@ -1220,19 +1227,16 @@ _relocate       ;lda @l $024000,X        ; HandleIrq address
                 sei                     ; disable IRQ
 
                 .m16
+                lda @l vecIRQ           ; ensure we only do this once
+                cmp #<>HandleIrq
+                beq _XIT
+
                 ;lda @l vecIRQ
                 ;sta IRQ_PRIOR
 
                 lda #<>HandleIrq
                 sta @l vecIRQ
-
                 .m8
-                lda #$07                ; reset consol
-                sta CONSOL
-
-                lda #$1F
-                sta InputFlags
-                stz InputType           ; joystick
 
 ;   enable Start-of-Frame + Start-of-Line IRQs
                 lda #160
@@ -1250,6 +1254,7 @@ _relocate       ;lda @l $024000,X        ; HandleIrq address
                 and #~FNX1_INT00_KBD
                 sta @l INT_MASK_REG1
 
+_XIT            .m8
                 cli                     ; enable IRQ
 
                 pla

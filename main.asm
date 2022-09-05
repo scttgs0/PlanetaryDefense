@@ -1,4 +1,43 @@
 ; -------------------------------------
+; Initialize the Platform
+; -------------------------------------
+InitHardware    .proc
+                jsr Random_Seed
+
+                .frsGraphics mcTextOn|mcOverlayOn|mcGraphicsOn|mcBitmapOn|mcSpriteOn,mcVideoMode320
+                .frsMouse_off
+                .frsBorder_off
+
+                lda #<CharResX
+                sta COLS_PER_LINE
+                lda #>CharResX
+                sta COLS_PER_LINE+1
+                lda #CharResX
+                sta COLS_VISIBLE
+
+                lda #<CharResY
+                sta LINES_MAX
+                lda #>CharResY
+                sta LINES_MAX+1
+                lda #CharResY
+                sta LINES_VISIBLE
+
+                jsr InitLUT
+                jsr InitCharLUT
+
+                jsr SetFont
+
+                jsr InitSID
+
+                jsr InitBitmap
+                jsr InitSprites
+
+                jmp Planet
+
+                .endproc
+
+
+; -------------------------------------
 ; Initialize Misc.
 ; -------------------------------------
 INIT            .proc

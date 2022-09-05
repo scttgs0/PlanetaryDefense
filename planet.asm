@@ -2,39 +2,10 @@
 ; Display the Intro Screen
 ;-------------------------------------
 Planet          .proc
-                jsr Random_Seed
-
-                .frsGraphics mcTextOn|mcOverlayOn|mcGraphicsOn|mcBitmapOn|mcSpriteOn,mcVideoMode320
-                .frsMouse_off
-                .frsBorder_off
-
-                lda #<CharResX
-                sta COLS_PER_LINE
-                lda #>CharResX
-                sta COLS_PER_LINE+1
-                lda #CharResX
-                sta COLS_VISIBLE
-
-                lda #<CharResY
-                sta LINES_MAX
-                lda #>CharResY
-                sta LINES_MAX+1
-                lda #CharResY
-                sta LINES_VISIBLE
-
-                jsr InitLUT
-                jsr InitCharLUT
-
-                jsr SetFont
                 jsr ClearScreen
                 jsr ClearPlayfield
                 jsr BlitPlayfield
                 jsr ClearSprites
-
-                jsr InitSID             ; init sound
-
-                jsr InitBitmap
-                jsr InitSprites
 
                 ldx #$7F                ; set index
 _next1          sta $80,X               ; clear top of page-0
