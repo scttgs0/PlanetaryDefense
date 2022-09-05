@@ -19,7 +19,7 @@ _next1          sta isBombActive,X      ; deactivate
 
                 ldx #19                 ; zero score line
 _next2          lda ScoreINI,X          ; get byte
-                ;sta SCOLIN,X            ; put score line       HACK:
+                sta SCOLIN,X            ; put score line
                 dex                     ; next byte
                 bpl _next2              ; done? No.
 
@@ -61,7 +61,7 @@ _next2          lda ScoreINI,X          ; get byte
 
                 lda #1
                 sta GAMCTL              ; game control
-                jsr ShowScore
+                ;jsr ShowScore
 
                 lda #$54                ; graphic-LF of planet center
                 sta Playfield+1939
@@ -81,6 +81,7 @@ _next2          lda ScoreINI,X          ; get byte
 ;-------------------------------------
 SetLevel        .proc
                 jsr ShowLevel
+                jsr ShowScore
 
                 ldx vBombLevel
 

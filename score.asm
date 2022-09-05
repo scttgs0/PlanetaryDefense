@@ -34,6 +34,7 @@ _next1          lda SCORE,Y             ; get digits
                 cpy #3                  ; done 6?
                 bne _next1              ;   no!
 
+                jsr RenderScoreLine
                 rts
                 .endproc
 
@@ -42,7 +43,7 @@ _next1          lda SCORE,Y             ; get digits
 ; Show level number
 ;======================================
 ShowLevel       .proc
-                ldy #$50                ; use color 2
+                ldy #$30                ; use color 2
                 sty SHCOLR              ; save it
                 lda LEVEL               ; get level #
                 ldx #11                 ; 12th char on line
@@ -58,14 +59,17 @@ ShowLevel       .proc
 ShowBCD         .proc
                 sta SHOBYT              ; save digits
                 and #$0F                ; get lower digit
-                ora SHCOLR              ; add color
-                ;sta SCOLIN+1,X          ; show it      HACK:
+                ;ora SHCOLR              ; add color
+                ora #$30
+                sta SCOLIN+1,X          ; show it
+
                 lda SHOBYT              ; get both again
-                lsr A                   ; mask...
-                lsr A                   ; off...
-                lsr A                   ; upper...
-                lsr A                   ; digit
-                ora SHCOLR              ; add color
-                ;sta SCOLIN,X            ; show it!     HACK:
+                lsr A                   ; /16 (get upper nibble)
+                lsr A
+                lsr A
+                lsr A
+                ;ora SHCOLR              ; add color
+                ora #$30
+                sta SCOLIN,X            ; show it!
                 rts
                 .endproc

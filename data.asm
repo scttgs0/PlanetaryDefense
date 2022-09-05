@@ -90,9 +90,9 @@ COORD2          .byte 0,0,1,255,0,1
 
 ScoreINI        .byte $00,$00,$00,$00   ; '        '
                 .byte $00,$00,$00,$00
-                .byte $6C,$76,$6C,$00   ; 'LVL '
-                .byte $00,$00,$CA,$CA   ; '  ***** '
-                .byte $CA,$CA,$CA,$00
+                .byte $4C,$56,$4C,$00   ; 'LVL '
+                .byte $00,$00,$2A,$2A   ; '  ***** '
+                .byte $2A,$2A,$2A,$00
 
 ; ------------
 ; Level tables
@@ -157,5 +157,4 @@ lrProj          .fill 8                 ; proj. left/right
 udBomb          .fill 4                 ; bomb up/down
 udProj          .fill 8                 ; proj. up/down
 
-;SCOLIN          .fill 20                ; score line
-SCOLIN          .text ' 000010 LVL01 ***** '
+SCOLIN          .fill 20                ; score line

@@ -925,7 +925,8 @@ _nextChar       inx
                 cpy #$14
                 beq _XIT2
 
-                lda v_SCOLIN,Y
+                lda SCOLIN,Y
+                beq _space
                 cmp #$20
                 beq _space
 
@@ -1011,8 +1012,6 @@ _letter         pha
 
 _XIT            plp
                 rts
-
-v_SCOLIN        .text ' 000010 LVL01 ***** '
                 .endproc
 
 
