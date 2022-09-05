@@ -176,8 +176,6 @@ _next7          ldy #0                  ; index pointer
 _next8          lda _tblDrawPlanet,X    ; table value
                 bne _dp2                ; done? No.
 
-                jsr BlitPlayfield
-
                 jmp SetupOrbiter
 
 _dp2            bmi _dpRepeat           ; repeat? Yes.
@@ -239,83 +237,89 @@ _dpN1           clc
 ; Planet Draw Data
 ; ----------------
 
-_tblDrawPlanet  ;.byte $EA,$EA,$EA,$EA
-                ;.byte $EA,$15,$A8,$54
-                ;.byte $C1,$15,$A8,$54
-                ;.byte $C1,$05,$A8,$50
-                ;.byte $C1,$05,$A8,$50
-                ;.byte $C1,$01,$A8,$40
-                ;.byte $C1,$81,$E8,$81
-                ;.byte $15,$A6,$54,$C1
-                ;.byte $81,$05,$A6,$50
-                ;.byte $C1,$81,$01,$A6
-                ;.byte $40,$C1,$82,$E6
-                ;.byte $82,$05,$A4,$50
-                ;.byte $C1,$83,$E4,$84
-                ;.byte $E2,0
+; bit-7         0=RAW pixel values (4 pixels, 2-bit pixel)
+;               1=REPEAT, lower nibble contains repeat count
 
-                .byte %11101010         ; ###  .#.#.
-                .byte %11101010         ; ###  .#.#.
-                .byte %11101010         ; ###  .#.#.
-                .byte %11101010         ; ###  .#.#.
-                .byte %11101010         ; ###  .#.#.
+; bit-6         1=Newline (NL) after processing
 
-                .byte %00010101         ; ...  #.#.#
-                .byte %10101000         ; #.#  .#...
-                .byte %01010100         ; .#.  #.#..
-                .byte %11000001         ; ##.  ....#
+; bit-5         0=Black (background color)
+;               1=Color (foreground color)
 
-                .byte %00010101         ; ...  #.#.#
-                .byte %10101000         ; #.#  .#...
-                .byte %01010100         ; .#.  #.#..
-                .byte %11000001         ; ##.  ....#
+; bit-4         no special meaning
 
-                .byte %00000101         ; ...  ..#.#
-                .byte %10101000         ; #.#  .#...
-                .byte %01010000         ; .#.  #....
-                .byte %11000001         ; ##.  ....#
+; bits 3-0      lower nibble contains repeat count
 
-                .byte %00000101         ; ...  ..#.#
-                .byte %10101000         ; #.#  .#...
-                .byte %01010000         ; .#.  #....
-                .byte %11000001         ; ##.  ....#
+_tblDrawPlanet  .byte %11101010         ; [###.] #.#.   ; REPEAT, NL, COLOR, x10
 
-                .byte %00000001         ; ...  ....#
-                .byte %10101000         ; #.#  .#...
-                .byte %01000000         ; .#.  .....
-                .byte %11000001         ; ##.  ....#
-                .byte %10000001         ; #..  ....#
-                .byte %11101000         ; ###  .#...
-                .byte %10000001         ; #..  ....#
+                .byte %11101010         ; [###.] #.#.   ; REPEAT, NL, COLOR, x10
 
-                .byte %00010101         ; ...  #.#.#
-                .byte %10100110         ; #.#  ..##.
-                .byte %01010100         ; .#.  #.#..
-                .byte %11000001         ; ##.  ....#
-                .byte %10000001         ; #..  ....#
+                .byte %11101010         ; [###.] #.#.   ; REPEAT, NL, COLOR, x10
 
-                .byte %00000101         ; ...  ..#.#
-                .byte %10100110         ; #.#  ..##.
-                .byte %01010000         ; .#.  #....
-                .byte %11000001         ; ##.  ....#
-                .byte %10000001         ; #..  ....#
+                .byte %11101010         ; [###.] #.#.   ; REPEAT, NL, COLOR, x10
 
-                .byte %00000001         ; ...  ....#
-                .byte %10100110         ; #.#  ..##.
-                .byte %01000000         ; .#.  .....
-                .byte %11000001         ; ##.  ....#
-                .byte %10000010         ; #..  ...#.
-                .byte %11100110         ; ###  ..##.
-                .byte %10000010         ; #..  ...#.
+                .byte %11101010         ; [###.] #.#.   ; REPEAT, NL, COLOR, x10
 
-                .byte %00000101         ; ...  ..#.#
-                .byte %10100100         ; #.#  ..#..
-                .byte %01010000         ; .#.  #....
-                .byte %11000001         ; ##.  ....#
-                .byte %10000011         ; #..  ...##
-                .byte %11100100         ; ###  ..#..
-                .byte %10000100         ; #..  ..#..
-                .byte %11100010         ; ###  ...#.
-                .byte $00
+                .byte %00010101         ; ../.#/.#/.#   ; RAW, .AAA
+                .byte %10101000         ; [#.#.] #...   ; REPEAT, COLOR, x8
+                .byte %01010100         ; .#/.#/.#/..   ; RAW, AAA.
+                .byte %11000001         ; [##..] ...#   ; REPEAT, NL, BLACK, x1
+
+                .byte %00010101         ; ../.#/.#/.#   ; RAW, .AAA
+                .byte %10101000         ; [#.#.] #...   ; REPEAT, COLOR, x8
+                .byte %01010100         ; .#/.#/.#/..   ; RAW, AAA.
+                .byte %11000001         ; [##..] ...#   ; REPEAT, NL, BLACK, x1
+
+                .byte %00000101         ; ../../.#/.#   ; RAW, ..AA
+                .byte %10101000         ; [#.#.] #...   ; REPEAT, COLOR, x8
+                .byte %01010000         ; .#/.#/../..   ; RAW, AA..
+                .byte %11000001         ; [##..] ...#   ; REPEAT, NL, BLACK, x1
+
+                .byte %00000101         ; ../../.#/.#   ; RAW, ..AA
+                .byte %10101000         ; [#.#.] #...   ; REPEAT, COLOR, x8
+                .byte %01010000         ; .#/.#/../..   ; RAW, AA..
+                .byte %11000001         ; [##..] ...#   ; REPEAT, NL, BLACK, x1
+
+                .byte %00000001         ; ../../../.#   ; RAW, ...A
+                .byte %10101000         ; [#.#.] #...   ; REPEAT, COLOR, x8
+                .byte %01000000         ; .#/../../..   ; RAW, A...
+                .byte %11000001         ; [##..] ...#   ; REPEAT, NL, BLACK, x1
+
+                .byte %10000001         ; [#...] ...#   ; REPEAT, BLACK, x1
+                .byte %11101000         ; [###.] #...   ; REPEAT, NL, COLOR, x8
+
+                .byte %10000001         ; [#...] ...#   ; REPEAT, BLACK, x1
+                .byte %00010101         ; ../.#/.#/.#   ; RAW, .AAA
+                .byte %10100110         ; [#.#.] .##.   ; REPEAT, COLOR, x6
+                .byte %01010100         ; .#/.#/.#/..   ; RAW, AAA.
+                .byte %11000001         ; [##..] ...#   ; REPEAT, NL, BLACK, x1
+
+                .byte %10000001         ; [#...] ...#   ; REPEAT, BLACK, x1
+                .byte %00000101         ; ../../.#/.#   ; RAW, ..AA
+                .byte %10100110         ; [#.#.] .##.   ; REPEAT, COLOR, x6
+                .byte %01010000         ; .#/.#/../..   ; RAW, AA..
+                .byte %11000001         ; [##..] ...#   ; REPEAT, NL, BLACK, x1
+
+                .byte %10000001         ; [#...] ...#   ; REPEAT, BLACK, x1
+                .byte %00000001         ; ../../../.#   ; RAW, ...A
+                .byte %10100110         ; [#.#.] .##.   ; REPEAT, COLOR, x6
+                .byte %01000000         ; .#/../../..   ; RAW, A...
+                .byte %11000001         ; [##..] ...#   ; REPEAT, NL, BLACK, x1
+
+                .byte %10000010         ; [#...] ..#.   ; REPEAT, BLACK, x2
+                .byte %11100110         ; [###.] .##.   ; REPEAT, NL, COLOR, x6
+
+                .byte %10000010         ; [#...] ..#.   ; REPEAT, BLACK, x2
+                .byte %00000101         ; ../../.#/.#   ; RAW, ..AA
+                .byte %10100100         ; [#.#.] .#..   ; REPEAT, COLOR, x4
+                .byte %01010000         ; .#/.#/../..   ; RAW, AA..
+                .byte %11000001         ; [##..] ...#   ; REPEAT, NL, BLACK, x1
+
+                .byte %10000011         ; [#...] ..##   ; REPEAT, BLACK, x3
+                .byte %11100100         ; [###.] .#..   ; REPEAT, NL, COLOR, x4
+
+                .byte %10000100         ; [#...] .#..   ; REPEAT, BLACK, x4
+                .byte %11100010         ; [###.] ..#.   ; REPEAT, NL, COLOR, x2
+
+                .byte $00               ; end token
 
                 .endproc

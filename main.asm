@@ -67,6 +67,7 @@ _next2          lda ScoreINI,X          ; get byte
                 sta Playfield+1939
                 lda #$15                ; graphic-RT of planet center
                 sta Playfield+1940
+                jsr BlitPlayfield
 
                 ;sta HITCLR             ; reset collision
 
