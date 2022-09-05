@@ -106,7 +106,9 @@ _next2          lda ScoreINI,X          ; get byte
                 sta Playfield+1939
                 lda #$15                ; graphic-RT of planet center
                 sta Playfield+1940
-                jsr BlitPlayfield
+
+                lda #TRUE
+                sta isDirtyPlayfield
 
                 ;sta HITCLR             ; reset collision
 
@@ -172,7 +174,15 @@ MainLoop        .proc
                 lda PAUSED              ; game paused?
                 bne MainLoop            ;   Yes. loop here
 
-                lda GAMCTL              ; game done?
+                lda isDirtyPlayfield
+                beq _1
+
+                jsr BlitPlayfield
+
+                lda #FALSE
+                sta isDirtyPlayfield
+
+_1              lda GAMCTL              ; game done?
                 bpl _checkCore          ;   No. check core
 
                 lda EXPCNT              ;   Yes. expl count
@@ -263,9 +273,11 @@ _noExplode      lda zpBombCount         ; # bombs to go
                 bne MainLoop            ; any left? Yes.
 
                 lda GAMCTL              ; game control
-                bmi MainLoop            ; dead? Yes.
+                bpl _chkBombs           ; dead? No.
 
-                lda isBombActive        ; bomb 0 status
+                jmp MainLoop
+
+_chkBombs       lda isBombActive        ; bomb 0 status
                 ora isBombActive+1      ; bomb 1 status
                 ora isBombActive+2      ; bomb 2 status
                 ora isBombActive+3      ; bomb 3 status

@@ -74,6 +74,8 @@ UD              .byte ?                 ; vector up/down hold       1=up, 0=down
 DELTAX          .byte ?                 ; vector work area
 DELTAY          .byte ?                 ; vector work area
 
+isDirtyPlayfield    .byte ?
+
 JIFFYCLOCK      .byte ?
 InputFlags      .byte ?
 InputType       .byte ?
