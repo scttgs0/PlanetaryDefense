@@ -1,4 +1,3 @@
-
 ; ------------------
 ; ANALOG Computing's
 ; PLANETARY  DEFENSE

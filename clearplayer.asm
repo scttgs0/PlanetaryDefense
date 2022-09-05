@@ -16,8 +16,8 @@ ClearPlayer     .proc
                 asl A
                 asl A
                 tax
-                lda #0                  ; move player...
-                sta SP00_X_POS,X        ; off screen
+                lda #0                  ; move player off screen
+                sta SP00_X_POS,X
                 sta SP00_Y_POS,X
                 .m8
 
