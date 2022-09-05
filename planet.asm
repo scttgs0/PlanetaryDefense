@@ -29,6 +29,7 @@ Planet          .proc
                 jsr ClearScreen
                 jsr ClearPlayfield
                 jsr BlitPlayfield
+                jsr ClearSprites
 
                 jsr InitSID             ; init sound
 

@@ -321,28 +321,28 @@ InitSprites     .proc
                 jsr Copy2VRAM
 
                 .m16
-                lda #$40
+                lda #$0
                 sta SP00_X_POS
-                lda #$60
-                sta SP01_X_POS
-                lda #$80
-                sta SP03_X_POS
-                lda #$A0
-                sta SP04_X_POS
-                lda #$C0
-                sta SP08_X_POS
-
-                lda #$40
                 sta SP00_Y_POS
+                sta SP01_X_POS
                 sta SP01_Y_POS
+                sta SP03_X_POS
                 sta SP03_Y_POS
+                sta SP04_X_POS
                 sta SP04_Y_POS
+                sta SP05_X_POS
                 sta SP05_Y_POS
+                sta SP06_X_POS
                 sta SP06_Y_POS
+                sta SP07_X_POS
                 sta SP07_Y_POS
+                sta SP08_X_POS
                 sta SP08_Y_POS
+                sta SP09_X_POS
                 sta SP09_Y_POS
+                sta SP10_X_POS
                 sta SP10_Y_POS
+                sta SP11_X_POS
                 sta SP11_Y_POS
 
                 .m8
@@ -362,6 +362,38 @@ InitSprites     .proc
                 plb
                 plp
                 rts
+                .endproc
+
+
+;======================================
+; Clear all Sprites
+;======================================
+ClearSprites    .proc
+                .m16
+                lda #0
+                sta SP00_X_POS
+                sta SP00_Y_POS
+                sta SP01_X_POS
+                sta SP01_Y_POS
+                sta SP03_X_POS
+                sta SP03_Y_POS
+                sta SP04_X_POS
+                sta SP04_Y_POS
+                sta SP05_X_POS
+                sta SP05_Y_POS
+                sta SP06_X_POS
+                sta SP06_Y_POS
+                sta SP07_X_POS
+                sta SP07_Y_POS
+                sta SP08_X_POS
+                sta SP08_Y_POS
+                sta SP09_X_POS
+                sta SP09_Y_POS
+                sta SP10_X_POS
+                sta SP10_Y_POS
+                sta SP11_X_POS
+                sta SP11_Y_POS
+                .m8
                 .endproc
 
 
