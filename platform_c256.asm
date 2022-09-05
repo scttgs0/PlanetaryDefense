@@ -665,8 +665,8 @@ _data_Dest      .long BITMAP0,BITMAP1,BITMAP2
 ; Clear the play area of the screen
 ;======================================
 ClearScreen     .proc
-v_QtyPages      .var $04                ; 40x30 = $4B0... 4 pages + 176 bytes
-                                        ; remaining 176 bytes cleared via ClearGamePanel
+v_QtyPages      .var $05                ; 40x30 = $4B0... 4 pages + 176 bytes
+                                        ; extra page to clear the remaining 176 bytes
 
 v_EmptyText     .var $00
 v_TextColor     .var $40
@@ -721,52 +721,6 @@ _next1T         sta [zpDest],Y
                 ply
                 plx
                 pla
-                plp
-                rts
-                .endproc
-
-
-;======================================
-; Clear the bottom of the screen
-;======================================
-ClearGamePanel  .proc
-v_EmptyText     .var $00
-v_TextColor     .var $40
-;---
-
-                php
-                .m8i8
-
-                lda #<CS_COLOR_MEM_PTR+24*CharResX
-                sta zpDest
-                lda #>CS_COLOR_MEM_PTR+24*CharResX
-                sta zpDest+1
-                lda #`CS_COLOR_MEM_PTR+24*CharResX
-                sta zpDest+2
-
-                lda #v_TextColor
-                ldy #$00
-_next1          sta [zpDest],Y
-
-                iny
-                cpy #$F0                ; 6 lines
-                bne _next1
-
-                lda #<CS_TEXT_MEM_PTR+24*CharResX
-                sta zpDest
-                lda #>CS_TEXT_MEM_PTR+24*CharResX
-                sta zpDest+1
-                lda #`CS_TEXT_MEM_PTR+24*CharResX
-                sta zpDest+2
-
-                lda #v_EmptyText
-                ldy #$00
-_next2          sta [zpDest],Y
-
-                iny
-                cpy #$F0                ; 6 lines
-                bne _next2
-
                 plp
                 rts
                 .endproc
@@ -1081,35 +1035,6 @@ _letter         pha
                 jmp _nextChar
 
 _XIT            plp
-                rts
-                .endproc
-
-
-;======================================
-; Blit bitmap text to VRAM
-;--------------------------------------
-; on entry:
-;   zpDest      set by caller
-;======================================
-BlitText        .proc
-                php
-                phb
-                .m16i16
-
-                lda #640*16             ; Set the size
-                sta zpSize
-                lda #$00
-                sta zpSize+2
-
-                lda #<>Text2Bitmap      ; Set the source address
-                sta zpSource
-                lda #`Text2Bitmap
-                sta zpSource+2
-
-                jsr Copy2VRAM
-
-                plb
-                plp
                 rts
                 .endproc
 
