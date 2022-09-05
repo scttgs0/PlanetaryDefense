@@ -390,6 +390,44 @@ InitBitmap      .proc
 
 
 ;======================================
+; Clear Playfield
+;======================================
+ClearPlayfield  .proc
+                .as
+                .xs
+                php
+                pha
+                phx
+
+                lda #0
+                ldx #0
+_nextByte       sta Playfield,X
+                sta Playfield+$100,X
+                sta Playfield+$200,X
+                sta Playfield+$300,X
+                sta Playfield+$400,X
+                sta Playfield+$500,X
+                sta Playfield+$600,X
+                sta Playfield+$700,X
+                sta Playfield+$800,X
+                sta Playfield+$900,X
+                sta Playfield+$A00,X
+                sta Playfield+$B00,X
+                sta Playfield+$C00,X
+                sta Playfield+$D00,X
+                sta Playfield+$E00,X
+
+                inx
+                bne _nextByte
+
+                plx
+                pla
+                plp
+                rts
+                .endproc
+
+
+;======================================
 ; BlitPlayfield
 ;======================================
 SetVideoRam     .proc

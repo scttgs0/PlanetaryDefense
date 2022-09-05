@@ -27,6 +27,8 @@ Planet          .proc
 
                 jsr SetFont
                 jsr ClearScreen
+                jsr ClearPlayfield
+                jsr BlitPlayfield
 
                 jsr InitSID             ; init sound
 
@@ -126,20 +128,20 @@ _wait2          lda DEADTM              ; debounce!
 ; Clear PM Area and Playfield
 ; ---------------------------
 
-                lda #>Playfield         ; scrn addr high
-                sta INDEX+1             ; pointer high
-                lda #<Playfield         ; get addr low
-                sta INDEX               ; pointer low
+;                 lda #>Playfield         ; scrn addr high
+;                 sta INDEX+1             ; pointer high
+;                 lda #<Playfield         ; get addr low
+;                 sta INDEX               ; pointer low
 
-                ldx #15                 ; 16 pages 0..15
-                tay                     ; use as index
-_next5          sta (INDEX),Y           ; clear ram
-                iny                     ; next byte
-                bne _next5              ; page done? No.
+;                 ldx #15                 ; 16 pages 0..15
+;                 tay                     ; use as index
+; _next5          sta (INDEX),Y           ; clear ram
+;                 iny                     ; next byte
+;                 bne _next5              ; page done? No.
 
-                inc INDEX+1             ; next page
-                dex                     ; page counter
-                bpl _next5              ; scrn done? No.
+;                 inc INDEX+1             ; next page
+;                 dex                     ; page counter
+;                 bpl _next5              ; scrn done? No.
 
 ;                ldx #0                  ; now clear P/m
 ;_next6          sta MISL,X              ; clear missiles
@@ -151,6 +153,7 @@ _next5          sta (INDEX),Y           ; clear ram
 ;                bne _next6
 
                 jsr ClearScreen
+                jsr ClearPlayfield
                 jsr RenderScoreLine
 
                 ;lda #>PM               ; PM address high
