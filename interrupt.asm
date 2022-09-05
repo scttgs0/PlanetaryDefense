@@ -99,7 +99,8 @@ TitleMsg        ;.text " PLANETARY  DEFENSE "
 
 AuthorMsg       .text " BY CHARLES BACHAND "
                 .text "   AND TOM HUDSON   "
-StartMsg        .text "  JOYSTICK - START  "
+StartMsg        .text "  MOUSE --- SELECT  "
+                .text "  JOYSTICK - START  "
                 .text "  OR PRESS TRIGGER  "
 
 

@@ -874,7 +874,7 @@ v_displayLine   .var 19*CharResX
                 ldy #$FF
 _nextChar       inx
                 iny
-                cpy #$28
+                cpy #$3C
                 beq _XIT
 
                 lda StartMsg,Y
@@ -908,7 +908,7 @@ _dash           lda #$C0
                 bra _nextChar
 _letter         pha
                 phx
-                cpy #$14
+                cpy #$28
                 bcc _topLine
 
                 lda #$40
