@@ -500,6 +500,8 @@ _nextPixel      stz zpTemp1             ; extract 2-bit pixel color
 
                 lda zpTemp1
                 beq _noColor
+                cmp #1
+                bne _noColor
 
                 lda _planetColor
 _noColor        ldy zpIndex2
@@ -587,7 +589,7 @@ _XIT            .i8
 
 _lineCounter    .byte 0
 _planetColor    .byte 3
-_colorTable     .byte 3,4,5,4,3,2,1,2
+_colorTable     .byte 6,7,8,7,6,5,4,5
 
                 .endproc
 

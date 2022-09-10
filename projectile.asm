@@ -20,12 +20,12 @@ _gotproj        lda #13                 ; shot sound time
                 sta PSSCNT              ; player shot sound
 
                 lda zpSatelliteX        ; satellite X
-                lsr A
+                lsr A                   ; /2
                 sta zpFromX             ; shot from X
                 sta ProjX,X             ; proj X table
 
                 lda zpSatelliteY        ; satellite Y
-                lsr A
+                lsr A                   ; /2
                 sta zpFromY             ; shot from Y
                 sta ProjY,X             ; proj Y table
 
@@ -46,10 +46,12 @@ _PROVEC         jsr CalcVector          ; compute vect
                 sta PXINC,X             ; X inc table
                 lda VYINC               ; Y increment
                 sta PYINC,X             ; Y inc table
+
                 lda LR                  ; L/R flag
                 sta lrProj,X            ; L/R flag table
                 lda UD                  ; U/D flag
                 sta udProj,X            ; U/D flag table
+
                 lda #1                  ; active
                 sta isProjActive,X      ; proj status
                 rts

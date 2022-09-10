@@ -1,13 +1,13 @@
 BkColor         .dword $00000000    ; [00]
 
-PfColor0        .dword $007f6c00    ; [01]      planet
-PfColor1        .dword $00675300    ;           planet
-PfColor2        .dword $004b3700    ;           planet
-PfColor3        .dword $00331f00    ;           planet
-PfColor4        .dword $001c0800    ;           planet
-PfColor5        .dword $00300400
-PfColor6        .dword $000000e2
-PfColor7        .dword $00400000
+PfColor0        .dword $00fcfcfc
+PfColor1        .dword $00fcfcfc
+PfColor2        .dword $00fcfcfc
+PfColor3        .dword $007f6c00    ; [04]      planet
+PfColor4        .dword $00675300    ;           planet
+PfColor5        .dword $004b3700    ;           planet
+PfColor6        .dword $00331f00    ;           planet
+PfColor7        .dword $001c0800    ;           planet
 
 SprColor0       .dword $00444cdc    ; [09]      cursor/satellite
 SprColor1       .dword $00fc901c    ;           saucer
