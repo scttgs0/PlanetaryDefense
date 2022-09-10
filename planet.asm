@@ -40,11 +40,6 @@ _next1          sta $80,X               ; clear top of page-0
                 ;lda #$C0               ; enable DLI
                 ;sta NMIEN
 
-                ldx #4                  ; 5 PM registers
-_next2          ;sta GRAFP0,X           ; clear register
-                dex
-                bpl _next2
-
                 jsr InitIRQs
 
 ;   render title screen
@@ -52,11 +47,6 @@ _next2          ;sta GRAFP0,X           ; clear register
                 jsr RenderTitle
                 jsr RenderAuthor
                 jsr RenderSelect
-
-                ;ldx #>Interrupt_VBI
-                ;ldy #<Interrupt_VBI
-                ;lda #7                 ; deferred
-                ;jsr SETVBV             ; set vblank
 
                 ;lda #60                 ; one second dead time
                 lda #0      ; HACK:
@@ -96,42 +86,15 @@ _wait2          lda DEADTM              ; debounce!
                 bne _next4
 
 
-; ---------------------------
-; Clear PM Area and Playfield
-; ---------------------------
-
-;                 lda #>Playfield         ; scrn addr high
-;                 sta INDEX+1             ; pointer high
-;                 lda #<Playfield         ; get addr low
-;                 sta INDEX               ; pointer low
-
-;                 ldx #15                 ; 16 pages 0..15
-;                 tay                     ; use as index
-; _next5          sta (INDEX),Y           ; clear ram
-;                 iny                     ; next byte
-;                 bne _next5              ; page done? No.
-
-;                 inc INDEX+1             ; next page
-;                 dex                     ; page counter
-;                 bpl _next5              ; scrn done? No.
-
-;                ldx #0                  ; now clear P/m
-;_next6          sta MISL,X              ; clear missiles
-;                sta PLR0,X              ; clear plyr 0
-;                sta PLR1,X              ; clear plyr 1
-;                sta PLR2,X              ; clear plyr 2
-;                sta PLR3,X              ; clear plyr 3
-;                dex                     ; done 256 bytes?
-;                bne _next6
+; ------------
+; Clear Screen
+; ------------
 
                 jsr ClearScreen
                 jsr ClearPlayfield
                 jsr RenderScoreLine
 
-                ;lda #>PM               ; PM address high
-                ;sta PMBASE             ; into hardware
-
-                lda #FALSE              ; title off
+                lda #FALSE              ; title screen off
                 sta isTitleScreen
 
 ; ---------------

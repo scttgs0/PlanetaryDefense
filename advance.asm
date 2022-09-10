@@ -25,7 +25,7 @@ AdvanceIt       .proc
 
                 lda BombX,X             ; bomb X-coord
                 adc DELTAX              ; add X-delta
-                jmp _advY               ; skip next
+                bra _advY               ; skip next
 
 _left           lda BombX,X             ; bomb X-coord
                 sec
@@ -39,7 +39,7 @@ _advY           sta BombX,X             ; save X-coord
                 lda BombY,X             ; bomb Y-coord
                 sec
                 sbc DELTAY              ; subtract Y-delta
-                jmp _XIT                ; skip next
+                bra _XIT                ; skip next
 
 _down           lda BombY,X             ; bomb Y-coord
                 clc

@@ -662,24 +662,28 @@ _badX           cpy #32                 ; too far up?
 ;-------------------------------------
 ; Handle timers and orbit
 ;-------------------------------------
-_timers         lda zpBombWait          ; bomb wait cnt
-                beq _5                  ; wait over? Yes.
+_timers         lda zpBombWait          ; bomb wait cnt -  wait over?
+                beq _5                  ;   Yes
 
                 dec zpBombWait          ; dec count
-_5              lda DEADTM              ; death timer
-                beq _6                  ; zero? yes.
+
+_5              lda DEADTM              ; death timer - zero?
+                beq _6                  ;   Yes
 
                 dec DEADTM              ; decrement it!
+
 _6              lda zpExplosionTimer    ; exp timer zero?
-                beq _7                  ;   Yes.
+                beq _7                  ;   Yes
 
                 dec zpExplosionTimer    ; decrement it!
-_7              lda zpBombTimer         ; get bomb time zero?
-                beq _8                  ;   Yes.
+
+_7              lda zpBombTimer         ; get bomb time - zero?
+                beq _8                  ;   Yes
 
                 dec zpBombTimer         ; dec bomb time
-_8              lda GAMCTL              ; game control
-                bpl _notGameOver        ; game over? No.
+
+_8              lda GAMCTL              ; game control - game over?
+                bpl _notGameOver        ;   No
 
                 jmp _XIT                ; exit VBLANK
 
@@ -734,13 +738,14 @@ _next5          cpy #32                 ; above top?
 
 ; saucer y-pos
                 lda SHAPE_Saucer,X      ; saucer image
-                sta PLR3,Y              ; store player 3
+                ;sta PLR3,Y              ; store player 3
 _nxtsp          dey                     ; next scan line
                 dex                     ; dec index
                 bpl _next5              ; done? No.
 
                 .m16
                 lda BombX+3             ; saucer X pos
+                and #$FF
                 sta SP03_X_POS          ; move it
                 .m8
 

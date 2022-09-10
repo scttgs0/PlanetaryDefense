@@ -58,6 +58,7 @@ _gotBomb        lda #TRUE               ; this one is active now
                 adc #35                 ; add X offset
 _saveSauX       sta zpFromX             ; from X vector
                 sta BombX,X             ; init X-coord
+
                 lda SaucerStartY,Y      ; saucer start Y
                 cmp #NIL                ; random flag?
                 bne _saveSauY           ;   No. use as Y
@@ -68,6 +69,7 @@ _saveSauX       sta zpFromX             ; from X vector
                 adc #55                 ; add Y offset
 _saveSauY       sta zpFromY             ; from Y vector
                 sta BombY,X             ; init Y-coord
+
                 lda SaucerEndX,Y        ; saucer end X
                 cmp #NIL                ; random flag?
                 bne _saveEndX           ;   No. use as X
@@ -82,7 +84,7 @@ _saveEndX       sta zpTargetX           ; to X vector
 
                 lda zpFromX             ; use X for Y
 _saveEndY       sta zpTargetY           ; to Y vector
-                jmp _getBombVec
+                bra _getBombVec
 
 
 ; ------------
@@ -104,7 +106,7 @@ _next2          .randomByte
                 bcs _next2              ; less than? No.
 
                 sta BombX,X             ; bomb X-coord
-                jmp _bombvec
+                bra _bombvec
 
 ;   maxX, randY :: x=0|250, y=0..250
 _bombMaxX       .randomByte
@@ -187,39 +189,45 @@ _showbomb       lda BombY,X             ; bomb Y-coord
                 clc
                 adc #2                  ; bomb center off
                 sta INDX1               ; save it
-                lda #0
-                sta LO                  ; init low byte
-                txa
-                ora #>PLR0              ; mask w/address
-                sta HI                  ; init high byte
+                stz INDX1+1
+
                 stx INDX2               ; X temp hold
+                stz INDX2+1
+
                 cpx #3                  ; saucer slot?
                 bne _notSaucer          ;   No. skip next
 
                 lda isSaucerActive      ; saucer active?
                 bne _nextbomb           ;   Yes. skip bomb
 
-_notSaucer      ldy lrBomb,X            ; L/R flag
-                lda #17                 ; do 17 bytes
-                sta TEMP                ; set counter
-                ldx BombPosStart,Y      ; start position
-                ldy INDX1               ; bomb Y pos
-_bombdraw       cpy #32                 ; off screen top?
-                bcc _nobombdraw         ;   Yes. skip next
-
-                cpy #223                ; screen bottom?
-                bcs _nobombdraw         ;   Yes. skip next
-
-                lda SHAPE_Bomb,X        ; bomb stamp put in PM area
-                sta (LO),Y
-_nobombdraw     dey                     ; PM index
-                dex                     ; stamp index
-                dec TEMP                ; dec count
-                bne _bombdraw           ; done? No.
+_notSaucer      lda lrBomb,X            ; L/R flag
+                asl A                   ; *4
+                asl A
+                clc
+                adc #$0C
+                sta SP04_ADDR+1
 
                 .m16
+;   set y position
+                lda INDX2               ; restore X
+                asl A                   ; *8
+                asl A
+                asl A
+                tax
+
+                lda INDX1               ; bomb Y-coord
+                and #$FF
+                clc
+                adc #32-8
+                sta SP04_Y_POS,X        ; player pos
+
+;   set x position
                 ldx INDX2               ; restore X
                 lda BombX,X             ; bomb X-coord
+                and #$FF
+                ;asl A                   ; *2
+                clc
+                adc #32+32
                 phx
                 pha
                 txa
@@ -285,6 +293,7 @@ _next1          lda #0
 
                 lda #2                  ; 1/30th second
                 sta zpBombWait          ; bomb wait time
+
                 cpx #3                  ; saucer player?
                 bne _addBombScore       ;   No. skip this
 
@@ -293,7 +302,7 @@ _next1          lda #0
 
                 lda zpSaucerValue       ; saucer value
                 sta SCOADD+1            ; point value
-                jmp _addit              ; add to score
+                bra _addit              ; add to score
 
 
 ; -----------------------

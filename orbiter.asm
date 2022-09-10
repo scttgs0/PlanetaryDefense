@@ -109,12 +109,12 @@ _moreSats       lda zpSatelliteX        ; sat X-coord
                 lda #21                 ; init sat Y
                 sta zpSatelliteY        ; sat Y-coord
 
-                ldx #0                  ; don't show the
-_clearSat       lda MISL,X              ; satellite pic
-                and #$F0                ; mask off sat
-                sta MISL,X              ; restore data
-                dex                     ; dec index
-                bne _clearSat           ; done? No.
+                ;ldx #0                  ; don't show the
+;_clearSat       ;lda MISL,X              ; satellite pic
+                ;and #$F0                ; mask off sat
+                ;sta MISL,X              ; restore data
+                ;dex                     ; dec index
+                ;bne _clearSat           ; done? No.
 
                 lda #$FF                ; 4.25 seconds
                 sta DEADTM              ; till next life!
