@@ -1,10 +1,10 @@
 BkColor         .dword $00000000    ; [00]
 
-PfColor0        .dword $00ac9838    ; [01]      planet
-PfColor1        .dword $00b0acfc
-PfColor2        .dword $00e4e4e4
-PfColor3        .dword $00dc241c
-PfColor4        .dword $00462075
+PfColor0        .dword $007f6c00    ; [01]      planet
+PfColor1        .dword $00675300    ;           planet
+PfColor2        .dword $004b3700    ;           planet
+PfColor3        .dword $00331f00    ;           planet
+PfColor4        .dword $001c0800    ;           planet
 PfColor5        .dword $00300400
 PfColor6        .dword $000000e2
 PfColor7        .dword $00400000

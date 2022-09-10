@@ -478,9 +478,9 @@ SetVideoRam     .proc
 
                 .i16
                 ldx #0
-                stx zpIndex1
-                stx zpIndex2
-                stx zpIndex3
+                stx zpIndex1            ; source pointer
+                stx zpIndex2            ; destination pointer
+                stx zpIndex3            ; column counter [0-39]
 
 _nextByte       ldy zpIndex1
                 lda [zpSource],Y
@@ -499,7 +499,10 @@ _nextPixel      stz zpTemp1             ; extract 2-bit pixel color
                 pha
 
                 lda zpTemp1
-                ldy zpIndex2
+                beq _noColor
+
+                lda _planetColor
+_noColor        ldy zpIndex2
                 sta [zpDest],Y
 
 ;   duplicate this in the next line down (double-height)
@@ -544,10 +547,10 @@ _nextPixel      stz zpTemp1             ; extract 2-bit pixel color
                 cpx #40
                 bcc _checkEnd
 
-                inc zpTemp2     ; HACK:
-                lda zpTemp2
-                cmp #12
-                beq _XIT
+                ;inc zpTemp2     ; HACK:
+                ;lda zpTemp2
+                ;cmp #12
+                ;beq _XIT
 
                 .m16
                 lda zpIndex2            ; we already processed the next line (double-height)...
@@ -555,13 +558,23 @@ _nextPixel      stz zpTemp1             ; extract 2-bit pixel color
                 adc #320                ; so move down one additional line
                 sta zpIndex2
 
+                inc _lineCounter
+                lda _lineCounter
+                ;lsr A                   ; /2
+                and #7
+                tax
+                lda _colorTable,X
+                sta _planetColor
+
                 lda #0
                 sta zpIndex3            ; reset the column counter
                 .m8
 
 _checkEnd       ldx zpIndex1
                 cpx #$1E0               ; 12 source lines... = 24 destination lines (~8K)
-                bcc _nextByte 
+                bcs _XIT
+
+                jmp _nextByte 
 
 _XIT            .i8
 
@@ -569,6 +582,13 @@ _XIT            .i8
                 plx
                 plp
                 rts
+
+;--------------------------------------
+
+_lineCounter    .byte 0
+_planetColor    .byte 3
+_colorTable     .byte 3,4,5,4,3,2,1,2
+
                 .endproc
 
 
@@ -611,6 +631,7 @@ BlitPlayfield   .proc
 
                 ldy #8
                 ldx #0
+                stx SetVideoRam._lineCounter
 
 _nextBank       .m16
                 lda _data_Source,X    ; Set the source address
