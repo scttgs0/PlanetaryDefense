@@ -54,6 +54,7 @@ _gotBomb        lda #TRUE               ; this one is active now
 
                 jsr SaucerRandom        ; random X-coord
 
+                clc
                 adc #35                 ; add X offset
 _saveSauX       sta zpFromX             ; from X vector
                 sta BombX,X             ; init X-coord
@@ -63,6 +64,7 @@ _saveSauX       sta zpFromX             ; from X vector
 
                 jsr SaucerRandom        ; random Y-coord
 
+                clc
                 adc #55                 ; add Y offset
 _saveSauY       sta zpFromY             ; from Y vector
                 sta BombY,X             ; init Y-coord
