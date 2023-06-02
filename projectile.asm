@@ -21,12 +21,12 @@ _gotproj        lda #13                 ; shot sound time
                 sta PSSCNT              ; player shot sound
 
                 lda zpSatelliteX        ; satellite X
-                lsr A                   ; /2
+                lsr                     ; /2
                 sta zpFromX             ; shot from X
                 sta ProjX,X             ; proj X table
 
                 lda zpSatelliteY        ; satellite Y
-                lsr A                   ; /2
+                lsr                     ; /2
                 sta zpFromY             ; shot from Y
                 sta ProjY,X             ; proj Y table
 
@@ -38,7 +38,7 @@ _gotproj        lda #13                 ; shot sound time
                 lda zpCursorY           ; cursor Y-coord
                 sec
                 sbc #32                 ; playfld offset
-                lsr A                   ; /2 (2 line res)
+                lsr                     ; /2 (2 line res)
                 sta zpTargetY           ; shot to Y-coord
 
 _PROVEC         jsr CalcVector          ; compute vect

@@ -3,33 +3,18 @@
 ; Initialize the Platform
 ; -------------------------------------
 InitHardware    .proc
-                jsr Random_Seed
+                jsr RandomSeedQuick
 
-                .frsGraphics mcTextOn|mcOverlayOn|mcGraphicsOn|mcBitmapOn|mcSpriteOn,mcVideoMode320
+                .frsGraphics mcTextOn|mcOverlayOn|mcGraphicsOn|mcBitmapOn|mcSpriteOn,mcVideoMode240
                 .frsMouse_off
                 .frsBorder_off
 
-                lda #<CharResX
-                sta COLS_PER_LINE
-                lda #>CharResX
-                sta COLS_PER_LINE+1
-                lda #CharResX
-                sta COLS_VISIBLE
-
-                lda #<CharResY
-                sta LINES_MAX
-                lda #>CharResY
-                sta LINES_MAX+1
-                lda #CharResY
-                sta LINES_VISIBLE
-
-                jsr InitLUT
-                jsr InitCharLUT
-
+                jsr InitTextPalette
                 jsr SetFont
 
                 jsr InitSID
 
+                jsr InitGfxPalette
                 jsr InitBitmap
                 jsr InitSprites
 
@@ -82,22 +67,22 @@ _next2          lda ScoreINI,X          ; get byte
                 sta zpCursorX           ; cursor X pos
                 sta zpCursorY           ; cursor Y pos
 
-                .m16
+                ; .m16
                 lda zpCursorX
                 and #$FF
-                asl A                   ; *2
+                asl                     ; *2
                 sec
                 sbc #96
                 clc
                 adc #32-3
-                sta SP00_X_POS
+                sta SP00_X
 
                 lda zpCursorY
                 and #$FF
                 clc
                 adc #32-8-3
-                sta SP00_Y_POS
-                .m8
+                sta SP00_Y
+                ; .m8
 
                 lda #1
                 sta GAMCTL              ; game control

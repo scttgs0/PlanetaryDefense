@@ -1,3 +1,4 @@
+
 frsCursor       .macro
                 lda #\1
                 sta CURSOR_CTRL

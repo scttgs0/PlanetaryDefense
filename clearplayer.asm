@@ -10,17 +10,17 @@
 ClearPlayer     .proc
                 phx
 
-                .m16
+                ; .m16
                 txa
                 and #$FF
-                asl A                   ; *8
-                asl A
-                asl A
+                asl                     ; *8
+                asl
+                asl
                 tax
                 lda #0                  ; move player off screen
-                sta SP00_X_POS,X
-                sta SP00_Y_POS,X
-                .m8
+                sta SP00_X,X
+                sta SP00_Y,X
+                ; .m8
 
                 plx
                 rts

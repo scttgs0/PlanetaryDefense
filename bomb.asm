@@ -202,45 +202,45 @@ _showbomb       lda BombY,X             ; bomb Y-coord
                 bne _nextbomb           ;   Yes. skip bomb
 
 _notSaucer      lda lrBomb,X            ; L/R flag
-                asl A                   ; *4
-                asl A
+                asl                     ; *4
+                asl
                 clc
                 adc #$0C
                 sta SP04_ADDR+1
 
-                .m16
+                ; .m16
 ;   set y position
                 lda INDX2               ; restore X
-                asl A                   ; *8
-                asl A
-                asl A
+                asl                     ; *8
+                asl
+                asl
                 tax
 
                 lda INDX1               ; bomb Y-coord
                 and #$FF
                 clc
                 adc #32-8
-                sta SP04_Y_POS,X        ; player pos
+                sta SP04_Y,X           ; player pos
 
 ;   set x position
                 ldx INDX2               ; restore X
                 lda BombX,X             ; bomb X-coord
                 and #$FF
-                ;asl A                   ; *2
+                ;asl                    ; *2
                 clc
                 adc #32+32
                 phx
                 pha
                 txa
                 and #$FF
-                asl A                   ; *8
-                asl A
-                asl A
+                asl                     ; *8
+                asl
+                asl
                 tax
                 pla
-                sta SP04_X_POS,X        ; player pos
+                sta SP04_X,X            ; player pos
                 plx
-                .m8
+                ; .m8
 
 _nextbomb       dex                     ; more bombs?
                 bpl _next1              ;   yes!
@@ -331,7 +331,7 @@ _noscore        lda #FALSE
                 lda BombY,X             ; bomb Y-coord
                 sec
                 sbc #40                 ; bomb Y offset
-                lsr A                   ; 2 line res.
+                lsr                     ; 2 line res.
                 sta NEWY                ; plotter Y-coord
 
                 lda isSaucerActive      ; saucer active?

@@ -65,10 +65,10 @@ ShowBCD         .proc
                 sta SCOLIN+1,X          ; show it
 
                 lda SHOBYT              ; get both again
-                lsr A                   ; /16 (get upper nibble)
-                lsr A
-                lsr A
-                lsr A
+                lsr                     ; /16 (get upper nibble)
+                lsr
+                lsr
+                lsr
                 ;ora SHCOLR              ; add color
                 ora #$30
                 sta SCOLIN,X            ; show it!

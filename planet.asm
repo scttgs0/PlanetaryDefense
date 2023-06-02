@@ -130,10 +130,10 @@ _dp2            bmi _dpRepeat           ; repeat? Yes.
 ; Repeat Byte Handler
 ; -------------------
 
-_dpRepeat       asl A                   ; shift byte
+_dpRepeat       asl                     ; shift byte
                 sta TEMP                ; new line flag
-                asl A                   ; NL bit -> carry
-                asl A                   ; color -> carry
+                asl                     ; NL bit -> carry
+                asl                     ; color -> carry
                 lda #$55                ; color 1 bits
                 bcs _fill1              ; color 1? Yes.
 

@@ -114,38 +114,35 @@ StartMsg        .text "  MOUSE --- SELECT  "
 ;
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 HandleIrq       .proc
-                .m16i16
                 pha
                 phx
                 phy
 
-                .m8i8
-                lda @l INT_PENDING_REG1
+                lda INT_PENDING_REG1
                 bit #FNX1_INT00_KBD
                 beq _1
 
-                jsl KeyboardHandler
+                jsr KeyboardHandler
 
-                lda @l INT_PENDING_REG1
-                ;and #FNX1_INT00_KBD
-                sta @l INT_PENDING_REG1
+                lda INT_PENDING_REG1
+                sta INT_PENDING_REG1
 
 _1              stz isDirty
 
-                lda @l INT_PENDING_REG0
+                lda INT_PENDING_REG0
                 bit #FNX0_INT00_SOF
                 beq _2
 
-                jsl VbiHandler
+                jsr VbiHandler
 
                 lda #TRUE
                 sta isDirty
 
-_2              lda @l INT_PENDING_REG0
+_2              lda INT_PENDING_REG0
                 bit #FNX0_INT01_SOL
                 beq _cleanUp
 
-                jsl DliHandler
+                jsr DliHandler
 
                 lda #TRUE
                 sta isDirty
@@ -153,16 +150,14 @@ _2              lda @l INT_PENDING_REG0
 _cleanUp        lda isDirty
                 beq _XIT
 
-                lda @l INT_PENDING_REG0
+                lda INT_PENDING_REG0
                 ;and #FNX0_INT00_SOF|FNX0_INT01_SOL
-                sta @l INT_PENDING_REG0
+                sta INT_PENDING_REG0
 
-_XIT            .m16i16
-                ply
+_XIT            ply
                 plx
                 pla
 
-                .m8i8
 HandleIrq_END   rti
                 ;jmp IRQ_PRIOR
 
@@ -196,15 +191,11 @@ KEY_DOWN        = $50
 KEY_CTRL        = $1D                   ; fire button
 ;---
 
-                .m16i16
                 pha
                 phx
                 phy
 
-                .m8i8
-                .setbank $00
-
-                lda KBD_INPT_BUF
+                lda PS2_KEYBD_IN
                 pha
                 sta KEYCHAR
 
@@ -421,13 +412,10 @@ _8r             pla
 _CleanUpXIT     stz KEYCHAR
                 pla
 
-_XIT            .m16i16
-                ply
+_XIT            ply
                 plx
                 pla
-
-                .m8i8
-                rtl
+                rts
                 .endproc
 
 
@@ -448,19 +436,19 @@ _nextA          lda zpSource,X
                 inc DLICNT              ; inc counter
                 lda DLICNT              ; get counter
                 and #$07                ; only 3 bits
-                asl A                   ; *2
+                asl                     ; *2
 
                 tax                     ; use as index
-                .m16
+                ; .m16
                 lda _BrightnessBase,X   ; planet brightness
                 sta zpSource
                 stz zpSource+2
                 stz zpSource+3
-                .m8
+                ; .m8
 
                 lda vPlanetColor
-                lsr A                   ; /4 :: ignore luminance ( val / 16 * 4 == /4 )
-                lsr A
+                lsr                     ; /4 :: ignore luminance ( val / 16 * 4 == /4 )
+                lsr
                 sta _temp1
 
                 lda zpSource
@@ -470,7 +458,7 @@ _nextA          lda zpSource,X
 
                 .setbank $AF
                 ldy #3
-_next1          lda [zpSource],Y
+_next1          lda (zpSource),Y
                 sta GRPH_LUT0_PTR+4,Y   ; color planet  (COLPF0)
                 dey
                 bpl _next1
@@ -515,17 +503,12 @@ _temp1          .byte ?
 ; VERTICAL BLANK ROUTINE
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 VbiHandler      .proc
-                .m16i16
                 pha
                 phx
                 phy
+                ;cld                     ; clr decimal mode
 
-                .m8i8
-                .setbank $00
-
-                cld                     ; clear decimal
-
-                inc JIFFYCLOCK
+                inc JIFFYCLOCK          ; increment the jiffy clock each VBI
 
                 lda JOYSTICK0           ; read joystick0
                 and #$1F
@@ -586,8 +569,8 @@ _nopau          lda isTitleScreen       ; title flag
 _nocyc          lda EXSCNT              ; explosion cnt
                 beq _4                  ; any? No.
 
-                lsr A                   ; count/2
-                lsr A                   ; count/4
+                lsr                     ; count/2
+                lsr                     ; count/4
                 ;sta AUDC4              ; explo volume
                 lda #40                 ; explosion
                 ;sta AUDC4              ; explo frequency
@@ -607,21 +590,21 @@ _cursor         lda InputFlags          ; read joystick
                 and #$0F
                 ldx zpCursorX           ; get X value
                 ldy zpCursorY           ; get Y value
-                lsr A                   ; shift right
+                lsr                     ; shift right
                 bcs _notN               ; North? No.
 
                 dey                     ; move cursor up
                 dey                     ; two scan lines
-_notN           lsr A                   ; shift right
+_notN           lsr                     ; shift right
                 bcs _notS               ; South? No.
 
                 iny                     ; cursor down
                 iny                     ; two scan lines
-_notS           lsr A                   ; shift right
+_notS           lsr                     ; shift right
                 bcs _notW               ; West? No.
 
                 dex                     ; cursor left
-_notW           lsr A                   ; shift right
+_notW           lsr                     ; shift right
                 bcs _notE               ; East? No.
 
                 inx                     ; cursor right
@@ -633,16 +616,16 @@ _notE           cpx #52                 ; too far left?
 
                 stx zpCursorX           ;   No. it's ok!
 
-                .m16
+                ; .m16
                 lda zpCursorX
                 and #$FF
-                asl A                   ; *2
+                asl                     ; *2
                 sec
                 sbc #96
                 clc
                 adc #32-3
-                sta SP00_X_POS
-                .m8
+                sta SP00_X
+                ; .m8
 
 _badX           cpy #32                 ; too far up?
                 bcc _timers             ;   Yes. skip next
@@ -652,13 +635,13 @@ _badX           cpy #32                 ; too far up?
 
                 sty zpCursorY           ;   No. it's ok!
 
-                .m16
+                ; .m16
                 lda zpCursorY
                 and #$FF
                 clc
                 adc #32-8-3
-                sta SP00_Y_POS
-                .m8
+                sta SP00_Y
+                ; .m8
 
 ;-------------------------------------
 ; Handle timers and orbit
@@ -695,24 +678,24 @@ _notGameOver    lda isSatelliteAlive    ; get satellite
                 ldy SCNT                ; orbit index
 
                 lda ORBX,Y              ; get X coord
-                asl A
+                asl
                 sta zpSatelliteX        ; save Pfield x
                 clc
                 adc #28                 ; X offset
-                sta SP01_X_POS          ; horizontal pos
+                sta SP01_X              ; horizontal pos
 
                 lda ORBY,Y              ; get Y coord
                 sta zpSatelliteY
                 clc
                 adc #52
-                sta SP01_Y_POS
+                sta SP01_Y
 
 ;   toggle between satellite A & B
                 inc zpSatPix            ; next sat. image
                 lda zpSatPix            ; get number
                 and #$08                ; use bit 3
 
-                .m16
+                ; .m16
                 and #$FF
                 bne _pixB
 
@@ -722,7 +705,7 @@ _notGameOver    lda isSatelliteAlive    ; get satellite
 _pixB           lda #$800
 
 _setPix         sta SP01_ADDR
-                .m8
+                ; .m8
 
 _noSat          lda isSaucerActive      ; saucer active?
                 beq _sounds             ;   No
@@ -744,15 +727,15 @@ _nxtsp          dey                     ; next scan line
                 dex                     ; dec index
                 bpl _next5              ; done? No.
 
-                .m16
+                ; .m16
                 lda BombX+3             ; saucer X pos
                 and #$FF
-                sta SP03_X_POS          ; move it
-                .m8
+                sta SP03_X              ; move it
+                ; .m8
 
                 inc SAUTIM              ; saucer time
                 lda SAUTIM              ; get counter
-                lsr A                   ; /2
+                lsr                     ; /2
                 and #$03                ; use only 0..3
                 tax                     ; as X index
                 lda SaucerMiddle,X      ; saucer middle
@@ -763,25 +746,25 @@ _sounds         ldx PSSCNT              ; shot sound
                 bpl _doSnd1             ; shot? Yes.
 
                 lda #0                  ;   No
-                sta SID_CTRL1           ; volume for shot
+                sta SID1_CTRL1          ; volume for shot
                 beq _trySnd2            ; skip next
 
 _doSnd1         lda #$A6                ; shot sound vol
-                sta SID_CTRL1           ; set hardware
+                sta SID1_CTRL1          ; set hardware
                 lda PLSHOT,X            ; shot sound
-                sta SID_FREQ1           ; frequency
+                sta SID1_FREQ1          ; frequency
                 dec PSSCNT              ; dec shot snd
 _trySnd2        ldx ESSCNT              ; enemy shots
                 bpl _doSnd2             ; shots? Yes.
 
                 lda #0                  ;   No
-                sta SID_CTRL2           ; into volume
+                sta SID1_CTRL2          ; into volume
                 beq _trySnd3            ; skip rest
 
 _doSnd2         lda #$A6                ; shot sound vol
-                sta SID_CTRL2           ; set hardware
+                sta SID1_CTRL2          ; set hardware
                 lda ENSHOT,X            ; shot sound
-                sta SID_FREQ2           ; frequency
+                sta SID1_FREQ2          ; frequency
                 dec ESSCNT              ; dec shot snd
 _trySnd3        lda isSaucerActive      ; saucer active?
                 beq _noSnd3             ;   No
@@ -794,7 +777,7 @@ _trySnd3        lda isSaucerActive      ; saucer active?
                 bcc _doSnd3             ;   No. make sound
 
 _noSnd3         lda #0
-                sta SID_CTRL3           ; no saucer snd
+                sta SID1_CTRL3          ; no saucer snd
                 beq _XIT                ; skip next
 
 _doSnd3         inc SSSCNT              ; inc saucer cnt
@@ -805,15 +788,13 @@ _doSnd3         inc SSSCNT              ; inc saucer cnt
                 ldx #0
                 stx SSSCNT              ; zero saucer cnt
 _setSnd3        lda #$A8                ; saucer volume
-                sta SID_CTRL3           ; set hardware
+                sta SID1_CTRL3          ; set hardware
                 lda SAUSND,X            ; saucer sound
-                sta SID_FREQ3           ; set hardware
+                sta SID1_FREQ3          ; set hardware
 
-_XIT            .m16i16
-                ply
+_XIT            ply
                 plx
                 pla
 
-                .m8i8
-                rtl
+                rts
                 .endproc

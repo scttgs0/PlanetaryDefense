@@ -4,8 +4,8 @@
 ;======================================
 SoundOff        .proc
                 lda #0                  ; zero volume
-                sta SID_CTRL1           ; to sound #1
-                sta SID_CTRL2           ; sound #2
-                sta SID_CTRL3           ; sound #3
+                sta SID1_CTRL1          ; to sound #1
+                sta SID1_CTRL2          ; sound #2
+                sta SID1_CTRL3          ; sound #3
                 rts
                 .endproc

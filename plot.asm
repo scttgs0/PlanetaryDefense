@@ -5,7 +5,7 @@
 ;======================================
 PLOT            .proc
                 lda PLOTY               ; get Y-coord
-                asl A                   ; shift it left
+                asl                     ; shift it left
                 sta LO                  ; save low *2
                 lda #0
                 sta HI                  ; init high byte
@@ -44,8 +44,8 @@ PLOT            .proc
                 and #3                  ; the plot bits,
                 tax                     ; place in X..
                 lda PLOTX               ; get PLOTX and
-                lsr A                   ; divide
-                lsr A                   ; by 4
+                lsr                     ; divide
+                lsr                     ; by 4
                 clc                     ; and add to
                 adc LO                  ; plot address
                 sta LO                  ; for final plot

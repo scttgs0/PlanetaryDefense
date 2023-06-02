@@ -49,7 +49,7 @@ _gotSauShot     lda #48                 ; PF center, Y
 
                 lda BombY+3             ; saucer Y-coord
                 sbc #37                 ; PF offset
-                lsr A                   ; 2 scan lines
+                lsr                     ; 2 scan lines
                 sta zpFromY             ; shot from Y
                 sta ProjY,X             ; Y-coord table
                 cmp #95                 ; screen Y limit
