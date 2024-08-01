@@ -3,14 +3,19 @@
 ; Screen + Player/Missile Area
 ;--------------------------------------
 
-PPOS            = Playfield+1935        ; planet pos
+PPOS            = Playfield+(48*40+15)  ; planet pos
 
 ORBX            = $1D00                 ; orbit X
 ORBY            = $1E00                 ; orbit Y
 
+ScreenRAM       = $2_0000
+Screen16K       = $8000                 ; 2 slots [$8000:$BFFF]
+
+;--------------------------------------
+
 CharResX        = 40
 CharResY        = 30
 
-FALSE           = 0
 TRUE            = 1
+FALSE           = 0
 NIL             = $FF
