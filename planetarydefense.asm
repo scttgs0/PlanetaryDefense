@@ -25,16 +25,14 @@
 
 ;   planet      (160,120)
 
-                .cpu "65816"
+                .include "equates/system_c256.equ"
+                .include "equates/zeropage.equ"
+                .include "equates/game.equ"
 
-                .include "equates_system_c256.inc"
-                .include "equates_zeropage.inc"
-                .include "equates_game.inc"
-
-                .include "macros_65816.asm"
-                .include "macros_frs_graphic.asm"
-                .include "macros_frs_mouse.asm"
-                .include "macros_frs_random.asm"
+                .include "macros/65816.mac"
+                .include "macros/c256_graphic.mac"
+                .include "macros/c256_mouse.mac"
+                .include "macros/c256_random.mac"
 
 
 ;-------------------------------------
