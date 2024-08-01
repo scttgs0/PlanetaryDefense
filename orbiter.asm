@@ -89,14 +89,17 @@ _live           lda LIVES               ; lives left?
                 lda #0
                 sta isSatelliteAlive    ; kill satellite
                 sta SCNT                ; init orbit
+
                 ldx LIVES               ; one less life
                 sta SCOLIN+14,X         ; erase life
+
                 dec LIVES               ; dec lives count
                 bpl _moreSats           ; any left? Yes.
 
                 lda #NIL
                 sta zpBombCount         ; lot of bombs into bomb count
                 sta GAMCTL              ; end game
+
                 jsr SoundOff            ; no sound 1 2 3
 
 _moreSats       lda zpSatelliteX        ; sat X-coord

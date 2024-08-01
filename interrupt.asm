@@ -91,7 +91,7 @@ TitleMsg        ;.text " PLANETARY  DEFENSE "
                 .byte $20,$20
                 .byte $BA,$BB,$BE,$BF,$C2,$C3,$BE,$BF,$CA,$CB,$D6,$D7,$BE,$BF
                 .byte $20,$20,$20
-;   top
+;   bottom
                 .byte $20,$20,$20
                 .byte $D0,$D1,$C8,$C9,$B8,$B9,$CC,$CD,$C0,$C1,$DC,$DD,$B8,$B9,$D4,$D5,$E0,$E1
                 .byte $20,$20
@@ -100,8 +100,8 @@ TitleMsg        ;.text " PLANETARY  DEFENSE "
 
 AuthorMsg       .text " BY CHARLES BACHAND "
                 .text "   AND TOM HUDSON   "
-StartMsg        .text "  MOUSE --- SELECT  "
-                .text "  JOYSTICK - START  "
+StartMsg        .text "  MOUSE ",$B4,$B4,$B4," SELECT  "
+                .text "  JOYSTICK ",$B4," START  "
                 .text "  OR PRESS TRIGGER  "
 
 
@@ -111,26 +111,33 @@ StartMsg        .text "  MOUSE --- SELECT  "
 ;--------------------------------------
 
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-;
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+; Main IRQ Handler
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 HandleIrq       .proc
                 pha
                 phx
                 phy
 
-                lda INT_PENDING_REG1
-                bit #FNX1_INT00_KBD
-                beq _1
+;   switch to system map
+                lda IOPAGE_CTRL
+                pha                     ; preserve
+                stz IOPAGE_CTRL
 
-                jsr KeyboardHandler
+                ; lda INT_PENDING_REG1
+                ; bit #INT01_VIA1
+                ; beq _1
 
-                lda INT_PENDING_REG1
-                sta INT_PENDING_REG1
+                ; lda INT_PENDING_REG1
+                ; sta INT_PENDING_REG1
+
+                ; jsr KeyboardHandler
 
 _1              stz isDirty
 
                 lda INT_PENDING_REG0
-                bit #FNX0_INT00_SOF
+                bit #INT00_SOF
                 beq _2
 
                 jsr VbiHandler
@@ -139,7 +146,7 @@ _1              stz isDirty
                 sta isDirty
 
 _2              lda INT_PENDING_REG0
-                bit #FNX0_INT01_SOL
+                bit #INT00_SOF
                 beq _cleanUp
 
                 jsr DliHandler
@@ -151,10 +158,13 @@ _cleanUp        lda isDirty
                 beq _XIT
 
                 lda INT_PENDING_REG0
-                ;and #FNX0_INT00_SOF|FNX0_INT01_SOL
+                ;and #INT00_SOF|INT00_SOL
                 sta INT_PENDING_REG0
 
-_XIT            ply
+_XIT            pla                     ; restore
+                sta IOPAGE_CTRL
+
+                ply
                 plx
                 pla
 
@@ -439,24 +449,24 @@ _nextA          lda zpSource,X
                 asl                     ; *2
 
                 tax                     ; use as index
-                ; .m16
-                lda _BrightnessBase,X   ; planet brightness
+                ;!!.m16
+                ;!!lda _BrightnessBase,X   ; planet brightness
                 sta zpSource
                 stz zpSource+2
                 stz zpSource+3
-                ; .m8
+                ;!!.m8
 
                 lda vPlanetColor
                 lsr                     ; /4 :: ignore luminance ( val / 16 * 4 == /4 )
                 lsr
-                sta _temp1
+                ;!!sta _temp1
 
                 lda zpSource
                 clc
-                adc _temp1
+                ;!!adc _temp1
                 sta zpSource
 
-                .setbank $AF
+                ;!!.setbank $AF
                 ldy #3
 _next1          lda (zpSource),Y
                 sta GRPH_LUT0_PTR+4,Y   ; color planet  (COLPF0)
@@ -464,12 +474,12 @@ _next1          lda (zpSource),Y
                 bpl _next1
 
                 ldx #3
-_next2          lda _Color8C,X          ; bright blue
+_next2          ;!!lda _Color8C,X          ; bright blue
                 sta GRPH_LUT0_PTR+8,X   ; shot color    (COLPF1)
                 dex
                 bpl _next2
 
-                .setbank $00
+                ;!!.setbank $00
 
 ;   restore zpSource
                 ldx #3
@@ -480,7 +490,7 @@ _nextB          lda saveSource,X
 
                 plx
                 pla
-                rtl
+                rts
 
 ;-------------------------------------
 
@@ -500,28 +510,32 @@ _temp1          .byte ?
 
 
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-; VERTICAL BLANK ROUTINE
+; Handle Vertical Blank Interrupt (SOF)
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 VbiHandler      .proc
                 pha
                 phx
                 phy
-                ;cld                     ; clr decimal mode
 
                 inc JIFFYCLOCK          ; increment the jiffy clock each VBI
+
+;   when already in joystick mode, bypass the override logic
+                lda InputType
+                cmp #itJoystick
+                beq _joyModeP1
 
                 lda JOYSTICK0           ; read joystick0
                 and #$1F
                 cmp #$1F
-                beq _1                  ; when no activity, keyboard is alternative
+                beq _2                  ; when no activity, keyboard is alternative
 
                 sta InputFlags          ; joystick activity -- override keyboard input
                 lda #itJoystick
                 sta InputType
 
-_1              ldx InputType
-                bne _2                  ; keyboard, move on
+                bra _2
 
+_joyModeP1      lda JOYSTICK0           ; read joystick0
                 sta InputFlags
 
 _2              ;jmp _XIT    ; HACK:
@@ -616,7 +630,7 @@ _notE           cpx #52                 ; too far left?
 
                 stx zpCursorX           ;   No. it's ok!
 
-                ; .m16
+                ;!!.m16
                 lda zpCursorX
                 and #$FF
                 asl                     ; *2
@@ -624,8 +638,8 @@ _notE           cpx #52                 ; too far left?
                 sbc #96
                 clc
                 adc #32-3
-                sta SP00_X
-                ; .m8
+                sta SPR(sprite_t.X, 0)
+                ;!!.m8
 
 _badX           cpy #32                 ; too far up?
                 bcc _timers             ;   Yes. skip next
@@ -635,13 +649,13 @@ _badX           cpy #32                 ; too far up?
 
                 sty zpCursorY           ;   No. it's ok!
 
-                ; .m16
+                ;!!.m16
                 lda zpCursorY
                 and #$FF
                 clc
                 adc #32-8-3
-                sta SP00_Y
-                ; .m8
+                sta SPR(sprite_t.Y, 0)
+                ;!!.m8
 
 ;-------------------------------------
 ; Handle timers and orbit
@@ -682,30 +696,30 @@ _notGameOver    lda isSatelliteAlive    ; get satellite
                 sta zpSatelliteX        ; save Pfield x
                 clc
                 adc #28                 ; X offset
-                sta SP01_X              ; horizontal pos
+                sta SPR(sprite_t.X, 1)  ; horizontal pos
 
                 lda ORBY,Y              ; get Y coord
                 sta zpSatelliteY
                 clc
                 adc #52
-                sta SP01_Y
+                sta SPR(sprite_t.Y, 1)
 
 ;   toggle between satellite A & B
                 inc zpSatPix            ; next sat. image
                 lda zpSatPix            ; get number
                 and #$08                ; use bit 3
 
-                ; .m16
+                ;!!.m16
                 and #$FF
                 bne _pixB
 
-                lda #$400
+                ;!!lda #$400
                 bra _setPix
 
-_pixB           lda #$800
+_pixB           ;!!lda #$800
 
-_setPix         sta SP01_ADDR
-                ; .m8
+_setPix         sta SPR(sprite_t.ADDR, 1)
+                ;!!.m8
 
 _noSat          lda isSaucerActive      ; saucer active?
                 beq _sounds             ;   No
@@ -727,11 +741,11 @@ _nxtsp          dey                     ; next scan line
                 dex                     ; dec index
                 bpl _next5              ; done? No.
 
-                ; .m16
+                ;!!.m16
                 lda BombX+3             ; saucer X pos
                 and #$FF
-                sta SP03_X              ; move it
-                ; .m8
+                sta SPR(sprite_t.X, 3) ; move it
+                ;!!.m8
 
                 inc SAUTIM              ; saucer time
                 lda SAUTIM              ; get counter
@@ -795,6 +809,5 @@ _setSnd3        lda #$A8                ; saucer volume
 _XIT            ply
                 plx
                 pla
-
                 rts
                 .endproc

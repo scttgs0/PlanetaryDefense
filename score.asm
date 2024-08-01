@@ -17,6 +17,8 @@ _next1          lda SCORE,X             ; get score
                 cld                     ; clear decimal
                 .endproc
 
+                ;[fall-through]
+
 
 ;======================================
 ; Show score
@@ -24,6 +26,7 @@ _next1          lda SCORE,X             ; get score
 ShowScore       .proc
                 lda #$10                ; put color 0
                 sta SHCOLR              ; in hold area
+
                 ldx #1                  ; 2nd line char
                 ldy #0                  ; digits 1,2
 _next1          lda SCORE,Y             ; get digits
@@ -36,6 +39,7 @@ _next1          lda SCORE,Y             ; get digits
                 bne _next1              ;   no!
 
                 jsr RenderScoreLine
+
                 rts
                 .endproc
 
@@ -46,6 +50,7 @@ _next1          lda SCORE,Y             ; get digits
 ShowLevel       .proc
                 ldy #$30                ; use color 2
                 sty SHCOLR              ; save it
+
                 lda LEVEL               ; get level #
                 ldx #11                 ; 12th char on line
 
@@ -72,5 +77,6 @@ ShowBCD         .proc
                 ;ora SHCOLR              ; add color
                 ora #$30
                 sta SCOLIN,X            ; show it!
+
                 rts
                 .endproc

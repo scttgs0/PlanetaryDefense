@@ -10,6 +10,7 @@ Planet          .proc
 
                 ldx #$7F                ; set index
 _next1          sta $80,X               ; clear top of page-0
+
                 dex                     ; dec pointer
                 bne _next1
 
@@ -64,8 +65,9 @@ _next3          ;lda PTRIG0             ; paddle trig 0
                 ;eor PTRIG1             ; mask w/PTRIG1
                 ;bne _pdev              ; pushed? Yes.
 
-                lda InputFlags          ; stick trigger
-                and #$10
+                ; HACK: lda InputFlags          ; stick trigger
+                lda #0      ; HACK:
+                and #joyButton0
                 beq _pdev               ; pushed? Yes.
 
                 lda CONSOL              ; get console

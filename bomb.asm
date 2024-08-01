@@ -39,14 +39,14 @@ _gotBomb        lda #TRUE               ; this one is active now
                 cpx #3                  ;   Yes. bomb #3?
                 bne _noSaucer           ;   No. skip next
 
-                .randomByte
+                .frsRandomByte
                 cmp zpSaucerChance      ; compare chance to place saucer?
                 bcs _noSaucer           ;   No
 
                 lda #TRUE               ;   Yes. enable saucer
                 sta isSaucerActive
 
-                .randomByte
+                .frsRandomByte
                 and #$03                ; range: 0..3
                 tay
                 lda SaucerStartX,Y      ; saucer start X
@@ -92,17 +92,17 @@ _saveEndY       sta zpTargetY           ; to Y vector
 ; Bomb handler
 ; ------------
 
-_noSaucer       .randomByte
+_noSaucer       .frsRandomByte
                 bmi _bombMaxX           ; coin flip
 
 ;   randX, maxY :: x=0..250, y=0|250
-                .randomByte
+                .frsRandomByte
                 and #1                  ; make 0..1
                 tay
                 lda BombLimits,Y        ; top/bottom tbl
                 sta BombY,X             ; bomb Y-coord
 
-_next2          .randomByte
+_next2          .frsRandomByte
                 cmp #250                ; compare w/250
                 bcs _next2              ; less than? No.
 
@@ -110,13 +110,13 @@ _next2          .randomByte
                 bra _bombvec
 
 ;   maxX, randY :: x=0|250, y=0..250
-_bombMaxX       .randomByte
+_bombMaxX       .frsRandomByte
                 and #1                  ; make 0..1
                 tay                     ; use as index
                 lda BombLimits,Y        ; 0 or 250
                 sta BombX,X             ; bomb X-coord
 
-_next3          .randomByte
+_next3          .frsRandomByte
                 cmp #250                ; compare w/250
                 bcs _next3              ; less than? No.
 
@@ -206,9 +206,9 @@ _notSaucer      lda lrBomb,X            ; L/R flag
                 asl
                 clc
                 adc #$0C
-                sta SP04_ADDR+1
+                sta SPR(sprite_t.ADDR+1, 4)
 
-                ; .m16
+                ;!!.m16
 ;   set y position
                 lda INDX2               ; restore X
                 asl                     ; *8
@@ -220,7 +220,8 @@ _notSaucer      lda lrBomb,X            ; L/R flag
                 and #$FF
                 clc
                 adc #32-8
-                sta SP04_Y,X           ; player pos
+                ;!!.frsSpriteSetY_ix
+                ;!!sta SPR(sprite_t.Y, 4),X           ; player pos
 
 ;   set x position
                 ldx INDX2               ; restore X
@@ -238,9 +239,10 @@ _notSaucer      lda lrBomb,X            ; L/R flag
                 asl
                 tax
                 pla
-                sta SP04_X,X            ; player pos
+                ;!!.frsSpriteSetX_ix
+                ;!!sta SPR(sprite_t.X, 4),X            ; player pos
                 plx
-                ; .m8
+                ;!!.m8
 
 _nextbomb       dex                     ; more bombs?
                 bpl _next1              ;   yes!

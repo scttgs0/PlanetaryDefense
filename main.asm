@@ -5,8 +5,9 @@
 InitHardware    .proc
                 jsr RandomSeedQuick
 
-                .frsGraphics mcTextOn|mcOverlayOn|mcGraphicsOn|mcBitmapOn|mcSpriteOn,mcVideoMode240
+                .frsGraphics mcTextOn|mcOverlayOn|mcGraphicsOn|mcBitmapOn|mcSpriteOn,mcVideoMode240|mcTextDoubleX|mcTextDoubleY
                 .frsMouse_off
+                .frsCursor 0
                 .frsBorder_off
 
                 jsr InitTextPalette
@@ -39,12 +40,14 @@ INIT            .proc
 
                 ldx #11                 ; no bombs!
 _next1          sta isBombActive,X      ; deactivate
+
                 dex                     ; next bomb
                 bpl _next1              ; done? No.
 
                 ldx #19                 ; zero score line
 _next2          lda ScoreINI,X          ; get byte
                 sta SCOLIN,X            ; put score line
+
                 dex                     ; next byte
                 bpl _next2              ; done? No.
 
@@ -67,7 +70,7 @@ _next2          lda ScoreINI,X          ; get byte
                 sta zpCursorX           ; cursor X pos
                 sta zpCursorY           ; cursor Y pos
 
-                ; .m16
+                ;!!.m16
                 lda zpCursorX
                 and #$FF
                 asl                     ; *2
@@ -75,14 +78,14 @@ _next2          lda ScoreINI,X          ; get byte
                 sbc #96
                 clc
                 adc #32-3
-                sta SP00_X
+                sta SPR(sprite_t.X, 0)
 
                 lda zpCursorY
                 and #$FF
                 clc
                 adc #32-8-3
-                sta SP00_Y
-                ; .m8
+                sta SPR(sprite_t.Y, 0)
+                ;!!.m8
 
                 lda #1
                 sta GAMCTL              ; game control
@@ -125,7 +128,7 @@ SetLevel        .proc
                 cmp #$FF                ; level >14?
                 bne _savePC             ;   No. skip next
 
-                .randomByte             ; random color
+                .frsRandomByte          ; random color
                 and #$F0                ; mask off lum.
 _savePC         sta vPlanetColor
 

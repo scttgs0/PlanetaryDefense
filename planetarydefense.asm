@@ -25,15 +25,15 @@
 
 ;   planet      (160,120)
 
-                .cpu "65c02"
+                .include "equates/system_f256.equ"
+                .include "equates/zeropage.equ"
+                .include "equates/game.equ"
 
-                .include "system_f256jr.equ"
-                .include "zeropage.equ"
-                .include "game.equ"
-
-                .include "frs_jr_graphic.mac"
-                .include "frs_jr_mouse.mac"
-                .include "frs_jr_random.mac"
+                .include "macros/f256_graphic.mac"
+                .include "macros/f256_mouse.mac"
+                .include "macros/f256_random.mac"
+                .include "macros/f256_sprite.mac"
+                .include "macros/f256_text.mac"
 
 
 ;--------------------------------------
@@ -41,14 +41,20 @@
                 * = $2000
 ;--------------------------------------
 
-                .byte $F2,$56           ; signature
-                .byte $02               ; block count
-                .byte $01               ; start at block1
-                .addr BOOT              ; execute address
-                .word $0000             ; version
-                .word $0000             ; kernel
-                                        ; binary name
-                .text 'Planetary Defense',$00
+.if PGX=1
+                .text "PGX"
+                .byte $03
+                .dword BOOT
+;--------------------------------------
+.else
+                .byte $F2,$56               ; signature
+                .byte $02                   ; block count
+                .byte $01                   ; start at block1
+                .addr BOOT                  ; execute address
+                .word $0001                 ; version
+                .word $0000                 ; kernel
+                .null 'Planetary Defense'   ; binary name
+.endif
 
 ;--------------------------------------
 
@@ -69,7 +75,8 @@ START
 ;--------------------------------------
 
                 .include "interrupt.asm"
-                .include "platform_f256jr.asm"
+                .include "platform_f256.asm"
+                .include "facade.asm"
 
 
 ;--------------------------------------
@@ -118,6 +125,6 @@ Playfield       .fill 96*40,$00
                 .align $100
 ;--------------------------------------
 
-Video8K         .fill 8192,$00
+;Video8K         .fill 8192,$00
 
                 .end

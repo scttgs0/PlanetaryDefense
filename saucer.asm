@@ -3,7 +3,7 @@
 ; Saucer random generator 0..99
 ;======================================
 SaucerRandom    .proc
-_tryAgain       .randomByte             ; random number
+_tryAgain       .frsRandomByte          ; random number
                 and #$7F                ; 0..127
                 cmp #100                ; compare w/100
                 bcs _tryAgain           ; less than? No.
@@ -16,7 +16,7 @@ _tryAgain       .randomByte             ; random number
 ; Saucer shoot routine
 ;======================================
 SaucerShoot     .proc
-                .randomByte             ; random number
+                .frsRandomByte          ; random number
                 cmp #6                  ; 2.3% chance?
                 bcs _XIT                ; less than? No.
 

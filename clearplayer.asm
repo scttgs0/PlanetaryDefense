@@ -10,7 +10,7 @@
 ClearPlayer     .proc
                 phx
 
-                ; .m16
+                ;!!.m16
                 txa
                 and #$FF
                 asl                     ; *8
@@ -18,9 +18,11 @@ ClearPlayer     .proc
                 asl
                 tax
                 lda #0                  ; move player off screen
-                sta SP00_X,X
-                sta SP00_Y,X
-                ; .m8
+                ;!!.frsSpriteSetX_ix
+                ;!!sta SPR(sprite_t.X, 0),X
+                ;!!.frsSpriteSetY_ix
+                ;!!sta SPR(sprite_t.Y, 0),X
+                ;!!.m8
 
                 plx
                 rts
