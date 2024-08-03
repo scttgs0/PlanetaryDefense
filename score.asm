@@ -6,15 +6,18 @@ AddScore        .proc
                 ldy #0                  ; init index
                 sed                     ; decimal mode
                 clc
+
                 ldx #2                  ; do 3 bytes
 _next1          lda SCORE,X             ; get score
                 adc SCOADD,X            ; add bomb value
                 sta SCORE,X             ; save score
                 sty SCOADD,X            ; zero value
+
                 dex                     ; next byte
                 bpl _next1
 
                 cld                     ; clear decimal
+
                 .endproc
 
                 ;[fall-through]
@@ -34,6 +37,7 @@ _next1          lda SCORE,Y             ; get digits
 
                 inx                     ; advance score
                 inx                     ; line pointer
+
                 iny                     ; next 2 digits
                 cpy #3                  ; done 6?
                 bne _next1              ;   no!
@@ -64,8 +68,9 @@ ShowLevel       .proc
 ;======================================
 ShowBCD         .proc
                 sta SHOBYT              ; save digits
+
                 and #$0F                ; get lower digit
-                ;ora SHCOLR              ; add color
+                ;!!ora SHCOLR              ; add color
                 ora #$30
                 sta SCOLIN+1,X          ; show it
 
@@ -74,7 +79,7 @@ ShowBCD         .proc
                 lsr
                 lsr
                 lsr
-                ;ora SHCOLR              ; add color
+                ;!!ora SHCOLR              ; add color
                 ora #$30
                 sta SCOLIN,X            ; show it!
 

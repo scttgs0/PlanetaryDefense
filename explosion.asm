@@ -45,10 +45,10 @@ _next1          inc COUNTR              ; nxt explosion
                 txa                     ; move index
                 tay                     ; to Y register
 
-; ---------------------------
+; - - - - - - - - - - - - - - - - - - -
 ; Repack explosion table, get
 ; rid of finished explosions
-; ---------------------------
+; - - - - - - - - - - - - - - - - - - -
 
 _next2          inx                     ; next explosion
                 cpx EXPCNT              ; done?
@@ -62,25 +62,30 @@ _rpk2           lda ExplosionX,X        ; get X position
                 sta ExplosionY,Y        ; move back Y
                 lda ExplosionCount,X    ; get count
                 sta ExplosionCount,Y    ; move back count
+
                 iny                     ; inc index
                 bne _next2              ; next repack
 
 _rpkEnd         dec EXPCNT              ; dec pointers
                 dec COUNTR              ; due to repack
+
                 jmp _next1
 
 _doPlot         inc ExplosionCount,X    ; inc pointer
+
                 tay                     ; exp phase in Y
                 lda ExplosionX,X        ; get X-coord
                 clc
                 adc COORD1,Y            ; add X offset
                 sta PLOTX               ; save it
+
                 cmp #160                ; off screen?
                 bcs _next1              ;   Yes. don't plot
 
                 lda ExplosionY,X        ; get Y-coord
                 adc COORD2,Y            ; add Y offset
                 sta PLOTY               ; save it
+
                 cmp #96                 ; off screen?
                 bcs _next1              ;   Yes. don't plot
 
@@ -92,10 +97,12 @@ _doPlot         inc ExplosionCount,X    ; inc pointer
                 lda PlotBits,X          ; get plot bits
                 ora (LO),Y              ; alter display
 _next3          sta (LO),Y              ; and replot it!
+
                 jmp _next1
 
 _clearIt        lda EraseBits,X         ; erase bits
                 and (LO),Y              ; turn off pixel
+
                 jmp _next3              ; put it back
 
                 .endproc

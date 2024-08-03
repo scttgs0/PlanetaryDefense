@@ -47,5 +47,6 @@ _down           lda BombY,X             ; bomb Y-coord
                 adc DELTAY              ; add Y-delta
 
 _XIT            sta BombY,X             ; save Y-coord
+
                 rts
                 .endproc

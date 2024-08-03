@@ -827,8 +827,8 @@ _checkRock      ldy zpTemp2
                 lda (zpSource),Y
                 beq _nextPlayer
 
-                ;cmp #4
-                ;bcs _nextPlayer
+                ;!!cmp #4
+                ;!!bcs _nextPlayer
 
                 sta P2PF,X
 

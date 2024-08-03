@@ -31,10 +31,9 @@ _gotBomb        lda #TRUE               ; this one is active now
                 lda GAMCTL              ; game control
                 bmi _noSaucer           ; saucer possible?
 
-
-; --------------
+; - - - - - - - - - - - - - - - - - - -
 ; Saucer handler
-; --------------
+; - - - - - - - - - - - - - - - - - - -
 
                 cpx #3                  ;   Yes. bomb #3?
                 bne _noSaucer           ;   No. skip next
@@ -87,10 +86,9 @@ _saveEndX       sta zpTargetX           ; to X vector
 _saveEndY       sta zpTargetY           ; to Y vector
                 bra _getBombVec
 
-
-; ------------
+; - - - - - - - - - - - - - - - - - - -
 ; Bomb handler
-; ------------
+; - - - - - - - - - - - - - - - - - - -
 
 _noSaucer       .frsRandomByte
                 bmi _bombMaxX           ; coin flip
@@ -133,10 +131,9 @@ _bombvec        lda BombX,X             ; bomb X-coord
 
 _getBombVec     jsr CalcVector          ; calc shot vect
 
-
-; ---------------------
+; - - - - - - - - - - - - - - - - - - -
 ; Store vector in table
-; ---------------------
+; - - - - - - - - - - - - - - - - - - -
 
                 lda LR                  ; bomb L/R flag
                 sta lrBomb,X            ; bomb L/R table
@@ -147,6 +144,7 @@ _getBombVec     jsr CalcVector          ; calc shot vect
                 sta BXINC,X             ; Vel X table
                 lda VYINC               ; velocity Y inc
                 sta BYINC,X             ; Vel Y table
+
                 rts
                 .endproc
 
@@ -180,11 +178,10 @@ _next1          lda isBombActive,X      ; bomb on?
                 jsr AdvanceIt           ;   faster than normal
                 jsr AdvanceIt
 
-
-; --------------------------
+; - - - - - - - - - - - - - - - - - - -
 ; We've now got updated bomb
 ; coordinates for plotting!
-; --------------------------
+; - - - - - - - - - - - - - - - - - - -
 
 _showbomb       lda BombY,X             ; bomb Y-coord
                 clc
@@ -227,7 +224,7 @@ _notSaucer      lda lrBomb,X            ; L/R flag
                 ldx INDX2               ; restore X
                 lda BombX,X             ; bomb X-coord
                 and #$FF
-                ;asl                    ; *2
+                ;!!asl                    ; *2
                 clc
                 adc #32+32
                 phx
@@ -241,6 +238,7 @@ _notSaucer      lda lrBomb,X            ; L/R flag
                 pla
                 ;!!.frsSpriteSetX_ix
                 ;!!sta SPR(sprite_t.X, 4),X            ; player pos
+
                 plx
                 ;!!.m8
 
@@ -282,9 +280,9 @@ CheckHit        .proc
 _next1          lda #0
                 sta zpBombCollCnt       ; clear collision count
 
-                ;lda P0PF,X             ; playf collision
-                ;and #$05               ; w/shot+planet
-                ;beq _nobombhit         ; hit either? No.
+                ;!!lda P0PF,X             ; playf collision
+                ;!!and #$05               ; w/shot+planet
+                ;!!beq _nobombhit         ; hit either? No.
                 bra _nobombhit  ; HACK:
 
                 inc zpBombCollCnt       ;   Yes. inc count
@@ -307,10 +305,9 @@ _next1          lda #0
                 sta SCOADD+1            ; point value
                 bra _addit              ; add to score
 
-
-; -----------------------
+; - - - - - - - - - - - - - - - - - - -
 ; Add bomb value to score
-; -----------------------
+; - - - - - - - - - - - - - - - - - - -
 
 _addBombScore   lda zpBombValueLO       ; bomb value low
                 sta SCOADD+2            ; score inc low
@@ -359,6 +356,7 @@ _explode        jsr ClearPlayer
 _nobombhit      dex                     ; dec index
                 bpl _next1              ; done? No.
 
-                ;sta HITCLR             ; reset collision
+                ;!!sta HITCLR             ; reset collision
+
                 rts
                 .endproc

@@ -17,6 +17,7 @@ ClearPlayer     .proc
                 asl
                 asl
                 tax
+
                 lda #0                  ; move player off screen
                 ;!!.frsSpriteSetX_ix
                 ;!!sta SPR(sprite_t.X, 0),X

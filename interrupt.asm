@@ -1,9 +1,9 @@
 
-; ------------------
+;--------------------------------------
 ; Intro Display List
-; ------------------
+;--------------------------------------
 
-TitleDL         ; .byte AEMPTY8,AEMPTY8,AEMPTY8
+TitleDL         ;!! .byte AEMPTY8,AEMPTY8,AEMPTY8
                 ; .byte AEMPTY8,AEMPTY8,AEMPTY8
                 ; .byte AEMPTY8,AEMPTY8,AEMPTY8
 
@@ -31,11 +31,11 @@ TitleDL         ; .byte AEMPTY8,AEMPTY8,AEMPTY8
                 ; .byte AVB+AJMP
                 ;    .addr TitleDL
 
-; -----------------
+;--------------------------------------
 ; Game Display List
-; -----------------
+;--------------------------------------
 
-GameDL          ; .byte AEMPTY8,AEMPTY8
+GameDL          ;!! .byte AEMPTY8,AEMPTY8
 
                 ; .byte $06+ALMS
                 ;    .addr SCOLIN
@@ -79,9 +79,9 @@ GameDL          ; .byte AEMPTY8,AEMPTY8
                 ;    .addr GameDL
 
 
-; ------------------
+;--------------------------------------
 ; Intro Message Text
-; ------------------
+;--------------------------------------
 
 MagMsg          .text "  ANALOG COMPUTING  "
 TitleMsg        ;.text " PLANETARY  DEFENSE "
@@ -125,14 +125,14 @@ HandleIrq       .proc
                 pha                     ; preserve
                 stz IOPAGE_CTRL
 
-                ; lda INT_PENDING_REG1
-                ; bit #INT01_VIA1
-                ; beq _1
+                ;!! lda INT_PENDING_REG1
+                ;!! bit #INT01_VIA1
+                ;!! beq _1
 
-                ; lda INT_PENDING_REG1
-                ; sta INT_PENDING_REG1
+                ;!! lda INT_PENDING_REG1
+                ;!! sta INT_PENDING_REG1
 
-                ; jsr KeyboardHandler
+                ;!! jsr KeyboardHandler
 
 _1              stz isDirty
 
@@ -158,7 +158,7 @@ _cleanUp        lda isDirty
                 beq _XIT
 
                 lda INT_PENDING_REG0
-                ;and #INT00_SOF|INT00_SOL
+                ;!!and #INT00_SOF|INT00_SOL
                 sta INT_PENDING_REG0
 
 _XIT            pla                     ; restore
@@ -538,17 +538,17 @@ VbiHandler      .proc
 _joyModeP1      lda JOYSTICK0           ; read joystick0
                 sta InputFlags
 
-_2              ;jmp _XIT    ; HACK:
+_2              ;!!jmp _XIT    ; HACK:
 
                 ldx isSaucerActive      ; saucer flag as
                 lda SaucerColor,X       ; index 0 or 1
-                ;sta PCOLR3             ; saucer color
+                ;!!sta PCOLR3             ; saucer color
 
                 lda #5
                 sta DLICNT              ; reset DLI count
 
-                ;lda #$C0               ; enable VBI+DLI
-                ;sta NMIEN
+                ;!!lda #$C0               ; enable VBI+DLI
+                ;!!sta NMIEN
 
                 lda KEYCHAR             ; keyboard char
                 cmp #$39                ; space bar?
@@ -566,7 +566,7 @@ _3              lda PAUSED              ; pause flag
 
                 lda #0
                 ldx #7                  ; do 8 bytes
-_next1          ;sta AUDF1,X            ; zero sound
+_next1          ;!!sta AUDF1,X            ; zero sound
                 dex                     ; dec index
                 bpl _next1              ; done? No.
 
@@ -575,19 +575,19 @@ _next1          ;sta AUDF1,X            ; zero sound
 _nopau          lda isTitleScreen       ; title flag
                 bne _nocyc              ; title? Yes.
 
-                ;lda COLOR2             ;   No. get color
+                ;!!lda COLOR2             ;   No. get color
                 clc
                 adc #$10                ; next color
-                ;sta COLOR2             ; explosion col.
+                ;!!sta COLOR2             ; explosion col.
 
 _nocyc          lda EXSCNT              ; explosion cnt
                 beq _4                  ; any? No.
 
                 lsr                     ; count/2
                 lsr                     ; count/4
-                ;sta AUDC4              ; explo volume
+                ;!!sta AUDC4              ; explo volume
                 lda #40                 ; explosion
-                ;sta AUDC4              ; explo frequency
+                ;!!sta AUDC4              ; explo frequency
                 dec EXSCNT              ; dec count
 
 _4              lda GAMCTL              ; game control
@@ -595,10 +595,9 @@ _4              lda GAMCTL              ; game control
 
                 jmp _timers             ;   No. skip
 
-
-; --------------
+; - - - - - - - - - - - - - - - - - - -
 ; Cursor handler
-; --------------
+; - - - - - - - - - - - - - - - - - - -
 
 _cursor         lda InputFlags          ; read joystick
                 and #$0F
@@ -657,9 +656,10 @@ _badX           cpy #32                 ; too far up?
                 sta SPR(sprite_t.Y, 0)
                 ;!!.m8
 
-;-------------------------------------
+; - - - - - - - - - - - - - - - - - - -
 ; Handle timers and orbit
-;-------------------------------------
+; - - - - - - - - - - - - - - - - - - -
+
 _timers         lda zpBombWait          ; bomb wait cnt -  wait over?
                 beq _5                  ;   Yes
 
@@ -736,7 +736,7 @@ _next5          cpy #32                 ; above top?
 
 ; saucer y-pos
                 lda SHAPE_Saucer,X      ; saucer image
-                ;sta PLR3,Y              ; store player 3
+                ;!!sta PLR3,Y              ; store player 3
 _nxtsp          dey                     ; next scan line
                 dex                     ; dec index
                 bpl _next5              ; done? No.

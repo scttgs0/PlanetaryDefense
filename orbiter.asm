@@ -81,9 +81,9 @@ _live           lda LIVES               ; lives left?
                 lda #TRUE
                 sta isSatelliteAlive    ; set alive flag
 
-                ;lda M0PL               ; did satellite
-                ;ora M0PL+1             ; hit any bombs?
-                ;beq _XIT               ;   No. exit
+                ;!!lda M0PL               ; did satellite
+                ;!!ora M0PL+1             ; hit any bombs?
+                ;!!beq _XIT               ;   No. exit
                 bra _XIT    ; HACK:
 
                 lda #0
@@ -113,14 +113,16 @@ _moreSats       lda zpSatelliteX        ; sat X-coord
                 lda #21                 ; init sat Y
                 sta zpSatelliteY        ; sat Y-coord
 
-                ;ldx #0                  ; don't show the
-;_clearSat       ;lda MISL,X              ; satellite pic
-                ;and #$F0                ; mask off sat
-                ;sta MISL,X              ; restore data
-                ;dex                     ; dec index
-                ;bne _clearSat           ; done? No.
+                ;!!ldx #0                  ; don't show the
+;!!_clearSat       ;lda MISL,X              ; satellite pic
+                ;!!and #$F0                ; mask off sat
+                ;!!sta MISL,X              ; restore data
+
+                ;!!dex                     ; dec index
+                ;!!bne _clearSat           ; done? No.
 
                 lda #$FF                ; 4.25 seconds
                 sta DEADTM              ; till next life!
+
                 rts
                 .endproc

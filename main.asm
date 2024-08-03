@@ -1,7 +1,7 @@
 
-; -------------------------------------
+;--------------------------------------
 ; Initialize the Platform
-; -------------------------------------
+;--------------------------------------
 InitHardware    .proc
                 jsr RandomSeedQuick
 
@@ -24,9 +24,9 @@ InitHardware    .proc
                 .endproc
 
 
-; -------------------------------------
+;--------------------------------------
 ; Initialize Misc.
-; -------------------------------------
+;--------------------------------------
 INIT            .proc
                 lda #0                  ; zero out..
                 sta SCORE               ; score byte 0
@@ -59,12 +59,12 @@ _next2          lda ScoreINI,X          ; get byte
                 sta LIVES               ; number of lives
 
                 lda #$0C                ; set explosion brightness
-                ;sta COLOR2
+                ;!!sta COLOR2
 
                 lda #$34                ; medium red
-                ;sta PCOLR0             ; bomb 0 color
-                ;sta PCOLR1             ; bomb 1 color
-                ;sta PCOLR2             ; bomb 2 color
+                ;!!sta PCOLR0             ; bomb 0 color
+                ;!!sta PCOLR1             ; bomb 1 color
+                ;!!sta PCOLR2             ; bomb 2 color
 
                 lda #128                ; center screen X/Y
                 sta zpCursorX           ; cursor X pos
@@ -89,7 +89,7 @@ _next2          lda ScoreINI,X          ; get byte
 
                 lda #1
                 sta GAMCTL              ; game control
-                ;jsr ShowScore
+                ;!!jsr ShowScore
 
                 lda #$54                ; graphic-LF of planet center
                 sta Playfield+1939
@@ -99,7 +99,7 @@ _next2          lda ScoreINI,X          ; get byte
                 lda #TRUE
                 sta isDirtyPlayfield
 
-                ;sta HITCLR             ; reset collision
+                ;!!sta HITCLR             ; reset collision
 
                 .endproc
 
@@ -149,6 +149,7 @@ _sameLevel      sed                     ; decimal mode
                 clc
                 adc #1
                 sta LEVEL               ; save game level
+
                 cld                     ; clear decimal
 
                 .endproc
@@ -179,10 +180,9 @@ _1              lda GAMCTL              ; game done?
 
                 jmp EndGame             ; The End!
 
-
-; --------------------------
+; - - - - - - - - - - - - - - - - - - -
 ; Check planet core for hit!
-; --------------------------
+; - - - - - - - - - - - - - - - - - - -
 
 _checkCore      lda Playfield+1939      ; center LF
                 and #$03                ; RT color clock
@@ -194,10 +194,9 @@ _checkCore      lda Playfield+1939      ; center LF
                 cmp #$C0                ; explosion colr?
                 bne _planetOK           ;   No. skip next
 
-
-; ---------------
+; - - - - - - - - - - - - - - - - - - -
 ; Planet is Dead!
-; ---------------
+; - - - - - - - - - - - - - - - - - - -
 
 _planetDead     lda #0
                 sta zpBombCount         ; zero bombs
@@ -208,10 +207,9 @@ _planetDead     lda #0
                 sta GAMCTL              ; game control
                 jsr SoundOff
 
-
-; -------------
+; - - - - - - - - - - - - - - - - - - -
 ; Check console
-; -------------
+; - - - - - - - - - - - - - - - - - - -
 
 _planetOK       lda CONSOL              ; get console
                 cmp #7                  ; any pressed?
@@ -219,10 +217,9 @@ _planetOK       lda CONSOL              ; get console
 
                 jmp Planet              ; restart game!
 
-
-; -----------------
+; - - - - - - - - - - - - - - - - - - -
 ; Projectile firing
-; -----------------
+; - - - - - - - - - - - - - - - - - - -
 
 _noRestart      jsr BombInit            ; try new bomb
 

@@ -23,24 +23,24 @@ _next1          sta $80,X               ; clear top of page-0
                 sta PSSCNT              ; no player shots
 
                 jsr SoundOff            ; no sound on 123
-                ;sta AUDC4              ; turn off snd 4
+                ;!!sta AUDC4              ; turn off snd 4
 
-                ;lda #$C4               ; medium green
-                ;sta COLOR0             ; score color
-                ;lda #$84               ; medium blue
-                ;sta COLOR1             ; text color
-                ;lda #$0A               ; bright white
-                ;sta COLOR2             ; shot color
-                ;lda #$98               ; light blue
-                ;sta COLOR3             ; text color
+                ;!!lda #$C4               ; medium green
+                ;!!sta COLOR0             ; score color
+                ;!!lda #$84               ; medium blue
+                ;!!sta COLOR1             ; text color
+                ;!!lda #$0A               ; bright white
+                ;!!sta COLOR2             ; shot color
+                ;!!lda #$98               ; light blue
+                ;!!sta COLOR3             ; text color
 
-                ;lda #<Interrupt_DLI
-                ;sta VDSLST
-                ;lda #>Interrupt_DLI
-                ;sta VDSLST+1
+                ;!!lda #<Interrupt_DLI
+                ;!!sta VDSLST
+                ;!!lda #>Interrupt_DLI
+                ;!!sta VDSLST+1
 
-                ;lda #$C0               ; enable DLI
-                ;sta NMIEN
+                ;!!lda #$C0               ; enable DLI
+                ;!!sta NMIEN
 
                 jsr InitIRQs
 
@@ -50,22 +50,22 @@ _next1          sta $80,X               ; clear top of page-0
                 jsr RenderAuthor
                 jsr RenderSelect
 
-                ;lda #60                 ; one second dead time
+                ;!!lda #60                 ; one second dead time
                 lda #0      ; HACK:
                 sta DEADTM
 
-; --------------------------
+; - - - - - - - - - - - - - - - - - - -
 ; Check console and triggers
-; --------------------------
+; - - - - - - - - - - - - - - - - - - -
 
 _wait1          lda DEADTM              ; look dead time
                 bne _wait1              ; alive? No.
 
-_next3          ;lda PTRIG0             ; paddle trig 0
-                ;eor PTRIG1             ; mask w/PTRIG1
-                ;bne _pdev              ; pushed? Yes.
+_next3          ;!!lda PTRIG0             ; paddle trig 0
+                ;!!eor PTRIG1             ; mask w/PTRIG1
+                ;!!bne _pdev              ; pushed? Yes.
 
-                ; HACK: lda InputFlags          ; stick trigger
+                ;!! HACK: lda InputFlags          ; stick trigger
                 lda #0      ; HACK:
                 and #joyButton0
                 beq _pdev               ; pushed? Yes.
@@ -78,7 +78,7 @@ _next3          ;lda PTRIG0             ; paddle trig 0
                 and #1                  ; mask off START
 _pdev           sta DEVICE              ; device switch
 
-_next4          ;lda #10                 ; 1/6 second dead time
+_next4          ;!!lda #10                 ; 1/6 second dead time
                 lda #0      ; HACK:
                 sta DEADTM
 _wait2          lda DEADTM              ; debounce!
@@ -88,10 +88,9 @@ _wait2          lda DEADTM              ; debounce!
                 cmp #7                  ; released?
                 bne _next4
 
-
-; ------------
+; - - - - - - - - - - - - - - - - - - -
 ; Clear Screen
-; ------------
+; - - - - - - - - - - - - - - - - - - -
 
                 jsr ClearScreen
                 jsr ClearPlayfield
@@ -100,9 +99,9 @@ _wait2          lda DEADTM              ; debounce!
                 lda #FALSE              ; title screen off
                 sta isTitleScreen
 
-; ---------------
+; - - - - - - - - - - - - - - - - - - -
 ; Draw The Planet
-; ---------------
+; - - - - - - - - - - - - - - - - - - -
 
                 lda #<PPOS              ; planet pos low
                 sta INDX1               ; pointer #1 low
@@ -127,10 +126,9 @@ _dp2            bmi _dpRepeat           ; repeat? Yes.
                 inx
                 bra _next8
 
-
-; -------------------
+; - - - - - - - - - - - - - - - - - - -
 ; Repeat Byte Handler
-; -------------------
+; - - - - - - - - - - - - - - - - - - -
 
 _dpRepeat       asl                     ; shift byte
                 sta TEMP                ; new line flag

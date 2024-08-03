@@ -1,6 +1,6 @@
 
 ;======================================
-; Saucer random generator 0..99
+; Saucer random generator  range[0:99]
 ;======================================
 SaucerRandom    .proc
 _tryAgain       .frsRandomByte          ; random number
@@ -30,20 +30,21 @@ SaucerShoot     .proc
 
 _XIT            rts                     ; return, no shot
 
-
-;-------------------
+; - - - - - - - - - - - - - - - - - - -
 ; Enable a saucer shot
-;-------------------
+; - - - - - - - - - - - - - - - - - - -
 
 _gotSauShot     lda #48                 ; PF center, Y
                 sta zpTargetY           ; shot to Y-coord
                 lda #80                 ; PF center X
                 sta zpTargetX           ; shot to X-coord
+
                 lda BombX+3             ; saucer x-coord
                 sec
                 sbc #44                 ; PF offset
                 sta zpFromX             ; shot from X
                 sta ProjX,X             ; X-coord table
+
                 cmp #160                ; screen X limit
                 bcs _XIT                ; on screen? No.
 
@@ -52,6 +53,7 @@ _gotSauShot     lda #48                 ; PF center, Y
                 lsr                     ; 2 scan lines
                 sta zpFromY             ; shot from Y
                 sta ProjY,X             ; Y-coord table
+
                 cmp #95                 ; screen Y limit
                 bcs _XIT                ; on screen? No.
 

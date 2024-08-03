@@ -12,10 +12,9 @@ _next1          lda isProjActive,X      ; get status - active?
 
                 rts
 
-
-; -----------------
+; - - - - - - - - - - - - - - - - - - -
 ; Got a projectile!
-; -----------------
+; - - - - - - - - - - - - - - - - - - -
 
 _gotproj        lda #13                 ; shot sound time
                 sta PSSCNT              ; player shot sound
@@ -55,6 +54,7 @@ _PROVEC         jsr CalcVector          ; compute vect
 
                 lda #1                  ; active
                 sta isProjActive,X      ; proj status
+
                 rts
                 .endproc
 
@@ -77,6 +77,7 @@ _next1          lda isBombActive,X      ; active?
                 lda (LO),Y              ; get plot byte
                 and EraseBits,X         ; erase bit
                 sta (LO),Y              ; replace byte
+
                 ldx XHOLD               ; restore X
                 jsr AdvanceIt           ; advance proj
 
@@ -85,6 +86,7 @@ _next1          lda isBombActive,X      ; active?
                 bcs _killProj           ;   Yes. kill it
 
                 sta PLOTX               ; plotter X
+
                 lda BombY,X             ; bomb Y-coord
                 cmp #96                 ; off screen?
                 bcs _killProj           ;   Yes. kill it
@@ -105,6 +107,7 @@ _next1          lda isBombActive,X      ; active?
 
 _killProj       lda #0
                 sta isBombActive,X      ; kill proj
+
                 jmp _nextProj           ; skip next
 
 _projOK         lda PlotBits,X          ; plot mask
@@ -112,6 +115,7 @@ _projOK         lda PlotBits,X          ; plot mask
                 and PROMSK,X            ; mask color
                 ora (LO),Y              ; add playfield
                 sta (LO),Y              ; replace byte
+
 _nextProj       dex                     ; next projectile
                 cpx #3                  ; proj #3 yet?
                 bne _next1              ;   No. continue
