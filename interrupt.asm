@@ -637,7 +637,7 @@ _notE           cpx #52                 ; too far left?
                 sbc #96
                 clc
                 adc #32-3
-                sta SPR(sprite_t.X, 0)
+                sta SPR(sprite_t.X, IDX_PLYR)
                 ;!!.m8
 
 _badX           cpy #32                 ; too far up?
@@ -653,7 +653,7 @@ _badX           cpy #32                 ; too far up?
                 and #$FF
                 clc
                 adc #32-8-3
-                sta SPR(sprite_t.Y, 0)
+                sta SPR(sprite_t.Y, IDX_PLYR)
                 ;!!.m8
 
 ; - - - - - - - - - - - - - - - - - - -
@@ -696,13 +696,13 @@ _notGameOver    lda isSatelliteAlive    ; get satellite
                 sta zpSatelliteX        ; save Pfield x
                 clc
                 adc #28                 ; X offset
-                sta SPR(sprite_t.X, 1)  ; horizontal pos
+                sta SPR(sprite_t.X, IDX_SATE)  ; horizontal pos
 
                 lda ORBY,Y              ; get Y coord
                 sta zpSatelliteY
                 clc
                 adc #52
-                sta SPR(sprite_t.Y, 1)
+                sta SPR(sprite_t.Y, IDX_SATE)
 
 ;   toggle between satellite A & B
                 inc zpSatPix            ; next sat. image
@@ -718,7 +718,7 @@ _notGameOver    lda isSatelliteAlive    ; get satellite
 
 _pixB           ;!!lda #$800
 
-_setPix         sta SPR(sprite_t.ADDR, 1)
+_setPix         sta SPR(sprite_t.ADDR, IDX_SATE)
                 ;!!.m8
 
 _noSat          lda isSaucerActive      ; saucer active?
@@ -744,7 +744,7 @@ _nxtsp          dey                     ; next scan line
                 ;!!.m16
                 lda BombX+3             ; saucer X pos
                 and #$FF
-                sta SPR(sprite_t.X, 3) ; move it
+                sta SPR(sprite_t.X, IDX_SAUC) ; move it
                 ;!!.m8
 
                 inc SAUTIM              ; saucer time

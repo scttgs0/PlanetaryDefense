@@ -20,9 +20,9 @@ ClearPlayer     .proc
 
                 lda #0                  ; move player off screen
                 ;!!.frsSpriteSetX_ix
-                ;!!sta SPR(sprite_t.X, 0),X
+                ;!!sta SPR(sprite_t.X, IDX_PLYR),X
                 ;!!.frsSpriteSetY_ix
-                ;!!sta SPR(sprite_t.Y, 0),X
+                ;!!sta SPR(sprite_t.Y, IDX_PLYR),X
                 ;!!.m8
 
                 plx

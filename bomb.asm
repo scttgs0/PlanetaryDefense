@@ -203,7 +203,7 @@ _notSaucer      lda lrBomb,X            ; L/R flag
                 asl
                 clc
                 adc #$0C
-                sta SPR(sprite_t.ADDR+1, 4)
+                sta SPR(sprite_t.ADDR+1, IDX_BOMB_L)
 
                 ;!!.m16
 ;   set y position
@@ -218,7 +218,7 @@ _notSaucer      lda lrBomb,X            ; L/R flag
                 clc
                 adc #32-8
                 ;!!.frsSpriteSetY_ix
-                ;!!sta SPR(sprite_t.Y, 4),X           ; player pos
+                ;!!sta SPR(sprite_t.Y, IDX_BOMB_L),X           ; bomb pos
 
 ;   set x position
                 ldx INDX2               ; restore X
@@ -237,7 +237,7 @@ _notSaucer      lda lrBomb,X            ; L/R flag
                 tax
                 pla
                 ;!!.frsSpriteSetX_ix
-                ;!!sta SPR(sprite_t.X, 4),X            ; player pos
+                ;!!sta SPR(sprite_t.X, IDX_BOMB_L),X            ; bomb pos
 
                 plx
                 ;!!.m8

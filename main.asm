@@ -78,13 +78,13 @@ _next2          lda ScoreINI,X          ; get byte
                 sbc #96
                 clc
                 adc #32-3
-                sta SPR(sprite_t.X, 0)
+                sta SPR(sprite_t.X, IDX_PLYR)
 
                 lda zpCursorY
                 and #$FF
                 clc
                 adc #32-8-3
-                sta SPR(sprite_t.Y, 0)
+                sta SPR(sprite_t.Y, IDX_PLYR)
                 ;!!.m8
 
                 lda #1
