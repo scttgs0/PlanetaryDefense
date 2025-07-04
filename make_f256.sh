@@ -13,11 +13,11 @@ mkdir -p obj/
         planetarydefense.asm
 
 
-64tass  --m65c02 \
-        --flat \
-        --nostart \
-        -D PGX=0 \
-        -o obj/pdefense.bin \
-        --list=obj/pdefenseB.lst \
-        --labels=obj/pdefenseB.lbl \
-        planetarydefense.asm
+# 64tass  --m65c02 \
+#         --flat \
+#         --nostart \
+#         -D PGX=0 \
+#         -o obj/pdefense.bin \
+#         --list=obj/pdefenseB.lst \
+#         --labels=obj/pdefenseB.lbl \
+#         planetarydefense.asm

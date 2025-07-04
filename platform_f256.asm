@@ -122,18 +122,61 @@ Bcd2Bin         .proc
                 pha                     ; n*2
                 lsr
                 lsr                     ; n*8
-                sta zpTemp1
+                sta _tmp
 
                 pla                     ; A=n*2
                 clc
-                adc zpTemp1             ; A=n*8+n*2 := n*10
-                sta zpTemp1
+                adc _tmp                ; A=n*8+n*2 := n*10
+                sta _tmp
 
 ;   add the lower-nibble
                 pla
                 and #$0F
                 clc
-                adc zpTemp1
+                adc _tmp
+
+                rts
+
+;--------------------------------------
+
+_tmp            .byte $00
+
+                .endproc
+
+
+;======================================
+; Convert BCD to Binary
+;======================================
+Bin2Bcd         .proc
+                ldx #00
+                ldy #00
+_next1          cmp #10
+                bcc _done
+
+                sec
+                sbc #10
+
+                inx
+                bra _next1
+
+_done           tay
+                txa
+                asl
+                asl
+                asl
+                asl
+                and #$F0
+                sta _tmp
+
+                tya
+                clc
+                adc _tmp
+
+                rts
+
+;--------------------------------------
+
+_tmp            .byte $00
 
                 .endproc
 
@@ -162,18 +205,19 @@ _next1          sta SID1_BASE,X
                 dex
                 bpl _next1
 
-                lda #$09                ; Attack/Decay = 9
+                lda #sidAttack2ms|sidDecay750ms
                 sta SID1_ATDCY1
                 sta SID1_ATDCY2
                 sta SID1_ATDCY3
                 sta SID2_ATDCY1
 
+                ; 0%|sidDecay6ms
                 stz SID1_SUREL1         ; Susatain/Release = 0 [square wave]
                 stz SID1_SUREL2
                 stz SID1_SUREL3
                 stz SID2_SUREL1
 
-                lda #$21
+                lda #sidcSaw|sidcGate
                 sta SID1_CTRL1
                 sta SID1_CTRL2
                 sta SID1_CTRL3
@@ -353,13 +397,11 @@ InitSprites     .proc
 ;   switch to system map
                 stz IOPAGE_CTRL
 
-;   set player sprites (sprite-00 & sprint-01)
-                .frsSpriteInit SPR_Cursor, scEnable|scLUT0|scDEPTH0|scSIZE_16, 0
-                .frsSpriteInit SPR_Cursor, scEnable|scLUT1|scDEPTH0|scSIZE_16, 1
-
-;   set bomb sprites (sprite-02 & sprint-03)
-                .frsSpriteInit SPR_BombL, scEnable|scLUT0|scDEPTH0|scSIZE_16, 2
-                .frsSpriteInit SPR_BombL, scEnable|scLUT0|scDEPTH0|scSIZE_16, 3
+;   set sprites
+                .frsSpriteInit SPR_Cursor,     scEnable|scLUT0|scDEPTH0|scSIZE_16, IDX_PLYR
+                .frsSpriteInit SPR_SatelliteA, scEnable|scLUT0|scDEPTH0|scSIZE_16, IDX_SATE
+                .frsSpriteInit SPR_Saucer,     scEnable|scLUT0|scDEPTH0|scSIZE_16, IDX_SAUC
+                .frsSpriteInit SPR_BombL,      scEnable|scLUT0|scDEPTH0|scSIZE_16, IDX_BOMB
 
 ;   restore IOPAGE control
                 pla
@@ -851,6 +893,8 @@ InitCPUVectors  .proc
 ;   switch to system map
                 stz IOPAGE_CTRL
 
+                sei
+
                 lda #<DefaultHandler
                 sta vecABORT
                 lda #>DefaultHandler
@@ -865,6 +909,8 @@ InitCPUVectors  .proc
                 sta vecIRQ_BRK
                 lda #>DefaultHandler
                 sta vecIRQ_BRK+1
+
+                cli
 
 ;   restore IOPAGE control
                 pla
@@ -901,6 +947,8 @@ InitMMU         .proc
 ;   switch to system map
                 stz IOPAGE_CTRL
 
+                sei
+
 ;   ensure edit mode
                 lda MMU_CTRL
                 pha                     ; preserve
@@ -928,6 +976,8 @@ InitMMU         .proc
                 pla
                 sta MMU_CTRL
 
+                cli
+
 ;   restore IOPAGE control
                 pla
                 sta IOPAGE_CTRL
@@ -954,6 +1004,8 @@ InitIRQs        .proc
 
 ;   switch to system map
                 stz IOPAGE_CTRL
+
+                sei                     ; disable IRQ
 
 ;   enable IRQ handler
                 ;lda #<vecIRQ_BRK
@@ -1008,6 +1060,7 @@ InitIRQs        .proc
                 pla
                 sta IOPAGE_CTRL
 
+                cli                     ; enable IRQ
                 pla
                 rts
                 .endproc
@@ -1047,7 +1100,7 @@ FONT0           lda #<GameFont
                 sta zpDest+1
                 stz zpDest+2
 
-                ldx #$08                ; 8 pages (7.1 used)
+                ldx #$08                ; 8 pages
 _nextPage       ldy #$00
 _next1          lda (zpSource),Y
                 sta (zpDest),Y

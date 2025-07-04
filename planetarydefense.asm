@@ -59,8 +59,12 @@
 ;--------------------------------------
 
 BOOT            cld
+
                 ldx #$FF                ; initialize the stack
                 txs
+
+                stz IOPAGE_CTRL
+
                 jmp InitHardware
 
 ;-------------------------------------
