@@ -15,6 +15,10 @@ InitHardware    .proc
 
                 jsr InitSID
 
+                stz BACKGROUND_COLOR_R
+                stz BACKGROUND_COLOR_G
+                stz BACKGROUND_COLOR_B
+
                 jsr InitGfxPalette
                 jsr InitBitmap
                 jsr InitSprites

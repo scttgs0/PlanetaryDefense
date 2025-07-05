@@ -1,4 +1,8 @@
 
+; SPDX-FileName: interrupt.asm
+; SPDX-FileCopyrightText: Copyright 2024, Scott Giese
+; SPDX-License-Identifier: GPL-3.0-or-later
+
 ;--------------------------------------
 ; Intro Display List
 ;--------------------------------------
@@ -115,10 +119,12 @@ StartMsg        .text "  MOUSE ",$B4,$B4,$B4," SELECT  "
 ; Main IRQ Handler
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-HandleIrq       .proc
+irqMain         .proc
                 pha
                 phx
                 phy
+
+                cld
 
 ;   switch to system map
                 lda IOPAGE_CTRL
@@ -141,7 +147,7 @@ _1              lda INT_PENDING_REG0
                 eor #INT00_SOF
                 sta INT_PENDING_REG0
 
-                jsr VbiHandler
+                jsr irqVBIHandler
 
 _2              lda INT_PENDING_REG0
                 bit #INT00_SOL
@@ -158,7 +164,8 @@ _XIT            pla                     ; restore
                 ply
                 plx
                 pla
-                ;jmp IRQ_PRIOR
+
+irqMain_END     ;jmp IRQ_PRIOR
                 rti
                 .endproc
 
@@ -497,9 +504,9 @@ _temp1          .byte ?
 
 
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-; Handle Vertical Blank Interrupt (SOF)
+; Vertical Blank Interrupt (SOF)
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-VbiHandler      .proc
+irqVBIHandler   .proc
                 pha
                 phx
                 phy
