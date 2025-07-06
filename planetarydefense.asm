@@ -65,7 +65,12 @@ BOOT            cld
 
                 stz IOPAGE_CTRL
 
+                stz BACKGROUND_COLOR_R
+                stz BACKGROUND_COLOR_G
+                stz BACKGROUND_COLOR_B
+
                 jmp InitHardware
+
 
 ;-------------------------------------
 ;-------------------------------------
@@ -101,17 +106,17 @@ START
                 .include "vector.asm"
                 .include "score.asm"
 
-                .include "DATA.inc"
+                .include "data/DATA.inc"
 
 
 ;--------------------------------------
                 .align $100
 ;--------------------------------------
 
-GameFont        .include "FONT.inc"
+GameFont        .include "data/FONT.inc"
 GameFont_end
 
-Palette         .include "PALETTE.inc"
+Palette         .include "data/PALETTE.inc"
 Palette_end
 
 
@@ -119,7 +124,7 @@ Palette_end
                 .align $100
 ;--------------------------------------
 
-Stamps          .include "SPRITES.inc"
+Stamps          .include "data/SPRITES.inc"
 Stamps_end
 
 Playfield       .fill 96*40,$00
