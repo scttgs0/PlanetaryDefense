@@ -88,7 +88,7 @@ GameDL          ;!! .byte AEMPTY8,AEMPTY8
 ;--------------------------------------
 
 MagMsg          .text "  ANALOG COMPUTING  "
-TitleMsg        ;.text " PLANETARY  DEFENSE "
+TitleMsg        ;.text " PLANETARY  DEFENSE "   ; double-sized
 ;   top
                 .byte $20,$20,$20
                 .byte $CE,$CF,$C6,$C7,$B6,$B7,$CA,$CB,$BE,$BF,$DA,$DB,$B6,$B7,$D2,$D3,$DE,$DF
