@@ -1,6 +1,6 @@
 
 ; SPDX-FileName: platform_f256.asm
-; SPDX-FileCopyrightText: Copyright 2023, Scott Giese
+; SPDX-FileCopyrightText: Copyright 2023-2025, Scott Giese
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -145,7 +145,7 @@ _tmp            .byte $00
 
 
 ;======================================
-; Convert BCD to Binary
+; Convert Binary to BCD
 ;======================================
 Bin2Bcd         .proc
                 ldx #00
@@ -180,6 +180,40 @@ _tmp            .byte $00
 
                 .endproc
 
+
+;======================================
+; Convert Binary to Ascii
+;--------------------------------------
+; on entry:
+;   A           byte value
+; on exit:
+;   Y,A         2-byte ascii value
+;======================================
+Bin2Ascii       .proc
+                pha
+
+;   upper-nibble to ascii
+                lsr
+                lsr
+                lsr
+                lsr
+                and #$0F
+                tax
+                ldy _hex,X
+
+;   lower-nibble to ascii
+                pla
+                and #$0F
+                tax
+                lda _hex,X
+
+                rts
+
+;--------------------------------------
+
+_hex            .text '0123456789ABCDEF'
+
+                .endproc
 
 ;======================================
 ; Initialize SID
@@ -328,7 +362,7 @@ _Text_CLUT      .dword $00282828        ; 0: Dark Jungle Green
 ;======================================
 ; Initialize the graphic-color LUT
 ;--------------------------------------
-; preserve      A, Y
+; preserve      A, X, Y
 ;======================================
 InitGfxPalette  .proc
                 pha
@@ -418,11 +452,18 @@ InitSprites     .proc
 ; Clear all Sprites
 ;======================================
 ClearSprites    .proc
+                pha
+
+;   preserve IOPAGE control
+                lda IOPAGE_CTRL
+                pha
+
 ;   switch to system map
                 stz IOPAGE_CTRL
 
                 .frsSpriteClear 0
                 .frsSpriteClear 1
+                .frsSpriteClear 2
                 .frsSpriteClear 3
                 .frsSpriteClear 4
                 .frsSpriteClear 5
@@ -432,6 +473,13 @@ ClearSprites    .proc
                 .frsSpriteClear 9
                 .frsSpriteClear 10
                 .frsSpriteClear 11
+
+;   restore IOPAGE control
+                pla
+                sta IOPAGE_CTRL
+
+                pla
+                rts
                 .endproc
 
 
@@ -510,232 +558,6 @@ _nextByte       sta Playfield,X
                 rts
                 .endproc
 
-
-;======================================
-; BlitPlayfield
-;====================================== ;;;
-SetVideoRam     .proc
-                php
-                phx
-                phy
-
-                ;!!.m16
-                ;!!lda #<>Video8K          ; Set the destination address
-                ;!!sta zpDest
-                ;!!lda #`Video8K
-                ;!!sta zpDest+2
-                ;!!.m8
-
-                stz zpTemp2     ; HACK:
-
-                ;!!.i16
-                ldx #0
-                stx zpIndex1            ; source pointer
-                stx zpIndex2            ; destination pointer
-                stx zpIndex3            ; column counter [0-39]
-
-_nextByte       ldy zpIndex1
-                lda (zpSource),Y
-
-                inc zpIndex1            ; increment the byte counter (source pointer)
-                bne _1
-                inc zpIndex1+1
-_1              inc zpIndex3            ; increment the column counter
-
-                ldx #3
-_nextPixel      stz zpTemp1             ; extract 2-bit pixel color
-                asl
-                rol zpTemp1
-                asl
-                rol zpTemp1
-                pha
-
-                lda zpTemp1
-                beq _noColor
-                cmp #1
-                bne _noColor
-
-                lda _planetColor
-_noColor        ldy zpIndex2
-                sta (zpDest),Y
-
-;   duplicate this in the next line down (double-height)
-                phy
-                pha
-                ;!!.m16
-                tya
-                clc
-                ;!!adc #320
-                tay
-                ;!!.m8
-                pla
-                sta (zpDest),Y          ; double-height
-                ply
-;---
-
-                iny
-                sta (zpDest),Y          ; double-pixel
-
-;   duplicate this in the next line down (double-height)
-                phy
-                pha
-                ;!!.m16
-                tya
-                clc
-                ;!!adc #320
-                tay
-                ;!!.m8
-                pla
-                sta (zpDest),Y          ; double-height
-                ply
-;---
-
-                iny
-                sty zpIndex2
-                pla
-
-                dex
-                bpl _nextPixel
-
-                ldx zpIndex3
-                cpx #40
-                bcc _checkEnd
-
-                ;inc zpTemp2     ; HACK:
-                ;lda zpTemp2
-                ;cmp #12
-                ;beq _XIT
-
-                ;!!.m16
-                lda zpIndex2            ; we already processed the next line (double-height)...
-                clc
-                ;!!adc #320                ; so move down one additional line
-                sta zpIndex2
-
-                inc _lineCounter
-                lda _lineCounter
-                ;lsr                   ; /2
-                and #7
-                tax
-                lda _colorTable,X
-                sta _planetColor
-
-                lda #0
-                sta zpIndex3            ; reset the column counter
-                ;!!.m8
-
-_checkEnd       ldx zpIndex1
-                ;!!cpx #$1E0               ; 12 source lines... = 24 destination lines (~8K)
-                bcs _XIT
-
-                jmp _nextByte
-
-_XIT            ;!!.i8
-
-                ply
-                plx
-                plp
-                rts
-
-;--------------------------------------
-
-_lineCounter    .byte 0
-_planetColor    .byte 3
-_colorTable     .byte 6,7,8,7,6,5,4,5
-
-                .endproc
-
-
-;======================================
-;
-;====================================== ;;;
-BlitVideoRam    .proc
-                php
-                pha
-
-                ;!!.m16
-
-                ;!!lda #$1E00              ; 24 lines (320 bytes/line)
-                sta zpSize
-                lda #0
-                sta zpSize+2
-
-                ;!!lda #<>Video8K          ; Set the source address
-                ;!!sta zpSource
-                ;!!lda #`Video8K
-                ;!!sta zpSource+2
-
-                ;!!.m8
-                ;!!jsr Copy2VRAM
-
-                pla
-                plp
-                rts
-                .endproc
-
-
-;======================================
-;
-;======================================
-; BlitPlayfield   .proc
-;                 php
-;                 pha
-;                 phx
-;                 phy
-
-;                 ldy #8
-;                 ldx #0
-;                 stx SetVideoRam._lineCounter
-
-; _nextBank       ;!!.m16
-;                 lda _data_Source,X    ; Set the source address
-;                 sta zpSource
-;                 lda _data_Source+2,X
-;                 and #$FF
-;                 sta zpSource+2
-;                 ;!!.m8
-
-;                 jsr SetVideoRam
-
-;                 ;!!.m16
-;                 lda _data_Dest,X      ; Set the destination address
-;                 sta zpDest
-;                 lda _data_Dest+2,X
-;                 and #$FF
-;                 sta zpDest+2
-;                 ;!!.m8
-
-;                 phx
-;                 phy
-;                 jsr BlitVideoRam
-;                 ply
-;                 plx
-
-;                 inx
-;                 inx
-;                 inx
-;                 dey
-;                 bpl _nextBank
-
-;                 ply
-;                 plx
-;                 pla
-;                 plp
-;                 rts
-
-; ;--------------------------------------
-
-; _data_Source    .long Playfield+$0000,Playfield+$01E0,Playfield+$03C0
-;                 .long Playfield+$05A0,Playfield+$0780,Playfield+$0960
-;                 .long Playfield+$0B40,Playfield+$0D20,Playfield+$0F00
-
-; _data_Dest      ;!!.long BITMAP0,BITMAP1,BITMAP2
-;                 ;!!.long BITMAP3,BITMAP4,BITMAP5
-;                 ;!!.long BITMAP6,BITMAP7,BITMAP8
-
-                ; .endproc
-
-
 ;======================================
 ; Clear the play area of the screen
 ;--------------------------------------
@@ -743,7 +565,6 @@ BlitVideoRam    .proc
 ;======================================
 ClearScreen     .proc
 v_QtyPages      .var $05                ; 40x30 = $4B0... 4 pages + 176 bytes
-
 v_EmptyText     .var $00
 v_TextColor     .var $40
 ;---
@@ -815,63 +636,109 @@ _nextByteT      sta (zpDest),Y
 
 
 ;======================================
-; Clear the bottom of the screen
+; Render Debug Info
+;--------------------------------------
+; preserve      A, X, Y
 ;======================================
-ClearGamePanel  .proc
-v_EmptyText     .var $00
-v_TextColor     .var $40
-v_RenderLine    .var 24*CharResX
+RenderDebug     .proc
+v_RenderLine    .var 0*CharResX
 ;---
 
-                php
                 pha
                 phx
                 phy
+
+;   preserve IOPAGE control
+                lda IOPAGE_CTRL
+                pha
 
 ;   switch to color map
                 lda #iopPage3
                 sta IOPAGE_CTRL
 
-;   text color
-                lda #<CS_COLOR_MEM_PTR+v_RenderLine
-                sta zpDest
-                lda #>CS_COLOR_MEM_PTR+v_RenderLine
-                sta zpDest+1
-                stz zpDest+2
-
-                lda #v_TextColor
-                ldy #$00
-_next1          sta (zpDest),Y
-
+;   reset color for the 40-char line
+                ldx #$FF
+                ldy #$FF
+_nextColor      inx
                 iny
-                cpy #$F0                ; 6 lines
-                bne _next1
+                cpy #$14
+                beq _processText
+
+                lda DebugMsgColor,Y
+                sta CS_COLOR_MEM_PTR+v_RenderLine,X
+                inx
+                sta CS_COLOR_MEM_PTR+v_RenderLine,X
+                bra _nextColor
+
+;   process the text
+_processText
 
 ;   switch to text map
                 lda #iopPage2
                 sta IOPAGE_CTRL
 
-                lda #<CS_TEXT_MEM_PTR+v_RenderLine
-                sta zpDest
-                lda #>CS_TEXT_MEM_PTR+v_RenderLine
-                sta zpDest+1
-                stz zpDest+2
-
-                lda #v_EmptyText
-                ldy #$00
-_next2          sta (zpDest),Y
-
+                ldx #$FF
+                ldy #$FF
+_nextChar       inx
                 iny
-                cpy #$F0                ; 6 lines
-                bne _next2
+                cpy #$14
+                beq _XIT
 
-;   switch to system map
-                stz IOPAGE_CTRL
+                lda DebugMsg,Y
+                beq _space
+                cmp #$20
+                beq _space
+
+                cmp #$9B
+                beq _bomb
+
+                cmp #$41
+                bcc _number
+                bra _letter
+
+_space          sta CS_TEXT_MEM_PTR+v_RenderLine,X
+                inx
+                sta CS_TEXT_MEM_PTR+v_RenderLine,X
+
+                bra _nextChar
+
+;   (ascii-30)*2+$A0
+_number         sec
+                sbc #$30
+                asl
+
+                clc
+                adc #$A0
+                sta CS_TEXT_MEM_PTR+v_RenderLine,X
+                inx
+                inc A
+                sta CS_TEXT_MEM_PTR+v_RenderLine,X
+
+                bra _nextChar
+
+_letter         sta CS_TEXT_MEM_PTR+v_RenderLine,X
+                inx
+                clc
+                adc #$40
+                sta CS_TEXT_MEM_PTR+v_RenderLine,X
+
+                bra _nextChar
+
+_bomb           sta CS_TEXT_MEM_PTR+v_RenderLine,X
+                inx
+                inc A
+                sta CS_TEXT_MEM_PTR+v_RenderLine,X
+
+                bra _nextChar
+
+_XIT
+;   restore IOPAGE control
+                pla
+                sta IOPAGE_CTRL
 
                 ply
                 plx
                 pla
-                plp
                 rts
                 .endproc
 
@@ -901,6 +768,11 @@ InitCPUVectors  .proc
                 sta vecABORT
                 lda #>DefaultHandler
                 sta vecABORT+1
+
+                lda #<DefaultHandler
+                sta vecNMI
+                lda #>DefaultHandler
+                sta vecNMI+1
 
                 lda #<BOOT
                 sta vecRESET
@@ -1053,10 +925,15 @@ InitIRQs        .proc
                 and #~INT00_SOF
                 sta INT_MASK_REG0
 
+;   enable Start-of-Line IRQ
+                ;!!lda INT_MASK_REG0
+                ;!!and #~INT00_SOL
+                ;!!sta INT_MASK_REG0
+
 ;   enable Keyboard IRQ
-                ; lda INT_MASK_REG1
-                ; and #~INT01_VIA1
-                ; sta INT_MASK_REG1
+                ;!! lda INT_MASK_REG1
+                ;!! and #~INT01_VIA1
+                ;!! sta INT_MASK_REG1
 
 ;   restore IOPAGE control
                 pla
