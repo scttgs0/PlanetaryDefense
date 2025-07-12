@@ -1,6 +1,6 @@
 
 ; SPDX-FileName: interrupt.asm
-; SPDX-FileCopyrightText: Copyright 2024, Scott Giese
+; SPDX-FileCopyrightText: Copyright 2025, Scott Giese
 ; SPDX-License-Identifier: GPL-3.0-or-later
 
 ;--------------------------------------
@@ -126,10 +126,12 @@ irqMain         .proc
 
                 cld
 
+; - - - - - - - - - - - - - - - - - - -
 ;   switch to system map
                 lda IOPAGE_CTRL
                 pha                     ; preserve
                 stz IOPAGE_CTRL
+; - - - - - - - - - - - - - - - - - - -
 
                 ;!! lda INT_PENDING_REG1
                 ;!! bit #INT01_VIA1
@@ -158,8 +160,10 @@ _2              lda INT_PENDING_REG0
 
                 jsr DliHandler
 
+; - - - - - - - - - - - - - - - - - - -
 _XIT            pla                     ; restore
                 sta IOPAGE_CTRL
+; - - - - - - - - - - - - - - - - - - -
 
                 ply
                 plx
@@ -217,6 +221,7 @@ _1              pla                     ;   no
 
                 jmp _CleanUpXIT
 
+; - - - - - - - - - - - - - - - - - - -
 _1r             pla
                 pha
                 cmp #KEY_F2|$80
@@ -228,6 +233,7 @@ _1r             pla
 
                 jmp _CleanUpXIT
 
+; - - - - - - - - - - - - - - - - - - -
 _2              pla
                 pha
                 cmp #KEY_F3
@@ -239,6 +245,7 @@ _2              pla
 
                 jmp _CleanUpXIT
 
+; - - - - - - - - - - - - - - - - - - -
 _2r             pla
                 pha
                 cmp #KEY_F3|$80
@@ -250,6 +257,7 @@ _2r             pla
 
                 jmp _CleanUpXIT
 
+; - - - - - - - - - - - - - - - - - - -
 _3              pla
                 pha
                 cmp #KEY_F4
@@ -261,6 +269,7 @@ _3              pla
 
                 jmp _CleanUpXIT
 
+; - - - - - - - - - - - - - - - - - - -
 _3r             pla
                 pha
                 cmp #KEY_F4|$80
@@ -272,6 +281,7 @@ _3r             pla
 
                 jmp _CleanUpXIT
 
+; - - - - - - - - - - - - - - - - - - -
 _4              pla
                 pha
                 cmp #KEY_UP
@@ -290,6 +300,7 @@ _4a             lda #itKeyboard
 
                 jmp _CleanUpXIT
 
+; - - - - - - - - - - - - - - - - - - -
 _4r             pla
                 pha
                 cmp #KEY_UP|$80
@@ -301,6 +312,7 @@ _4r             pla
 
                 jmp _CleanUpXIT
 
+; - - - - - - - - - - - - - - - - - - -
 _5              pla
                 pha
                 cmp #KEY_DOWN
@@ -319,6 +331,7 @@ _5a             lda #itKeyboard
 
                 jmp _CleanUpXIT
 
+; - - - - - - - - - - - - - - - - - - -
 _5r             pla
                 pha
                 cmp #KEY_DOWN|$80
@@ -330,6 +343,7 @@ _5r             pla
 
                 jmp _CleanUpXIT
 
+; - - - - - - - - - - - - - - - - - - -
 _6              pla
                 pha
                 cmp #KEY_LEFT
